@@ -1,0 +1,23 @@
+from argparse import ArgumentParser
+
+
+def add_basic_cli_args(p: ArgumentParser):
+    p.add_argument("-h", "--help", action="store_true", help="Print the help message", required=False)
+    p.add_argument("--env", type=str, default=None, required=True, help="Name of the environment to use")
+
+
+def add_default_env_args(p: ArgumentParser):
+    p.add_argument(
+        "--max-steps",
+        type=int,
+        default=10000,
+        help="Number of maximum steps per episode.",
+    )
+    p.add_argument("--no-render", action="store_true", help="Disables env.render().")
+    p.add_argument(
+        "--render_mode",
+        type=str,
+        default="human",
+        choices=["human", "full", "ansi"],
+        help="Render mode. Defaults to 'human'.",
+    )
