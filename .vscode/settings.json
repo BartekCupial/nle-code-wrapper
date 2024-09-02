@@ -1,0 +1,7 @@
+{
+    "python.analysis.extraPaths": [
+        "${workspaceFolder}",
+        "/home/bartek/Workspace/CW/nle",
+        "${workspaceFolder}/external/nle_utils",
+    ]
+}

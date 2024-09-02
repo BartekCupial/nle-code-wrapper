@@ -125,9 +125,6 @@ artifacts
 .idea/modules.xml
 .idea
 
-# vscode
-.vscode
-
 .tmp
 
 # macOS

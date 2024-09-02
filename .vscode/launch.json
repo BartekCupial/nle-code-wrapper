@@ -1,0 +1,21 @@
+{
+    // Use IntelliSense to learn about possible attributes.
+    // Hover to view descriptions of existing attributes.
+    // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "run minihack",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.envs.minihack.run_minihack",
+            "justMyCode": false,
+            "args": [
+                "--env", "mazewalk_small_mapped",
+            ],
+            "env": {
+                "PYTHONPATH": "${workspaceFolder}/external/nle_utils:${env:PYTHONPATH}",
+            }
+        }
+    ]
+}
