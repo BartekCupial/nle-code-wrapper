@@ -7,6 +7,7 @@ from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.envs.create_env import create_env
 from nle_code_wrapper.plugins.pathfinder import Pathfinder
 from nle_code_wrapper.plugins.pvp import Pvp
+from nle_code_wrapper.plugins.strategy import StrategyManager
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.attr_dict import AttrDict
 
@@ -16,6 +17,10 @@ class Bot:
         self.cfg = cfg
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
+        self.strategy_manager: StrategyManager = StrategyManager(self)
+
+    def strategy(self, func):
+        return self.strategy_manager.strategy(func)
 
     @property
     def blstats(self):
@@ -41,7 +46,7 @@ class Bot:
         ]
 
     def global_strategy(self):
-        raise NotImplementedError
+        return self.strategy_manager.run()
 
     def main(self):
         render_mode = "human"
@@ -65,7 +70,8 @@ class Bot:
         self.update()
 
         try:
-            self.global_strategy()
+            for _ in self.global_strategy():
+                pass
         except BotFinished:
             pass
 

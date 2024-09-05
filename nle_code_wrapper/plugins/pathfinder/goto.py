@@ -66,6 +66,8 @@ def goto(bot: "Bot", goal):
         # - water
         # - lava
         # - boulders
+
+        # TODO: check if enemies moved and get out
         try:
             move(bot, y, x)
         except BotPanic:

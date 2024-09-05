@@ -1,5 +1,3 @@
-from functools import partial
-
 import pytest
 
 from nle_code_wrapper.bot.bot import Bot
@@ -21,10 +19,7 @@ class TestMazewalkMapped(object):
     def test_solve_explore(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
         bot = Bot(cfg)
-
-        def condition(bot):
-            kill_all_monsters(bot)
-            goto_stairs(bot)
-
-        bot.global_strategy = partial(explore, bot, partial(condition, bot))
+        bot.strategy(kill_all_monsters)
+        bot.strategy(goto_stairs)
+        bot.strategy(explore)
         assert bot.main()

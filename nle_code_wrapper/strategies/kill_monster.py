@@ -17,3 +17,5 @@ def kill_all_monsters(bot: "Bot"):
     while len([e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]) > 0:
         monster_name = bot.entities[0].name
         kill_monster(bot, monster_name)
+
+    yield
