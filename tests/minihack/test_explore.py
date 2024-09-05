@@ -1,7 +1,7 @@
 import pytest
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.envs.minihack.run_minihack import parse_minihack_args
+from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.strategies import explore, goto_stairs, kill_all_monsters
 
 

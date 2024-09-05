@@ -1,8 +1,8 @@
+from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.cfg.arguments import parse_args, parse_full_cfg
 from nle_code_wrapper.envs.env_utils import register_env
 from nle_code_wrapper.envs.minihack.minihack_env import MINIHACK_ENVS, make_minihack_env
 from nle_code_wrapper.envs.minihack.minihack_params import add_extra_params_minihack_env
-from nle_code_wrapper.main import play
 
 
 def register_minihack_envs():
@@ -24,7 +24,8 @@ def parse_minihack_args(argv=None):
 def main():
     register_minihack_components()
     cfg = parse_minihack_args()
-    play(cfg)
+    bot = Bot(cfg)
+    bot.main()
 
 
 if __name__ == "__main__":
