@@ -14,6 +14,13 @@ def add_default_env_args(p: ArgumentParser):
         default=10000,
         help="Number of maximum steps per episode.",
     )
+    p.add_argument(
+        "--ngames",
+        type=int,
+        default=1,
+        help="Number of episodes to play.",
+    )
+    p.add_argument("--play-mode", type=str, default="human")
     p.add_argument("--no-render", action="store_true", help="Disables env.render().")
     p.add_argument(
         "--render_mode",
