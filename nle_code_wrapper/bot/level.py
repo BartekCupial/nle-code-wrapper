@@ -40,6 +40,9 @@ class Level:
     def key(self):
         return (self.dungeon_number, self.level_number)
 
+    def object_positions(self, obj):
+        return list(zip(*utils.isin(self.objects, obj).nonzero()))
+
     @property
     def stairs(self):
-        return list(zip(*utils.isin(self.objects, G.STAIR_DOWN).nonzero()))
+        return self.object_positions(G.STAIR_DOWN)

@@ -3,6 +3,7 @@ from nle_code_wrapper.strategies.find_monster import find_monster
 from nle_code_wrapper.strategies.find_stairs import find_stairs
 from nle_code_wrapper.strategies.goto_stairs import goto_stairs
 from nle_code_wrapper.strategies.kill_monster import kill_all_monsters, kill_monster
+from nle_code_wrapper.strategies.open_doors import open_doors
 
 __all__ = [
     find_stairs,
@@ -11,4 +12,5 @@ __all__ = [
     find_monster,
     kill_monster,
     kill_all_monsters,
+    open_doors,
 ]

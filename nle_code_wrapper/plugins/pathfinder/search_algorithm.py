@@ -160,10 +160,11 @@ class SearchAlgorithm(ABC, Generic[T]):
 
     def distances(self, start: T):
         openSet: OpenSet[SearchNode[T]] = OpenSet()
+        nodeSet: OpenSet[SearchNode[T]] = OpenSet()
         searchNodes: SearchNodeDict[T] = SearchNodeDict()
         startNode = searchNodes[start] = SearchNode(start, gscore=0.0, fscore=0.0)
         openSet.push(startNode)
-        nodeSet: OpenSet[SearchNode[T]] = OpenSet()
+        nodeSet.push(startNode)
 
         while openSet:
             current = openSet.pop()
