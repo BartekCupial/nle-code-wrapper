@@ -189,13 +189,15 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
     kwargs = dict(
         observation_keys=observation_keys,
         character=cfg.character,
-        max_episode_steps=cfg.max_episode_steps,
         penalty_step=cfg.penalty_step,
         penalty_time=cfg.penalty_time,
         penalty_mode=cfg.fn_penalty_step,
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
     )
+
+    if cfg.max_episode_steps is not None:
+        kwargs["max_episode_steps"] = cfg.max_episode_steps
 
     env = env_class(**kwargs)
 
