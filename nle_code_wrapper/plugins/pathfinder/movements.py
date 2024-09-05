@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from nle_utils.glyph import C, G
+from nle_utils.level import Level as DungeonLevel
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
@@ -30,6 +31,11 @@ class Movements:
         walkable = level.walkable[pos] and not (level.objects[pos] in G.BOULDER)
         return walkable
 
+    @property
+    def walkable_diagonally(self):
+        level = self.bot.current_level()
+        return level.dungeon_number != DungeonLevel.SOKOBAN
+
     def get_move_forward(self, pos, dir, neighbors):
         new_pos = (pos[0] + dir[0], pos[1] + dir[1])
 
@@ -44,7 +50,11 @@ class Movements:
     def get_neighbors(self, node):
         neighbors = []
 
-        for dir in cardinal_directions + intermediate_directions:
+        for dir in cardinal_directions:
             self.get_move_forward(node, dir, neighbors)
+
+        if self.walkable_diagonally:
+            for dir in intermediate_directions:
+                self.get_move_forward(node, dir, neighbors)
 
         return neighbors
