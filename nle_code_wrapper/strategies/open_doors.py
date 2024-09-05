@@ -8,9 +8,10 @@ def open_doors(bot: "Bot"):
     level = bot.current_level()
 
     closed_doors = level.object_positions(G.DOOR_CLOSED)
-    if len(closed_doors) > 0:
-        adjacent_to_doors = [bot.pathfinder.reachable_adjacent(bot.entity.position, door) for door in closed_doors]
-        adjacent_distance, reachable_doors = list(
+    adjacent_to_doors = [bot.pathfinder.reachable_adjacent(bot.entity.position, door) for door in closed_doors]
+    # open doors if there is any closed and reachable doors
+    if len(closed_doors) > 0 and any(adjacent_to_doors):
+        adjacent_distance, reachable_doors = tuple(
             zip(
                 *[
                     (bot.pathfinder.distance(bot.entity.position, adjacent), doors)
