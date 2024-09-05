@@ -1,3 +1,4 @@
+from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
 from nle_utils.glyph import G
 
@@ -29,6 +30,10 @@ class Bot:
     @property
     def glyphs(self):
         return self.last_obs["glyphs"]
+
+    @property
+    def message(self):
+        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
     @property
     def position(self):
@@ -93,6 +98,13 @@ class Bot:
             raise BotFinished
 
         self.update()
+
+    def kick(self, dir):
+        self.step(A.Command.KICK)
+        self.direction(dir)
+
+    def direction(self, dir):
+        self.pathfinder.direction(dir)
 
     def update(self):
         self.update_level()

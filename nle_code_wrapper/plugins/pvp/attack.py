@@ -17,7 +17,7 @@ def attack(bot: "Bot", entity: Entity):
             if bot.pathfinder.distance(bot.entity.position, entity.position) > 1:
                 bot.pathfinder.move(point)
             else:
-                bot.pathfinder.direction(entity.position)
+                bot.direction(entity.position)
         except BotPanic:
             return False
 

@@ -26,4 +26,6 @@ def explore(bot: "Bot"):
     goal = np.unravel_index(np.argmax(exploration_priority), exploration_priority.shape)
     bot.pathfinder.goto(goal)
 
+    # TODO: add search
+
     yield

@@ -1,3 +1,5 @@
+import re
+
 import numpy as np
 from nle_utils.glyph import G
 
@@ -22,7 +24,11 @@ def open_doors(bot: "Bot"):
         )
         idx = np.argmin(adjacent_distance)
         bot.pathfinder.goto(adjacent_to_doors[idx])
-        bot.pathfinder.direction(reachable_doors[idx])
-        # TODO: what if doors are locked?
+        bot.direction(reachable_doors[idx])
+
+        # if door is locked
+        if re.match(".*This door is locked.*", bot.message):
+            # TODO: try to open with key or credit card
+            bot.kick(reachable_doors[idx])
 
     yield
