@@ -1,6 +1,11 @@
+from typing import TYPE_CHECKING
+
 from nle.nethack import actions as A
 
-from nle_code_wrapper.plugins.pathfinder.movements import Movements
+from nle_code_wrapper.bot.exceptions import BotPanic
+
+if TYPE_CHECKING:
+    from nle_code_wrapper.bot import Bot
 
 
 def calc_direction(from_y, from_x, to_y, to_x):
@@ -21,7 +26,7 @@ def calc_direction(from_y, from_x, to_y, to_x):
     return ret
 
 
-def direction(bot, dir):
+def direction(bot: "Bot", dir):
     action = {
         "n": A.CompassDirection.N,
         "s": A.CompassDirection.S,
@@ -39,15 +44,19 @@ def direction(bot, dir):
     bot.step(action)
 
 
-def move(bot, y, x):
+def move(bot: "Bot", y, x):
     dir = calc_direction(bot.blstats.y, bot.blstats.x, y, x)
     direction(bot, dir)
-    # TODO: check that expected position matches the actual one
+
+    if bot.position != (y, x):
+        raise BotPanic(
+            f'agent position do not match after "move": '
+            f"expected ({y}, {x}), got ({bot.entity.position[0]}, {bot.entity.position[1]})"
+        )
 
 
-def goto(bot, goal):
-    movements = Movements(bot)
-    path = bot.pathfinder.get_path_to(movements, goal)
+def goto(bot: "Bot", goal):
+    path = bot.pathfinder.get_path_to(goal)
     orig_path = list(path)
     path = orig_path[1:]
 
@@ -56,4 +65,10 @@ def goto(bot, goal):
         # - trap (including holes)
         # - water
         # - lava
-        move(bot, y, x)
+        # - boulders
+        try:
+            move(bot, y, x)
+        except BotPanic:
+            return False
+
+    return True

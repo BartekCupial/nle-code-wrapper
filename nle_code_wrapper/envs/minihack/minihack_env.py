@@ -179,11 +179,11 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         # "specials",
         # "colors",
         # "chars",
-        # "glyphs",
-        # "inv_glyphs",
-        # "inv_strs",
-        # "inv_letters",
-        # "inv_oclasses",
+        "glyphs",
+        "inv_glyphs",
+        "inv_strs",
+        "inv_letters",
+        "inv_oclasses",
     )
 
     actions = tuple(nethack.CompassDirection) + (nethack.Command.OPEN,)

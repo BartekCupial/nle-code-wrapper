@@ -3,7 +3,8 @@ from argparse import ArgumentParser
 
 def add_basic_cli_args(p: ArgumentParser):
     p.add_argument("-h", "--help", action="store_true", help="Print the help message", required=False)
-    p.add_argument("--env", type=str, default=None, required=True, help="Name of the environment to use")
+    p.add_argument("--env", type=str, default=None, help="Name of the environment to use", required=True)
+    p.add_argument("--seed", type=int, default=None, help="Seed to use")
 
 
 def add_default_env_args(p: ArgumentParser):

@@ -1,9 +1,10 @@
 import numpy as np
 
+from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.strategies.goto_stairs import goto_stairs
 
 
-def find_stairs(bot):
+def find_stairs(bot: "Bot"):
     level = bot.current_level()
 
     # Create a matrix to store exploration priorities

@@ -14,8 +14,8 @@ from nle_code_wrapper.utils.attr_dict import AttrDict
 class Bot:
     def __init__(self, cfg):
         self.cfg = cfg
-        self.pathfinder = Pathfinder(self)
-        self.pvp = Pvp(self)
+        self.pathfinder: Pathfinder = Pathfinder(self)
+        self.pvp: Pvp = Pvp(self)
 
     @property
     def blstats(self):
@@ -60,7 +60,7 @@ class Bot:
         self.reward = 0.0
 
         self.done = False
-        self.last_obs, self.last_info = self.env.reset()
+        self.last_obs, self.last_info = self.env.reset(seed=self.cfg.seed)
 
         self.update()
 
