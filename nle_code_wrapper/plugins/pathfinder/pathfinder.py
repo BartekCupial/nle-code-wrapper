@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 
-from nle_code_wrapper.plugins.pathfinder.astar import ChebyshevAStar
+from nle_code_wrapper.plugins.pathfinder.chebyshev_astar import ChebyshevAStar
 from nle_code_wrapper.plugins.pathfinder.distance import chebyshev_distance
 from nle_code_wrapper.plugins.pathfinder.goto import goto
 from nle_code_wrapper.plugins.pathfinder.movements import Movements
