@@ -12,8 +12,8 @@ def find_monster(bot: "Bot"):
 
     # Find the highest priority location that is reachable
     while True:
-        # fill all visible monsters
-        while len(bot.entities) > 0:
+        # kill all reachable monsters
+        while len([e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]) > 0:
             monster_name = bot.entities[0].name
             kill_monster(bot, monster_name)
 
