@@ -186,11 +186,8 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         "inv_oclasses",
     )
 
-    actions = tuple(nethack.CompassDirection) + (nethack.Command.OPEN,)
-
     kwargs = dict(
         observation_keys=observation_keys,
-        actions=actions,
         character=cfg.character,
         max_episode_steps=cfg.max_episode_steps,
         penalty_step=cfg.penalty_step,
