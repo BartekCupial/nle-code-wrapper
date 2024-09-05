@@ -1,13 +1,14 @@
-from nle_code_wrapper.plugins.pathfinder.astar import AStar
 from nle_code_wrapper.plugins.pathfinder.distance import chebyshev_distance
+from nle_code_wrapper.plugins.pathfinder.movements import Movements
+from nle_code_wrapper.plugins.pathfinder.search_algorithm import SearchAlgorithm
 
 
-class ChebyshevAStar(AStar):
-    """sample use of the astar algorithm. In this exemple we work on a maze made of ascii characters,
+class ChebyshevSearch(SearchAlgorithm):
+    """sample use of the search algorithm. In this exemple we work on a maze made of ascii characters,
     and a 'node' is just a (x,y) tuple that represents a reachable position"""
 
-    def __init__(self, movements):
-        self.movements = movements
+    def __init__(self, movements: Movements):
+        self.movements: Movements = movements
 
     def heuristic_cost_estimate(self, n1, n2):
         """computes the Chabyshev distance between two (x,y) tuples"""

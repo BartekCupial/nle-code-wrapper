@@ -65,7 +65,7 @@ class OpenSet(Generic[SNType]):
         return len(self.sortedlist)
 
 
-class AStar(ABC, Generic[T]):
+class SearchAlgorithm(ABC, Generic[T]):
     __slots__ = ()
 
     @abstractmethod
@@ -155,6 +155,46 @@ class AStar(ABC, Generic[T]):
 
         return None
 
+    def reconstruct_distances(self, nodeSet: OpenSet[SearchNode[T]]) -> Iterable[T]:
+        return {node.data: node.fscore for node in nodeSet.sortedlist}
+
+    def distances(self, start: T):
+        openSet: OpenSet[SearchNode[T]] = OpenSet()
+        searchNodes: SearchNodeDict[T] = SearchNodeDict()
+        startNode = searchNodes[start] = SearchNode(start, gscore=0.0, fscore=0.0)
+        openSet.push(startNode)
+        nodeSet: OpenSet[SearchNode[T]] = OpenSet()
+
+        while openSet:
+            current = openSet.pop()
+
+            current.closed = True
+
+            for neighbor in map(lambda n: searchNodes[n], self.neighbors(current.data)):
+                if neighbor.closed:
+                    continue
+
+                tentative_gscore = current.gscore + self.distance_between(current.data, neighbor.data)
+
+                if tentative_gscore >= neighbor.gscore:
+                    continue
+
+                neighbor_from_openset = neighbor.in_openset
+
+                if neighbor_from_openset:
+                    # we have to remove the item from the heap, as its score has changed
+                    openSet.remove(neighbor)
+
+                # update the node
+                neighbor.came_from = current
+                neighbor.gscore = tentative_gscore
+                neighbor.fscore = tentative_gscore
+
+                openSet.push(neighbor)
+                nodeSet.push(neighbor)
+
+        return self.reconstruct_distances(nodeSet)
+
 
 ################################################################################
 U = TypeVar("U")
@@ -171,7 +211,7 @@ def find_path(
 ) -> Union[Iterable[U], None]:
     """A non-class version of the path finding algorithm"""
 
-    class FindPath(AStar):
+    class FindPath(SearchAlgorithm):
         def heuristic_cost_estimate(self, current: U, goal: U) -> float:
             return heuristic_cost_estimate_fnct(current, goal)  # type: ignore
 
