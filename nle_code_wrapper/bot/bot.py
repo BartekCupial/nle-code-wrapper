@@ -51,7 +51,7 @@ class Bot:
         ]
 
     def global_strategy(self):
-        return self.strategy_manager.run()
+        return self.strategy_manager.run_strategies()
 
     def main(self):
         render_mode = "human"
@@ -102,6 +102,10 @@ class Bot:
     def kick(self, dir):
         self.step(A.Command.KICK)
         self.direction(dir)
+
+    def pray(self):
+        self.step(A.Command.PRAY)
+        # TODO: confirmation??
 
     def direction(self, dir):
         self.pathfinder.direction(dir)
