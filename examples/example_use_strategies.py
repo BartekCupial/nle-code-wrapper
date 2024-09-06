@@ -1,6 +1,6 @@
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args, register_minihack_components
-from nle_code_wrapper.strategies import explore, fight_all_monsters, goto_stairs
+from nle_code_wrapper.plugins.strategy.strategies import explore, fight_all_monsters, goto_stairs
 
 
 def main():

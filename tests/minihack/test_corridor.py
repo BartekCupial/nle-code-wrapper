@@ -2,7 +2,7 @@ import pytest
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-from nle_code_wrapper.strategies import explore, fight_all_monsters, goto_stairs, open_door
+from nle_code_wrapper.plugins.strategy.strategies import explore, fight_all_monsters, goto_stairs, open_door
 
 
 @pytest.mark.usefixtures("register_components")
