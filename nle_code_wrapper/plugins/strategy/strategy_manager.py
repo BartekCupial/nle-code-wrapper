@@ -33,22 +33,30 @@ class StrategyManager:
         self.panics[wrapper.__name__] = wrapper
         return wrapper
 
+    def run_strategy(self, strategy_name):
+        strategy_func = self.strategies[strategy_name]
+        try:
+            if strategy_name not in self.strategy_generators:
+                self.strategy_generators[strategy_name] = strategy_func()
+
+            # print(f"Running strategy: {strategy_name}")
+            ret = next(self.strategy_generators[strategy_name])
+            return ret
+        except StopIteration:
+            # Reset the generator if it's exhausted
+            self.strategy_generators[strategy_name] = strategy_func()
+        except BotPanic as e:
+            # TODO: optionally print panic messages
+            # print(f"Panic in strategy {strategy_name}: {e}")
+            # Reset the generator after a panic
+            self.strategy_generators[strategy_name] = strategy_func()
+
+        return False
+
     def run_strategies(self):
         while True:
-            for strategy_name, strategy_func in self.strategies.items():
-                try:
-                    if strategy_name not in self.strategy_generators:
-                        self.strategy_generators[strategy_name] = strategy_func()
-
-                    next(self.strategy_generators[strategy_name])
-                except StopIteration:
-                    # Reset the generator if it's exhausted
-                    self.strategy_generators[strategy_name] = strategy_func()
-                except BotPanic as e:
-                    # TODO: optionally print panic messages
-                    # print(f"Panic in strategy {strategy_name}: {e}")
-                    # Reset the generator after a panic
-                    self.strategy_generators[strategy_name] = strategy_func()
+            for strategy_name in self.strategies.keys():
+                self.run_strategy(strategy_name)
 
     def check_panics(self):
         for panic_name, panic_func in self.panics.items():
