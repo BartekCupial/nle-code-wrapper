@@ -8,6 +8,7 @@ def print_boolean_array_ascii(arr):
         print("".join([str(int(cell)) for cell in row]))
 
 
+# TODO: we need smarter exploration
 def explore(bot: "Bot"):
     # Find the highest priority location that is reachable
     level = bot.current_level()

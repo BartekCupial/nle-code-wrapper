@@ -2,7 +2,7 @@ import pytest
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-from nle_code_wrapper.strategies import explore, goto_stairs, kill_all_monsters, open_doors
+from nle_code_wrapper.strategies import explore, fight_all_monsters, goto_stairs, open_doors
 
 
 @pytest.mark.usefixtures("register_components")
@@ -13,7 +13,7 @@ class TestMazewalkMapped(object):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         bot = Bot(cfg)
         bot.strategy(open_doors)
-        bot.strategy(kill_all_monsters)
+        bot.strategy(fight_all_monsters)
         bot.strategy(goto_stairs)
         bot.strategy(explore)
         assert bot.main()
@@ -24,7 +24,7 @@ class TestMazewalkMapped(object):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         bot = Bot(cfg)
         bot.strategy(open_doors)
-        bot.strategy(kill_all_monsters)
+        bot.strategy(fight_all_monsters)
         bot.strategy(goto_stairs)
         bot.strategy(explore)
         assert bot.main()
@@ -36,7 +36,7 @@ class TestMazewalkMapped(object):
     #     cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
     #     bot = Bot(cfg)
     #     bot.strategy(open_doors)
-    #     bot.strategy(kill_all_monsters)
+    #     bot.strategy(fight_all_monsters)
     #     bot.strategy(goto_stairs)
     #     bot.strategy(explore)
     #     assert bot.main()

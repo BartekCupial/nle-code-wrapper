@@ -2,7 +2,7 @@ import pytest
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-from nle_code_wrapper.strategies import explore, goto_stairs, kill_all_monsters
+from nle_code_wrapper.strategies import explore, fight_all_monsters, goto_stairs
 
 
 @pytest.mark.usefixtures("register_components")
@@ -19,7 +19,7 @@ class TestMazewalkMapped(object):
     def test_solve_mazewalk(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
         bot = Bot(cfg)
-        bot.strategy(kill_all_monsters)
+        bot.strategy(fight_all_monsters)
         bot.strategy(goto_stairs)
         bot.strategy(explore)
         assert bot.main()
