@@ -10,14 +10,15 @@ def fight_closest_monster(bot: "Bot"):
 
     if entity:
         bot.pvp.attack(entity)
-        return True
+        yield True
     else:
-        return False
+        yield False
 
 
 def fight_all_monsters(bot: "Bot"):
     # kill all reachable monsters
-    while fight_closest_monster(bot):
-        pass
+    for fighting in fight_closest_monster(bot):
+        if not fighting:
+            break
 
     yield
