@@ -23,6 +23,9 @@ class Bot:
     def strategy(self, func):
         return self.strategy_manager.strategy(func)
 
+    def panic(self, func):
+        return self.strategy_manager.panic(func)
+
     @property
     def blstats(self):
         return BLStats(*self.last_obs["blstats"])
@@ -98,6 +101,7 @@ class Bot:
             raise BotFinished
 
         self.update()
+        self.strategy_manager.check_panics()
 
     def kick(self, dir):
         self.step(A.Command.KICK)

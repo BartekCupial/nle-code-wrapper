@@ -31,6 +31,14 @@ class StrategyManager:
         self.strategies.append(self.infinite_iterator(wrapper))
         return wrapper
 
+    def panic(self, func: Callable[["Bot"], Generator]):
+        @wraps(func)
+        def wrapper():
+            return func(self.bot)
+
+        self.panics.append(self.infinite_iterator(wrapper))
+        return wrapper
+
     def run_strategies(self):
         while True:
             for strategy in self.strategies:
@@ -39,3 +47,8 @@ class StrategyManager:
                 except BotPanic:
                     # for now just go to the next strategy when bot panics
                     pass
+
+    def check_panics(self):
+        for panic in self.panics:
+            if next(panic):
+                raise BotPanic
