@@ -85,7 +85,7 @@ class Bot:
                 f"Bot finished, episode done: {self.done}, episode reward: {self.reward}, episode steps: {self.steps}"
             )
 
-        return self.done
+        return self.last_info["end_status"]
 
     def step(self, action):
         self.last_obs, reward, terminated, truncated, self.last_info = self.env.step(self.env.actions.index(action))

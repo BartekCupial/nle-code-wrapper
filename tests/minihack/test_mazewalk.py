@@ -22,4 +22,5 @@ class TestMazewalkMapped(object):
         bot.strategy(fight_all_monsters)
         bot.strategy(goto_stairs)
         bot.strategy(explore)
-        assert bot.main()
+        status = bot.main()
+        assert status == bot.env.StepStatus.TASK_SUCCESSFUL

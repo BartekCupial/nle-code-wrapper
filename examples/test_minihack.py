@@ -2,7 +2,7 @@ import numpy as np
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args, register_minihack_components
-from nle_code_wrapper.strategies import explore, fight_all_monsters, goto_stairs, open_door
+from nle_code_wrapper.strategies import explore, fight_all_monsters, goto_stairs, open_door, random_move
 
 
 def main():
@@ -15,19 +15,21 @@ def main():
     bot.strategy(fight_all_monsters)
     bot.strategy(goto_stairs)
     bot.strategy(explore)
+    bot.strategy(random_move)
 
-    init_seed = cfg.seed
-    if init_seed is not None:
-        assert bot.main()
+    def run_bot():
+        status = bot.main()
+        succeess = status == bot.env.StepStatus.TASK_SUCCESSFUL
+        if not succeess:
+            print(f"seed: {cfg.seed} failed, status: {status.name}")
+
+    if cfg.seed is not None:
+        run_bot()
     else:
         for i in range(100):
             cfg.seed = i
             print(f"test bot on seed: {i}")
-            try:
-                assert bot.main()
-            except Exception:
-                print(f"seed: {i} failed")
-                pass
+            run_bot()
 
 
 if __name__ == "__main__":

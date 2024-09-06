@@ -24,7 +24,8 @@ class TestMazewalkMapped(object):
         bot.strategy(fight_all_monsters)
         bot.strategy(goto_stairs)
         bot.strategy(explore)
-        assert bot.main()
+        status = bot.main()
+        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
 
     @pytest.mark.parametrize(
         "env",
@@ -43,4 +44,16 @@ class TestMazewalkMapped(object):
         bot.strategy(fight_all_monsters)
         bot.strategy(goto_stairs)
         bot.strategy(explore)
-        assert bot.main()
+        status = bot.main()
+        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+
+    @pytest.mark.parametrize("env", ["big_room_ultimate"])
+    @pytest.mark.parametrize("seed", [4])
+    def test_solve_room_fight_hard(self, env, seed):
+        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        bot = Bot(cfg)
+        bot.strategy(fight_all_monsters)
+        bot.strategy(goto_stairs)
+        bot.strategy(explore)
+        status = bot.main()
+        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
