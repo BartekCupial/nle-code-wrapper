@@ -2,7 +2,7 @@ import numpy as np
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args, register_minihack_components
-from nle_code_wrapper.plugins.strategy.panics import lost_hp
+from nle_code_wrapper.plugins.strategy.panics import entity_moved, lost_hp
 from nle_code_wrapper.plugins.strategy.strategies import (
     explore,
     fight_all_monsters,
@@ -18,8 +18,8 @@ def main():
 
     bot = Bot(cfg)
 
-    bot.panic(lost_hp)
-    # bot.panic(monster_moved)
+    # bot.panic(lost_hp)
+    bot.panic(entity_moved)
     # bot.strategy(open_door)
     bot.strategy(fight_all_monsters)
     bot.strategy(goto_stairs)

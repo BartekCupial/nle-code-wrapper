@@ -10,25 +10,19 @@ if TYPE_CHECKING:
 class StrategyManager:
     def __init__(self, bot: "Bot"):
         self.bot = bot
-        self.strategies = []
-        self.panics = []
 
-    def infinite_iterator(self, generator):
-        iterator = iter(generator())
-        while True:
-            try:
-                data = next(iterator)
-            except StopIteration:
-                iterator = iter(generator())
-                data = next(iterator)
-            yield data
+        self.strategies = {}
+        self.panics = {}
+
+        self.strategy_generators = {}
+        self.panic_generators = {}
 
     def strategy(self, func: Callable[["Bot"], Generator]):
         @wraps(func)
         def wrapper():
             return func(self.bot)
 
-        self.strategies.append(self.infinite_iterator(wrapper))
+        self.strategies[wrapper.__name__] = wrapper
         return wrapper
 
     def panic(self, func: Callable[["Bot"], Generator]):
@@ -36,19 +30,34 @@ class StrategyManager:
         def wrapper():
             return func(self.bot)
 
-        self.panics.append(self.infinite_iterator(wrapper))
+        self.panics[wrapper.__name__] = wrapper
         return wrapper
 
     def run_strategies(self):
         while True:
-            for strategy in self.strategies:
+            for strategy_name, strategy_func in self.strategies.items():
                 try:
-                    next(strategy)
-                except BotPanic:
-                    # for now just go to the next strategy when bot panics
-                    pass
+                    if strategy_name not in self.strategy_generators:
+                        self.strategy_generators[strategy_name] = strategy_func()
+
+                    next(self.strategy_generators[strategy_name])
+                except StopIteration:
+                    # Reset the generator if it's exhausted
+                    self.strategy_generators[strategy_name] = strategy_func()
+                except BotPanic as e:
+                    # TODO: optionally print panic messages
+                    # print(f"Panic in strategy {strategy_name}: {e}")
+                    # Reset the generator after a panic
+                    self.strategy_generators[strategy_name] = strategy_func()
 
     def check_panics(self):
-        for panic in self.panics:
-            if next(panic):
-                raise BotPanic
+        for panic_name, panic_func in self.panics.items():
+            try:
+                if panic_name not in self.panic_generators:
+                    self.panic_generators[panic_name] = panic_func()
+
+                if msg := next(self.panic_generators[panic_name]):
+                    raise BotPanic(f"Panic {panic_name}: {msg}")
+            except StopIteration:
+                # Reset the generator if it's exhausted
+                self.panic_generators[panic_name] = panic_func()

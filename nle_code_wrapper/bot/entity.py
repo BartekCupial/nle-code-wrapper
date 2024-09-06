@@ -13,3 +13,8 @@ class Entity:
             mon = nethack.permonst(mon_id)
             return mon.mname
         return None
+
+    def __eq__(self, other):
+        if isinstance(other, Entity):
+            return self.position == other.position and self.glyph == other.glyph
+        return False

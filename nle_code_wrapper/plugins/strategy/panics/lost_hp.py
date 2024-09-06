@@ -10,6 +10,6 @@ def lost_hp(bot: "Bot"):
 
         if prev_hp > bot.blstats.hitpoints:
             prev_hp = bot.blstats.hitpoints
-            yield True
+            yield "lost hp"
         else:
             yield False
