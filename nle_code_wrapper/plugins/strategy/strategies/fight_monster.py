@@ -1,6 +1,8 @@
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.plugins.strategy import Strategy
 
 
+@Strategy.wrap
 def fight_closest_monster(bot: "Bot"):
     entity = min(
         (e for e in bot.entities if bot.pathfinder.get_path_to(e.position)),
@@ -15,9 +17,13 @@ def fight_closest_monster(bot: "Bot"):
         yield False
 
 
+@Strategy.wrap
 def fight_all_monsters(bot: "Bot"):
+    fight_strategy = fight_closest_monster(bot)
+
     # kill all reachable monsters
-    for fighting in fight_closest_monster(bot):
+    while True:
+        fighting = fight_strategy()
         if not fighting:
             break
 

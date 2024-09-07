@@ -2,6 +2,7 @@ import numpy as np
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.plugins.strategy import Strategy
 
 
 def print_boolean_array_ascii(arr):
@@ -23,6 +24,7 @@ def print_boolean_array_ascii(arr):
         print(line)
 
 
+@Strategy.wrap
 def explore(bot: "Bot"):
     level = bot.current_level()
 

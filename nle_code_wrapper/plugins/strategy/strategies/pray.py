@@ -1,16 +1,17 @@
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.plugins.strategy import State, Strategy
 
 
-def pray(bot: "Bot"):
-    last_pray = -1
+@Strategy.wrap
+def pray(bot: "Bot", last_pray=State(-1)):
     pray_timeout = 1200
 
     while True:
-        if last_pray == -1:
-            last_pray = bot.blstats.time
+        if last_pray.value == -1:
+            last_pray.value = bot.blstats.time
             bot.pray()
-        elif bot.blstats.time - last_pray > pray_timeout:
-            last_pray = bot.blstats.time
+        elif bot.blstats.time - last_pray.value > pray_timeout:
+            last_pray.value = bot.blstats.time
             bot.pray()
 
         yield
