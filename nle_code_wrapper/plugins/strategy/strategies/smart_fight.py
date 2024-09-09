@@ -4,6 +4,11 @@ from nle_code_wrapper.plugins.strategy import Strategy
 
 @Strategy.wrap
 def smart_fight_strategy(bot: "Bot"):
+    # TODO: smart fight strategy isn't perfect
+    # in the `fight_corridor` case it should stay in the corridor and wait for the enemies
+    # instead it fights and when there are multiple enemies it backs up to the corridor
+    # this means that sometimes it gets hit by multiple enemies at once before backing up
+
     # Get all nearby monsters
     nearby_monsters = [e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]
 
