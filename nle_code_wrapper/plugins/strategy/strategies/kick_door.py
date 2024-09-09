@@ -5,20 +5,21 @@ from nle_code_wrapper.plugins.strategy import Strategy
 
 
 @Strategy.wrap
-def open_door(bot: "Bot"):
+def kick_door(bot: "Bot"):
     level = bot.current_level()
     closed_doors = level.object_positions(G.DOOR_CLOSED)
 
     reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
+        (door for door in closed_doors if bot.pathfinder.distance(bot.entity.position, door) == 1),
         key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
         default=None,
     )
 
     if reachable_door:
-        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
-        bot.pathfinder.goto(adjacent)
-        bot.direction(reachable_door)
+        # if door is locked
+        if "This door is locked." in bot.message:
+            # TODO: try to open with key or credit card
+            bot.kick(reachable_door)
 
         yield True
     else:

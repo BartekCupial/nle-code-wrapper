@@ -1,8 +1,10 @@
 import pytest
 
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-from nle_code_wrapper.plugins.strategy.strategies import explore, fight_all_monsters, goto_stairs, open_door
+from nle_code_wrapper.plugins.strategy import Strategy
+from nle_code_wrapper.plugins.strategy.strategies import explore, goto_stairs, kick_door, open_door
 
 
 @pytest.mark.usefixtures("register_components")
@@ -23,9 +25,27 @@ class TestMazewalkMapped(object):
     def test_corridor_closed_doors(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         bot = Bot(cfg)
-        bot.strategy(open_door)
-        bot.strategy(goto_stairs)
-        bot.strategy(explore)
+
+        @Strategy.wrap
+        def general_kick(bot: "Bot"):
+            stairs_strat = goto_stairs(bot)
+            door_strat = open_door(bot)
+            kick_strat = kick_door(bot)
+            explore_strat = explore(bot)
+
+            while True:
+                try:
+                    if stairs_strat():
+                        pass
+                    elif door_strat():
+                        kick_strat()
+                    else:
+                        explore_strat()
+                except BotPanic:
+                    pass
+                yield True
+
+        bot.strategy(general_kick)
         status = bot.main()
         assert status == bot.env.StepStatus.TASK_SUCCESSFUL
 
@@ -36,7 +56,6 @@ class TestMazewalkMapped(object):
     #     cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
     #     bot = Bot(cfg)
     #     bot.strategy(open_door)
-    #     bot.strategy(fight_all_monsters)
     #     bot.strategy(goto_stairs)
     #     bot.strategy(explore)
     # status = bot.main()
