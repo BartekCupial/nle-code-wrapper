@@ -194,6 +194,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         penalty_mode=cfg.fn_penalty_step,
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
+        autopickup=cfg.autopickup,
     )
 
     if cfg.max_episode_steps is not None:
