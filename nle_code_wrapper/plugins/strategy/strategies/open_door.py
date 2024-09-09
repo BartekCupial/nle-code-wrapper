@@ -1,5 +1,3 @@
-import re
-
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
@@ -23,7 +21,7 @@ def open_door(bot: "Bot"):
         bot.direction(reachable_door)
 
         # if door is locked
-        if re.match(".*This door is locked.*", bot.message):
+        if "This door is locked." in bot.message:
             # TODO: try to open with key or credit card
             bot.kick(reachable_door)
 
