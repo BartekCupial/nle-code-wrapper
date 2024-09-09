@@ -103,6 +103,10 @@ class Bot:
         self.update()
         self.strategy_manager.check_panics()
 
+    def type_text(self, text):
+        for char in text:
+            self.step(ord(char))
+
     def kick(self, dir):
         self.step(A.Command.KICK)
         self.direction(dir)
@@ -122,6 +126,11 @@ class Bot:
 
     def apply(self):
         self.step(A.Command.APPLY)
+        # TODO: handle multiple items
+        # self.type_text(self.inventory.items.get_letter(item))
+
+    def eat(self):
+        self.step(A.Command.EAT)
 
     def direction(self, dir):
         self.pathfinder.direction(dir)

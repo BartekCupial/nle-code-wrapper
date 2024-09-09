@@ -15,8 +15,6 @@ class Level:
         self.seen = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.objects = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
         self.objects[:] = -1
-        self.item_objects = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
-        self.item_objects[:] = -1
         self.was_on = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
 
         self.shop = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
@@ -52,7 +50,7 @@ class Level:
         self.seen[mask] = True
         self.objects[mask] = glyphs[mask]
 
-        mask = utils.isin(glyphs, G.MONS, G.PETS, G.BODIES, G.STATUES)
+        mask = utils.isin(glyphs, G.MONS, G.PETS, G.BODIES, G.OBJECTS, G.STATUES)
         self.seen[mask] = True
         self.walkable[mask & (self.objects == -1)] = True
 
@@ -61,16 +59,11 @@ class Level:
         self.objects[mask] = glyphs[mask]
         self.walkable[mask] = False
 
-        mask = utils.isin(glyphs, G.OBJECTS)
-        self.walkable[mask] = True
-        self.seen[mask] = True
-        self.item_objects[mask] = glyphs[mask]
-
         self.was_on[blstats.y, blstats.x] = True
 
-    def object_positions(self, obj):
-        return list(zip(*utils.isin(self.objects, obj).nonzero()))
+    def object_coords(self, obj):
+        return utils.coords(self.objects, obj)
 
     @property
     def stairs(self):
-        return self.object_positions(G.STAIR_DOWN)
+        return self.object_coords(G.STAIR_DOWN)

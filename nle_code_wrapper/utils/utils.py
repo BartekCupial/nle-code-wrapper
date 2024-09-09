@@ -177,3 +177,7 @@ def infinite_iterator(func: Callable[[Any], Generator]) -> Iterator:
             iterator = iter(func())
             data = next(iterator)
         yield data
+
+
+def coords(glyphs, obj):
+    return list(zip(*isin(glyphs, obj).nonzero()))
