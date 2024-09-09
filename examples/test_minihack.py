@@ -43,14 +43,14 @@ def main():
 
             yield
 
-    bot.strategy(general_strategy)
+    # bot.strategy(general_strategy)
 
     # bot.panic(lost_hp)
     # bot.panic(entity_moved)
-    # bot.strategy(open_door)
-    # bot.strategy(fight_all_monsters)
-    # bot.strategy(goto_stairs)
-    # bot.strategy(explore)
+    bot.strategy(open_door)
+    bot.strategy(fight_all_monsters)
+    bot.strategy(goto_stairs)
+    bot.strategy(explore)
     # bot.strategy(random_move)
 
     def run_bot():

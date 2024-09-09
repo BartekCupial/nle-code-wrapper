@@ -5,6 +5,7 @@ import logging
 import os
 from itertools import chain
 from subprocess import SubprocessError, check_output, run
+from typing import Any, Callable, Generator, Iterator
 
 import numba as nb
 import numpy as np
@@ -165,3 +166,14 @@ def isin(array, *elems):
 def any_in(array, *elems):
     # TODO: optimize
     return isin(array, *elems).any()
+
+
+def infinite_iterator(func: Callable[[Any], Generator]) -> Iterator:
+    iterator = iter(func())
+    while True:
+        try:
+            data = next(iterator)
+        except StopIteration:
+            iterator = iter(func())
+            data = next(iterator)
+        yield data
