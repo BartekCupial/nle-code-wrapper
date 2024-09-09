@@ -23,3 +23,45 @@ def open_door(bot: "Bot"):
         yield True
     else:
         yield False
+
+
+@Strategy.wrap
+def open_doors_kick(bot: "Bot"):
+    level = bot.current_level()
+    closed_doors = level.object_positions(G.DOOR_CLOSED)
+
+    reachable_door = min(
+        (door for door in closed_doors if bot.pathfinder.distance(bot.entity.position, door) == 1),
+        key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
+        default=None,
+    )
+
+    if reachable_door:
+        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
+        bot.pathfinder.goto(adjacent)
+        bot.kick(reachable_door)
+
+        yield True
+    else:
+        yield False
+
+
+@Strategy.wrap
+def open_doors_key(bot: "Bot"):
+    level = bot.current_level()
+    closed_doors = level.object_positions(G.DOOR_CLOSED)
+
+    reachable_door = min(
+        (door for door in closed_doors if bot.pathfinder.distance(bot.entity.position, door) == 1),
+        key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
+        default=None,
+    )
+
+    if reachable_door:
+        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
+        bot.pathfinder.goto(adjacent)
+        bot.apply()
+
+        yield True
+    else:
+        yield False

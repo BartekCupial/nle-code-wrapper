@@ -111,33 +111,23 @@ class Bot:
         self.step(A.Command.PRAY)
         # TODO: confirmation??
 
+    def inventory(self):
+        self.step(A.Command.INVENTORY)
+
+    def look(self):
+        self.step(A.Command.LOOK)
+
+    def pickup(self):
+        self.step(A.Command.PICKUP)
+
+    def apply(self):
+        self.step(A.Command.APPLY)
+
     def direction(self, dir):
         self.pathfinder.direction(dir)
 
     def update(self):
-        self.update_level()
-
-    def update_level(self):
-        if utils.isin(self.glyphs, G.SWALLOW).any():
-            return
-
-        level = self.current_level()
-
-        mask = utils.isin(self.glyphs, G.FLOOR, G.STAIR_UP, G.STAIR_DOWN, G.DOOR_OPENED, G.TRAPS, G.ALTAR, G.FOUNTAIN)
-        level.walkable[mask] = True
-        level.seen[mask] = True
-        level.objects[mask] = self.glyphs[mask]
-
-        mask = utils.isin(self.glyphs, G.MONS, G.PETS, G.BODIES, G.OBJECTS, G.STATUES)
-        level.seen[mask] = True
-        level.walkable[mask & (level.objects == -1)] = True
-
-        mask = utils.isin(self.glyphs, G.WALL, G.DOOR_CLOSED, G.BARS)
-        level.seen[mask] = True
-        level.objects[mask] = self.glyphs[mask]
-        level.walkable[mask] = False
-
-        level.was_on[self.blstats.y, self.blstats.x] = True
+        self.current_level().update(self.glyphs, self.blstats)
 
     def current_level(self) -> Level:
         key = (self.blstats.dungeon_number, self.blstats.level_number)

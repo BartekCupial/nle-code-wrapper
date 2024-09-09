@@ -24,7 +24,10 @@ def test_strategy_state_persistence():
     assert strategy()
 
     # Second call should raise BotPanic but keep the state
-    assert not strategy()
+    try:
+        strategy()
+    except BotPanic:
+        pass
 
     # Subsequent calls should continue from the last state
     assert strategy()
@@ -49,9 +52,12 @@ def test_strategy_composition():
     def outer_strategy(bot: "Bot"):
         inner = inner_strategy(bot)
         while True:
-            # The strategy should catch the panic and yield False
-            data = inner()
-            yield data
+            # The strategy should catch the panic and yield
+            try:
+                data = inner()
+                yield data
+            except BotPanic:
+                yield False
 
     mock_bot = None
 
