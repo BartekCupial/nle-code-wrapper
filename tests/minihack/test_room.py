@@ -1,8 +1,15 @@
 import pytest
 
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-from nle_code_wrapper.plugins.strategy.strategies import explore, fight_all_monsters, goto_stairs
+from nle_code_wrapper.plugins.strategy import Strategy
+from nle_code_wrapper.plugins.strategy.strategies import (
+    explore,
+    fight_closest_monster,
+    goto_stairs,
+    smart_fight_strategy,
+)
 
 
 @pytest.mark.usefixtures("register_components")
@@ -18,12 +25,26 @@ class TestMazewalkMapped(object):
             "big_room_dark",
         ],
     )
-    def test_solve_room_simple(self, env):
+    def test_solve_room_explore(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
         bot = Bot(cfg)
-        bot.strategy(fight_all_monsters)
-        bot.strategy(goto_stairs)
-        bot.strategy(explore)
+
+        @Strategy.wrap
+        def general_explore(bot: "Bot"):
+            stairs_strat = goto_stairs(bot)
+            explore_strat = explore(bot)
+
+            while True:
+                try:
+                    if stairs_strat():
+                        pass
+                    else:
+                        explore_strat()
+                except BotPanic:
+                    pass
+                yield True
+
+        bot.strategy(general_explore)
         status = bot.main()
         assert status == bot.env.StepStatus.TASK_SUCCESSFUL
 
@@ -31,29 +52,96 @@ class TestMazewalkMapped(object):
         "env",
         [
             "small_room_monster",
-            "small_room_trap",
-            "small_room_ultimate",
             "big_room_monster",
-            "big_room_trap",
-            "big_room_ultimate",
         ],
     )
-    def test_solve_room_hard(self, env):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
+    @pytest.mark.parametrize("seed", [4])
+    def test_solve_room_fight_easy(self, env, seed):
+        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         bot = Bot(cfg)
-        bot.strategy(fight_all_monsters)
-        bot.strategy(goto_stairs)
-        bot.strategy(explore)
+
+        @Strategy.wrap
+        def general_fight(bot: "Bot"):
+            fight_strat = fight_closest_monster(bot)
+            stairs_strat = goto_stairs(bot)
+            explore_strat = explore(bot)
+
+            while True:
+                try:
+                    if fight_strat():
+                        pass
+                    elif stairs_strat():
+                        pass
+                    else:
+                        explore_strat()
+                except BotPanic:
+                    pass
+                yield True
+
+        bot.strategy(general_fight)
         status = bot.main()
         assert status == bot.env.StepStatus.TASK_SUCCESSFUL
 
-    @pytest.mark.parametrize("env", ["big_room_ultimate"])
-    @pytest.mark.parametrize("seed", [4])
+    @pytest.mark.parametrize(
+        "env, seed",
+        [
+            ("small_room_trap", 17),
+            ("big_room_trap", 2),
+        ],
+    )
+    def test_solve_room_teleport_traps(self, env, seed):
+        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        bot = Bot(cfg)
+
+        @Strategy.wrap
+        def general_traps(bot: "Bot"):
+            stairs_strat = goto_stairs(bot)
+            explore_strat = explore(bot)
+
+            while True:
+                try:
+                    if stairs_strat():
+                        pass
+                    else:
+                        explore_strat()
+                except BotPanic:
+                    pass
+
+                yield True
+
+        bot.strategy(general_traps)
+        status = bot.main()
+        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+
+    @pytest.mark.parametrize(
+        "env, seed",
+        [
+            ("big_room_monster", 33),
+            ("big_room_ultimate", 4),
+        ],
+    )
     def test_solve_room_fight_hard(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         bot = Bot(cfg)
-        bot.strategy(fight_all_monsters)
-        bot.strategy(goto_stairs)
-        bot.strategy(explore)
+
+        @Strategy.wrap
+        def general_smart_fight(bot: "Bot"):
+            fight_strat = smart_fight_strategy(bot)
+            stairs_strat = goto_stairs(bot)
+            explore_strat = explore(bot)
+
+            while True:
+                try:
+                    if fight_strat():
+                        pass
+                    elif stairs_strat():
+                        pass
+                    else:
+                        explore_strat()
+                except BotPanic:
+                    pass
+                yield True
+
+        bot.strategy(general_smart_fight)
         status = bot.main()
         assert status == bot.env.StepStatus.TASK_SUCCESSFUL

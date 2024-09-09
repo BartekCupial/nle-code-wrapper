@@ -31,7 +31,7 @@ class Strategy:
             # print(f"Panic in strategy {strategy_name}: {e}")
             # Reset the generator after a panic
             self.iterator = infinite_iterator(self.func)
-            return False
+            raise e
 
     def reset(self):
         self.iterator = None

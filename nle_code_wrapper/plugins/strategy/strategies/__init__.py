@@ -4,6 +4,7 @@ from nle_code_wrapper.plugins.strategy.strategies.goto_stairs import goto_stairs
 from nle_code_wrapper.plugins.strategy.strategies.open_door import open_door
 from nle_code_wrapper.plugins.strategy.strategies.pray import pray
 from nle_code_wrapper.plugins.strategy.strategies.random_move import random_move
+from nle_code_wrapper.plugins.strategy.strategies.smart_fight import smart_fight_strategy
 
 __all__ = [
     explore,
@@ -13,4 +14,5 @@ __all__ = [
     fight_all_monsters,
     open_door,
     random_move,
+    smart_fight_strategy,
 ]
