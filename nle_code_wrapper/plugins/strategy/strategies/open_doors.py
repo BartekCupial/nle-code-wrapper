@@ -5,7 +5,7 @@ from nle_code_wrapper.plugins.strategy import Strategy
 
 
 @Strategy.wrap
-def open_door(bot: "Bot"):
+def open_doors(bot: "Bot"):
     level = bot.current_level()
     closed_doors = level.object_coords(G.DOOR_CLOSED)
 
@@ -31,7 +31,7 @@ def open_doors_kick(bot: "Bot"):
     closed_doors = level.object_coords(G.DOOR_CLOSED)
 
     reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.distance(bot.entity.position, door) == 1),
+        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
         key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
         default=None,
     )
@@ -52,7 +52,7 @@ def open_doors_key(bot: "Bot"):
     closed_doors = level.object_coords(G.DOOR_CLOSED)
 
     reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.distance(bot.entity.position, door) == 1),
+        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
         key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
         default=None,
     )

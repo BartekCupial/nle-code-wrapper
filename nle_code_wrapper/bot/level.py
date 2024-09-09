@@ -45,7 +45,9 @@ class Level:
         if utils.isin(glyphs, G.SWALLOW).any():
             return
 
-        mask = utils.isin(glyphs, G.FLOOR, G.STAIR_UP, G.STAIR_DOWN, G.DOOR_OPENED, G.TRAPS, G.ALTAR, G.FOUNTAIN)
+        mask = utils.isin(
+            glyphs, G.FLOOR, G.STAIR_UP, G.STAIR_DOWN, G.DOOR_OPENED, G.TRAPS, G.ALTAR, G.FOUNTAIN, G.SINK
+        )
         self.walkable[mask] = True
         self.seen[mask] = True
         self.objects[mask] = glyphs[mask]

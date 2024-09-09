@@ -9,7 +9,7 @@ from nle_code_wrapper.plugins.strategy.strategies import (
     explore_items,
     goto_items,
     goto_stairs,
-    open_door,
+    open_doors,
     open_doors_key,
     pickup_items,
 )
@@ -32,7 +32,7 @@ class TestMazewalkMapped(object):
         @Strategy.wrap
         def general_key(bot: "Bot"):
             stairs_strat = goto_stairs(bot)
-            door_strat = open_door(bot)
+            door_strat = open_doors(bot)
             key_strat = open_doors_key(bot)
             explore_items_strat = explore_items(bot)
             pickup_items_strat = pickup_items(bot)
@@ -70,7 +70,7 @@ class TestMazewalkMapped(object):
         @Strategy.wrap
         def general_key(bot: "Bot"):
             stairs_strat = goto_stairs(bot)
-            door_strat = open_door(bot)
+            door_strat = open_doors(bot)
             key_strat = open_doors_key(bot)
             goto_items_strat = goto_items(bot)
             pickup_items_strat = pickup_items(bot)

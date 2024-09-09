@@ -113,7 +113,24 @@ class Bot:
 
     def pray(self):
         self.step(A.Command.PRAY)
-        # TODO: confirmation??
+
+    def quaff(self):
+        self.step(A.Command.QUAFF)
+
+    def read(self):
+        self.step(A.Command.READ)
+
+    def puton(self):
+        self.step(A.Command.PUTON)
+
+    def wear(self):
+        self.step(A.Command.WEAR)
+
+    def wield(self):
+        self.step(A.Command.WIELD)
+
+    def zap(self):
+        self.step(A.Command.ZAP)
 
     def inventory(self):
         self.step(A.Command.INVENTORY)
