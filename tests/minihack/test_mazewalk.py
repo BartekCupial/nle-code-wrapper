@@ -12,10 +12,12 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env",
         [
-            "explore_easy",
-            "explore_easy_map",
-            "explore_hard",
-            "explore_hard_map",
+            "mazewalk_small",
+            "mazewalk_small_mapped",
+            "mazewalk_big",
+            "mazewalk_big_mapped",
+            "mazewalk_huge",
+            "mazewalk_huge_mapped",
         ],
     )
     def test_solve_mazewalk(self, env):
