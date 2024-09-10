@@ -72,15 +72,19 @@ class TestMazewalkMapped(object):
             ("mini_eat_fixed", G.FOOD_OBJECTS, partial(make_action_and_confirm, command=A.Command.EAT)),
             ("mini_pray_fixed", G.ALTAR, partial(make_action_and_confirm, command=A.Command.PRAY)),
             ("mini_sink_fixed", G.SINK, partial(make_action_and_confirm, command=A.Command.QUAFF)),
-            ("mini_read_fixed", G.OBJECTS, partial(pickup_and_use_item, command=A.Command.READ)),
-            ("mini_zap_fixed", G.OBJECTS, partial(pickup_and_use_item, command=A.Command.ZAP)),
-            ("mini_puton_fixed", G.OBJECTS, partial(pickup_and_use_item, command=A.Command.PUTON)),
-            ("mini_wear_fixed", G.OBJECTS, partial(pickup_and_use_item, command=A.Command.WEAR)),
-            ("mini_wield_fixed", G.OBJECTS, partial(pickup_and_use_item, command=A.Command.WIELD)),
+            ("mini_read_fixed", G.SCROLL_CLASS, partial(pickup_and_use_item, command=A.Command.READ)),
+            ("mini_zap_fixed", G.WAND_CLASS, partial(pickup_and_use_item, command=A.Command.ZAP)),
+            (
+                "mini_puton_fixed",
+                frozenset.union(G.AMULET_CLASS, G.RING_CLASS),
+                partial(pickup_and_use_item, command=A.Command.PUTON),
+            ),
+            ("mini_wear_fixed", G.ARMOR_CLASS, partial(pickup_and_use_item, command=A.Command.WEAR)),
+            ("mini_wield_fixed", G.WEAPON_CLASS, partial(pickup_and_use_item, command=A.Command.WIELD)),
         ],
     )
     @pytest.mark.parametrize("seed", [1])
-    def test_mini(self, env, where, action, seed):
+    def test_mini_fixed(self, env, where, action, seed):
         # TODO: for some of the variants there are monsters which have to be dealt with
         # TODO: for some of the seeds there are items already worn, which have to be taken off
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
