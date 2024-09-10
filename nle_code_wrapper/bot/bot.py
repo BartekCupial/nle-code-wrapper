@@ -1,30 +1,26 @@
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
-from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.entity import Entity
-from nle_code_wrapper.bot.exceptions import BotFinished
+from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.level import Level
-from nle_code_wrapper.envs.create_env import create_env
 from nle_code_wrapper.plugins.pathfinder import Pathfinder
 from nle_code_wrapper.plugins.pvp import Pvp
-from nle_code_wrapper.plugins.strategy import StrategyManager
-from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.attr_dict import AttrDict
 
 
 class Bot:
-    def __init__(self, cfg):
-        self.cfg = cfg
+    def __init__(self, env):
+        self.env = env
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
-        self.strategy_manager: StrategyManager = StrategyManager(self)
+        self.strategies = []
+        self.panics = []
 
     def strategy(self, func):
-        return self.strategy_manager.strategy(func)
+        self.strategies.append(func(self))
 
     def panic(self, func):
-        return self.strategy_manager.panic(func)
+        self.panics.append(func(self))
 
     @property
     def blstats(self):
@@ -53,55 +49,49 @@ class Bot:
             for position in zip(*self.pvp.monster_tracker.get_monster_mask().nonzero())
         ]
 
-    def global_strategy(self):
-        return self.strategy_manager.run_strategies()
-
-    def main(self):
-        render_mode = "human"
-        if self.cfg.no_render:
-            render_mode = None
-
-        self.env = create_env(
-            self.cfg.env,
-            cfg=self.cfg,
-            env_config=AttrDict(worker_index=0, vector_index=0, env_id=0),
-            render_mode=render_mode,
-        )
-
+    def reset(self, **kwargs):
         self.levels = {}
         self.steps = 0
         self.reward = 0.0
 
         self.done = False
-        self.last_obs, self.last_info = self.env.reset(seed=self.cfg.seed)
 
+        self.last_obs, self.last_info = self.env.reset(**kwargs)
         self.update()
 
-        try:
-            for _ in self.global_strategy():
-                pass
-        except BotFinished:
-            pass
-
-        if render_mode is not None:
-            print(
-                f"Bot finished, episode done: {self.done}, episode reward: {self.reward}, episode steps: {self.steps}"
-            )
-
-        return self.last_info["end_status"]
+        return self.last_obs, self.last_info
 
     def step(self, action):
-        self.last_obs, reward, terminated, truncated, self.last_info = self.env.step(self.env.actions.index(action))
+        self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
+            self.env.actions.index(action)
+        )
 
         self.steps += 1
         self.reward += reward
 
-        if terminated or truncated:
+        if self.terminated or self.truncated:
             self.done = True
             raise BotFinished
 
         self.update()
-        self.strategy_manager.check_panics()
+        self.check_panics()
+
+    def strategy_step(self, action):
+        self.steps = 0
+        self.reward = 0
+        self.terminated = 0
+        self.truncated = 0
+        self.last_info = {}
+
+        strategy = self.strategies[action]
+        try:
+            strategy()
+        except (BotPanic, BotFinished):
+            pass
+
+        self.last_info["steps"] = self.steps
+
+        return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
 
     def type_text(self, text):
         for char in text:
@@ -154,6 +144,10 @@ class Bot:
 
     def update(self):
         self.current_level().update(self.glyphs, self.blstats)
+
+    def check_panics(self):
+        for panic in self.panics:
+            panic()
 
     def current_level(self) -> Level:
         key = (self.blstats.dungeon_number, self.blstats.level_number)
