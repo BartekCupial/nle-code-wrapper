@@ -41,7 +41,7 @@ def get_action(env, action_mode):
     return action
 
 
-def play(cfg, get_action=get_action):
+def play(cfg, get_action=get_action, strategies=[]):
     render_mode = "human"
     if cfg.no_render:
         render_mode = None
@@ -51,6 +51,7 @@ def play(cfg, get_action=get_action):
         cfg=cfg,
         env_config=AttrDict(worker_index=0, vector_index=0, env_id=0),
         render_mode=render_mode,
+        strategies=strategies,
     )
 
     obs, info = env.reset(seed=cfg.seed)
@@ -78,9 +79,11 @@ def play(cfg, get_action=get_action):
 
         time_delta = timeit.default_timer() - start_time
 
-        print("Final reward:", reward)
-        print("End status:", info["end_status"].name)
-        print(f"Total reward: {total_reward}, Steps: {steps}, SPS: {steps / time_delta}", total_reward)
+        if cfg.verbose:
+            print("Final reward:", reward)
+            print("End status:", info["end_status"].name)
+            print(f"Total reward: {total_reward}, Steps: {steps}, SPS: {steps / time_delta}", total_reward)
+
         break
     env.close()
 

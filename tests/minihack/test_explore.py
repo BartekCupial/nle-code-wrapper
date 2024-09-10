@@ -3,8 +3,13 @@ import pytest
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
+from nle_code_wrapper.play import play
 from nle_code_wrapper.plugins.strategy import Strategy
 from nle_code_wrapper.plugins.strategy.strategies import explore, goto_stairs
+
+
+def get_action(env, mode):
+    return env.action_space.sample()
 
 
 @pytest.mark.usefixtures("register_components")
@@ -20,7 +25,6 @@ class TestMazewalkMapped(object):
     )
     def test_solve_explore(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
-        bot = Bot(cfg)
 
         @Strategy.wrap
         def general_explore(bot: "Bot"):
@@ -37,6 +41,5 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        bot.strategy(general_explore)
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, get_action=get_action, strategies=[general_explore])
+        assert status == "TASK_SUCCESSFUL"

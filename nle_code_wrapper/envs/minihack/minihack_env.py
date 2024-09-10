@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Callable, List, Optional
 
 import minihack  # NOQA: F401
 from minihack.envs import (
@@ -167,7 +167,7 @@ def minihack_env_by_name(name):
     raise Exception("Unknown MiniHack env")
 
 
-def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = None):
+def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = None, strategies: List[Callable] = []):
     env_class = minihack_env_by_name(env_name)
 
     observation_keys = (
@@ -212,6 +212,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         env.render_mode = render_mode
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, cfg.strategies)
+        env = NLECodeWrapper(env, strategies)
 
     return env
