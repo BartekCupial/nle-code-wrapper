@@ -23,6 +23,7 @@ from nle import nethack
 
 from external.nle_utils.nle_utils.wrappers import GymV21CompatibilityV0, NLETimeLimit
 from nle_code_wrapper.utils.utils import is_module_available
+from nle_code_wrapper.wrappers.nle_code_wrapper import NLECodeWrapper
 
 
 def minihack_available():
@@ -209,5 +210,8 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     if render_mode:
         env.render_mode = render_mode
+
+    if cfg.code_wrapper:
+        env = NLECodeWrapper(env, cfg.strategies)
 
     return env
