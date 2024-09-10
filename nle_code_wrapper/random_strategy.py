@@ -9,7 +9,7 @@ def get_action(env, mode):
     return env.action_space.sample()
 
 
-def main(cfg):
+def play_random_strategy(cfg):
     render_mode = "human"
     if cfg.no_render:
         render_mode = None
@@ -20,9 +20,9 @@ def main(cfg):
         env_config=AttrDict(worker_index=0, vector_index=0, env_id=0),
         render_mode=render_mode,
     )
-    env = NLECodeWrapper(env)
+    env = NLECodeWrapper(env, cfg.strategies)
 
-    obs, info = env.reset()
+    obs, info = env.reset(seed=cfg.seed)
 
     strategy_steps = 0
     steps = 0

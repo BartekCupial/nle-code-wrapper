@@ -1,3 +1,4 @@
+import ast
 from argparse import ArgumentParser
 
 
@@ -5,6 +6,7 @@ def add_basic_cli_args(p: ArgumentParser):
     p.add_argument("-h", "--help", action="store_true", help="Print the help message", required=False)
     p.add_argument("--env", type=str, default=None, help="Name of the environment to use", required=True)
     p.add_argument("--seed", type=int, default=None, help="Seed to use")
+    p.add_argument("--strategies", type=ast.literal_eval, default=[], help="List of strategy names")
 
 
 def add_default_env_args(p: ArgumentParser):
