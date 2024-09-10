@@ -1,6 +1,7 @@
 import contextlib
 import os
 import termios
+import timeit
 import tty
 
 import minihack  # noqa: F401
@@ -57,7 +58,11 @@ def play(cfg):
     reward = 0.0
     action = None
 
-    obs, info = env.reset(seed=cfg.seed)
+    mean_sps = 0
+    mean_reward = 0.0
+
+    total_start_time = timeit.default_timer()
+    start_time = total_start_time
 
     while True:
         action = get_action(env, cfg.play_mode)
@@ -66,15 +71,27 @@ def play(cfg):
 
         obs, reward, terminated, truncated, info = env.step(action)
         steps += 1
+        mean_reward += (reward - mean_reward) / steps
 
         if not (terminated or truncated):
             continue
 
-        print("Episode: %i. Steps: %i." % (episodes, steps))
+        time_delta = timeit.default_timer() - start_time
+
+        print("Final reward:", reward)
+        print("End status:", info["end_status"].name)
+        print("Mean reward:", mean_reward)
+
+        sps = steps / time_delta
+        print("Episode: %i. Steps: %i. SPS: %f" % (episodes, steps, sps))
 
         episodes += 1
+        mean_sps += (sps - mean_sps) / episodes
+
+        start_time = timeit.default_timer()
 
         steps = 0
+        mean_reward = 0.0
 
         if episodes == cfg.ngames:
             break
