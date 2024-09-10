@@ -8,17 +8,13 @@ from nle_code_wrapper.plugins.strategy import Strategy
 from nle_code_wrapper.plugins.strategy.strategies import explore, goto_stairs, open_doors, open_doors_kick
 
 
-def get_action(env, mode):
-    return env.action_space.sample()
-
-
 @pytest.mark.usefixtures("register_components")
 class TestMazewalkMapped(object):
     @pytest.mark.parametrize("env", ["corridor3"])
     @pytest.mark.parametrize("seed", [0, 1])
     def test_corridor_open_doors(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        status = play(cfg, get_action=get_action, strategies=[open_doors, goto_stairs, explore])
+        status = play(cfg, strategies=[open_doors, goto_stairs, explore])
         assert status == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["corridor2"])
@@ -45,7 +41,7 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, get_action=get_action, strategies=[general_kick])
+        status = play(cfg, strategies=[general_kick])
         assert status == "TASK_SUCCESSFUL"
 
     # @pytest.mark.parametrize("env", ["corridor3"])

@@ -8,10 +8,6 @@ from nle_code_wrapper.plugins.strategy import Strategy
 from nle_code_wrapper.plugins.strategy.strategies import explore, goto_stairs
 
 
-def get_action(env, mode):
-    return env.action_space.sample()
-
-
 @pytest.mark.usefixtures("register_components")
 class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
@@ -41,5 +37,5 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, get_action=get_action, strategies=[general_explore])
+        status = play(cfg, strategies=[general_explore])
         assert status == "TASK_SUCCESSFUL"

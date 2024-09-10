@@ -6,6 +6,7 @@ from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
+from nle_code_wrapper.play import play
 from nle_code_wrapper.plugins.strategy import Strategy
 from nle_code_wrapper.plugins.strategy.strategies import (
     explore,
@@ -88,11 +89,8 @@ class TestMazewalkMapped(object):
         # TODO: for some of the variants there are monsters which have to be dealt with
         # TODO: for some of the seeds there are items already worn, which have to be taken off
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        bot = Bot(cfg)
-        bot.strategy(partial(general_mini, where=where, action=action))
-
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, strategies=[partial(general_mini, where=where, action=action)])
+        assert status == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["mini_locked_fixed"])
     @pytest.mark.parametrize("seed", [0])
@@ -104,5 +102,5 @@ class TestMazewalkMapped(object):
         bot.strategy(explore)
         bot.strategy(goto_stairs)
 
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, strategies=[open_doors_kick, explore, goto_stairs])
+        assert status == "TASK_SUCCESSFUL"

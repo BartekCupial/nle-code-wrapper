@@ -19,10 +19,6 @@ def get_function_by_name(module_name, function_name):
         raise AttributeError(f"Function {function_name} not found in module {module_name}")
 
 
-def get_action(env, mode):
-    return env.action_space.sample()
-
-
 def main():
     register_minihack_components()
     cfg = parse_minihack_args()
@@ -32,7 +28,7 @@ def main():
         strategy_func = get_function_by_name("nle_code_wrapper.plugins.strategy.strategies", strategy_name)
         strategies.append(strategy_func)
 
-    play_random_strategy = partial(play, get_action=get_action, strategies=strategies)
+    play_random_strategy = partial(play, strategies=strategies)
 
     def run_bot():
         status = play_random_strategy(cfg)

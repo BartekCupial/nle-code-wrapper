@@ -3,6 +3,7 @@ import pytest
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
+from nle_code_wrapper.play import play
 from nle_code_wrapper.plugins.strategy import Strategy
 from nle_code_wrapper.plugins.strategy.strategies import (
     explore,
@@ -27,7 +28,6 @@ class TestMazewalkMapped(object):
     )
     def test_solve_room_explore(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
-        bot = Bot(cfg)
 
         @Strategy.wrap
         def general_explore(bot: "Bot"):
@@ -44,9 +44,8 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        bot.strategy(general_explore)
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, strategies=[general_explore])
+        assert status == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
         "env",
@@ -58,7 +57,6 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", [4])
     def test_solve_room_fight_easy(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        bot = Bot(cfg)
 
         @Strategy.wrap
         def general_fight(bot: "Bot"):
@@ -78,9 +76,8 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        bot.strategy(general_fight)
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, strategies=[general_fight])
+        assert status == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
         "env, seed",
@@ -91,7 +88,6 @@ class TestMazewalkMapped(object):
     )
     def test_solve_room_teleport_traps(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        bot = Bot(cfg)
 
         @Strategy.wrap
         def general_traps(bot: "Bot"):
@@ -109,9 +105,8 @@ class TestMazewalkMapped(object):
 
                 yield True
 
-        bot.strategy(general_traps)
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, strategies=[general_traps])
+        assert status == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
         "env, seed",
@@ -122,7 +117,6 @@ class TestMazewalkMapped(object):
     )
     def test_solve_room_fight_hard(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        bot = Bot(cfg)
 
         @Strategy.wrap
         def general_smart_fight(bot: "Bot"):
@@ -142,6 +136,5 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        bot.strategy(general_smart_fight)
-        status = bot.main()
-        assert status == bot.env.StepStatus.TASK_SUCCESSFUL
+        status = play(cfg, strategies=[general_smart_fight])
+        assert status == "TASK_SUCCESSFUL"
