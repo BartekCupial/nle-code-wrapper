@@ -2,7 +2,7 @@ from nle_code_wrapper.cfg.arguments import parse_args, parse_full_cfg
 from nle_code_wrapper.envs.env_utils import register_env
 from nle_code_wrapper.envs.minihack.minihack_env import MINIHACK_ENVS, make_minihack_env
 from nle_code_wrapper.envs.minihack.minihack_params import add_extra_params_minihack_env
-from nle_code_wrapper.envs.play import play
+from nle_code_wrapper.play import play
 
 
 def register_minihack_envs():
