@@ -59,7 +59,7 @@ def make_action_and_confirm(bot, command):
 
 
 def pickup_and_use_item(bot, command):
-    bot.pickup()
+    bot.step(A.Command.PICKUP)
     letter = bot.message[0]
     bot.step(command)
     bot.type_text(letter)

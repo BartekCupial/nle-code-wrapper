@@ -1,3 +1,4 @@
+from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
@@ -39,7 +40,8 @@ def open_doors_kick(bot: "Bot"):
     if reachable_door:
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
-        bot.kick(reachable_door)
+        bot.step(A.Command.KICK)
+        bot.direction(reachable_door)
 
         yield True
     else:
@@ -60,7 +62,7 @@ def open_doors_key(bot: "Bot"):
     if reachable_door:
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
-        bot.apply()
+        bot.step(A.Command.APPLY)
 
         yield True
     else:

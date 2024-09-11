@@ -24,7 +24,7 @@ class Pathfinder:
         return self.search.distances(start)
 
     def get_path_to(self, goal):
-        result = self.get_path_from_to(self.bot.position, goal)
+        result = self.get_path_from_to(self.bot.entity.position, goal)
         return result
 
     def get_path_from_to(self, start, goal):

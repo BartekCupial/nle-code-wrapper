@@ -39,10 +39,6 @@ class Bot:
         return tuple(self.last_obs["tty_cursor"])
 
     @property
-    def position(self):
-        return self.blstats.y, self.blstats.x
-
-    @property
     def entity(self):
         return Entity(self.position, self.glyphs[self.position])
 
@@ -100,48 +96,6 @@ class Bot:
     def type_text(self, text):
         for char in text:
             self.step(ord(char))
-
-    def kick(self, dir):
-        self.step(A.Command.KICK)
-        self.direction(dir)
-
-    def pray(self):
-        self.step(A.Command.PRAY)
-
-    def quaff(self):
-        self.step(A.Command.QUAFF)
-
-    def read(self):
-        self.step(A.Command.READ)
-
-    def puton(self):
-        self.step(A.Command.PUTON)
-
-    def wear(self):
-        self.step(A.Command.WEAR)
-
-    def wield(self):
-        self.step(A.Command.WIELD)
-
-    def zap(self):
-        self.step(A.Command.ZAP)
-
-    def inventory(self):
-        self.step(A.Command.INVENTORY)
-
-    def look(self):
-        self.step(A.Command.LOOK)
-
-    def pickup(self):
-        self.step(A.Command.PICKUP)
-
-    def apply(self):
-        self.step(A.Command.APPLY)
-        # TODO: handle multiple items
-        # self.type_text(self.inventory.items.get_letter(item))
-
-    def eat(self):
-        self.step(A.Command.EAT)
 
     def direction(self, dir):
         self.pathfinder.direction(dir)

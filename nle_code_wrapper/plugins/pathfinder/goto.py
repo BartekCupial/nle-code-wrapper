@@ -48,7 +48,7 @@ def move(bot: "Bot", y, x):
     dir = calc_direction(bot.blstats.y, bot.blstats.x, y, x)
     direction(bot, dir)
 
-    if bot.position != (y, x):
+    if bot.entity.position != (y, x):
         raise BotPanic(
             f'agent position do not match after "move": '
             f"expected ({y}, {x}), got ({bot.entity.position[0]}, {bot.entity.position[1]})"
