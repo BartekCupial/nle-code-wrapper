@@ -2,7 +2,7 @@ import numpy as np
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.plugins.strategy import Strategy
+from nle_code_wrapper.bot.strategy import Strategy
 
 
 def print_boolean_array_ascii(arr):

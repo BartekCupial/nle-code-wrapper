@@ -1,6 +1,6 @@
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.plugins.strategy.panic import Panic
+from nle_code_wrapper.bot.strategy.panic import Panic
 
 
 def lists_match(list1, list2):

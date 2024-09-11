@@ -1,6 +1,6 @@
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.plugins.strategy import Panic, State
+from nle_code_wrapper.bot.strategy import Panic, State
 
 
 @Panic.wrap

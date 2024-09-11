@@ -2,7 +2,7 @@ from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.plugins.strategy import Strategy
+from nle_code_wrapper.bot.strategy import Strategy
 from nle_code_wrapper.utils.utils import coords
 
 

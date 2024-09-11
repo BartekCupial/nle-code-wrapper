@@ -1,6 +1,6 @@
-from nle_code_wrapper.plugins.pathfinder.distance import chebyshev_distance
-from nle_code_wrapper.plugins.pathfinder.movements import Movements
-from nle_code_wrapper.plugins.pathfinder.search_algorithm import SearchAlgorithm
+from nle_code_wrapper.bot.pathfinder.distance import chebyshev_distance
+from nle_code_wrapper.bot.pathfinder.movements import Movements
+from nle_code_wrapper.bot.pathfinder.search_algorithm import SearchAlgorithm
 
 
 class ChebyshevSearch(SearchAlgorithm):

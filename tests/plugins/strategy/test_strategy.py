@@ -1,6 +1,6 @@
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.plugins.strategy import State, Strategy
+from nle_code_wrapper.bot.strategy import State, Strategy
 
 
 def test_strategy_state_persistence():

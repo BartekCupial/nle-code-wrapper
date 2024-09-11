@@ -1,5 +1,5 @@
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.plugins.strategy import Strategy
+from nle_code_wrapper.bot.strategy import Strategy
 
 
 @Strategy.wrap

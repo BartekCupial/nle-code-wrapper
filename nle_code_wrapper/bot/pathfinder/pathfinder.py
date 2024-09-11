@@ -4,9 +4,9 @@ import numpy as np
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.plugins.pathfinder.chebyshev_search import ChebyshevSearch
-from nle_code_wrapper.plugins.pathfinder.distance import chebyshev_distance
-from nle_code_wrapper.plugins.pathfinder.movements import Movements
+from nle_code_wrapper.bot.pathfinder.chebyshev_search import ChebyshevSearch
+from nle_code_wrapper.bot.pathfinder.distance import chebyshev_distance
+from nle_code_wrapper.bot.pathfinder.movements import Movements
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot

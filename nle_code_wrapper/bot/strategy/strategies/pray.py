@@ -1,7 +1,7 @@
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.plugins.strategy import State, Strategy
+from nle_code_wrapper.bot.strategy import State, Strategy
 
 
 @Strategy.wrap

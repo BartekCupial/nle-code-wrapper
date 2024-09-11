@@ -4,8 +4,8 @@ from nle_utils.blstats import BLStats
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.level import Level
-from nle_code_wrapper.plugins.pathfinder import Pathfinder
-from nle_code_wrapper.plugins.pvp import Pvp
+from nle_code_wrapper.bot.pathfinder import Pathfinder
+from nle_code_wrapper.bot.pvp import Pvp
 
 
 class Bot:
@@ -45,10 +45,7 @@ class Bot:
 
     @property
     def entities(self):
-        return [
-            Entity(position, self.glyphs[position])
-            for position in zip(*self.pvp.monster_tracker.get_monster_mask().nonzero())
-        ]
+        return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
     def reset(self, **kwargs):
         self.levels = {}

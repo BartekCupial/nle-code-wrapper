@@ -25,7 +25,7 @@ def main():
 
     strategies = []
     for strategy_name in cfg.strategies:
-        strategy_func = get_function_by_name("nle_code_wrapper.plugins.strategy.strategies", strategy_name)
+        strategy_func = get_function_by_name("nle_code_wrapper.bot.strategy.strategies", strategy_name)
         strategies.append(strategy_func)
 
     play_random_strategy = partial(play, strategies=strategies)
