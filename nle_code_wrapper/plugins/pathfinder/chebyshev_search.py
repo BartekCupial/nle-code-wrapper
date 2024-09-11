@@ -19,4 +19,4 @@ class ChebyshevSearch(SearchAlgorithm):
         return 1
 
     def neighbors(self, node):
-        return self.movements.get_neighbors(node)
+        return self.movements.neighbors(node)

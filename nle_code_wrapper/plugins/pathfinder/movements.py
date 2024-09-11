@@ -71,7 +71,7 @@ class Movements:
         if self.walkable_intermediate(pos, new_pos):
             neighbors.append(new_pos)
 
-    def get_neighbors(self, node):
+    def neighbors(self, node):
         neighbors = []
 
         for dir in cardinal_directions:

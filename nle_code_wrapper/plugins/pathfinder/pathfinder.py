@@ -107,9 +107,12 @@ class Pathfinder:
     def distance(self, n1, n2):
         return chebyshev_distance(n1, n2)
 
+    def neighbors(self, pos):
+        return self.movements.neighbors(pos)
+
     def reachable_adjacent(self, start, goal):
         distances = self.distances(start)
-        neighbors = self.movements.get_neighbors(goal)
+        neighbors = self.neighbors(goal)
 
         n_dist = []
         for n in neighbors:

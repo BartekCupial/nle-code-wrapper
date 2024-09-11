@@ -38,7 +38,7 @@ def smart_fight_strategy(bot: "Bot"):
 
 def find_escape_position(bot: "Bot", monsters):
     current_pos = bot.entity.position
-    neighbors = bot.pathfinder.movements.get_neighbors(current_pos)
+    neighbors = bot.pathfinder.neighbors(current_pos)
 
     def neighbor_to_monsters_distance(n):
         return sum([bot.pathfinder.distance(n, m.position) for m in monsters])
