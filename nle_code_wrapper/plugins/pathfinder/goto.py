@@ -55,17 +55,27 @@ def move(bot: "Bot", y, x):
         )
 
 
-def goto(bot: "Bot", goal):
-    path = bot.pathfinder.get_path_to(goal)
-    orig_path = list(path)
-    path = orig_path[1:]
+def goto(bot: "Bot", goal, fast=False):
+    cont = True
+    while cont and bot.entity.position != goal:
+        path = bot.pathfinder.get_path_to(goal)
+        if path is None:
+            raise BotPanic("end point is no longer accessible")
+        orig_path = list(path)
+        path = orig_path[1:]
 
-    for y, x in path:
-        # TODO: add checks if the terrain ahead is still walkable
-        # - trap (including holes)
-        # - water
-        # - lava
-        # - boulders
-        move(bot, y, x)
+        # TODO: implement fast_goto
+        # if fast and len(path) > 2:
+        #     my_position = bot.entity.position
+        #     bot.pathfinder.fast_go_to()
+
+        for y, x in path:
+            # TODO: check if there is peaceful monster
+            if not bot.current_level().walkable[y, x]:
+                cont = True
+                break
+            move(bot, y, x)
+        else:
+            cont = False
 
     return True
