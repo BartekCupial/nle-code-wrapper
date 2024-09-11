@@ -15,7 +15,7 @@ def attack(bot: "Bot", entity: Entity):
         if bot.pathfinder.distance(bot.entity.position, entity.position) > 1:
             bot.pathfinder.move(point)
         else:
-            bot.direction(entity.position)
+            bot.pathfinder.direction(entity.position)
 
         # if the enemy is not at original position stop attacking
         # either enemy is dead or it moved

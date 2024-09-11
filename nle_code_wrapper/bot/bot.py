@@ -40,7 +40,8 @@ class Bot:
 
     @property
     def entity(self):
-        return Entity(self.position, self.glyphs[self.position])
+        position = (self.blstats.y, self.blstats.x)
+        return Entity(position, self.glyphs[position])
 
     @property
     def entities(self):
@@ -96,9 +97,6 @@ class Bot:
     def type_text(self, text):
         for char in text:
             self.step(ord(char))
-
-    def direction(self, dir):
-        self.pathfinder.direction(dir)
 
     def update(self):
         self.current_level().update(self.glyphs, self.blstats)

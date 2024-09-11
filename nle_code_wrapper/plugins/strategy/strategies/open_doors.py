@@ -19,7 +19,7 @@ def open_doors(bot: "Bot"):
     if reachable_door:
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
-        bot.direction(reachable_door)
+        bot.pathfinder.direction(reachable_door)
 
         yield True
     else:
@@ -41,7 +41,7 @@ def open_doors_kick(bot: "Bot"):
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
         bot.step(A.Command.KICK)
-        bot.direction(reachable_door)
+        bot.pathfinder.direction(reachable_door)
 
         yield True
     else:
