@@ -35,6 +35,10 @@ class Bot:
         return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
     @property
+    def cursor(self):
+        return tuple(self.last_obs["tty_cursor"])
+
+    @property
     def position(self):
         return self.blstats.y, self.blstats.x
 
