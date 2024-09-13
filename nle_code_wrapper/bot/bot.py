@@ -91,6 +91,10 @@ class Bot:
 
         return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
 
+    def search(self):
+        self.step(A.Command.SEARCH)
+        self.current_level().search_count[self.blstats.y, self.blstats.x] += 1
+
     def type_text(self, text):
         for char in text:
             self.step(ord(char))

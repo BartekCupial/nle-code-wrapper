@@ -50,9 +50,9 @@ def explore(bot: "Bot"):
 
     # Combine factors to create exploration priority
     exploration_priority = (
-        (1 / (distance_matrix + 1))
-        * unexplored  # Prefer closer locations
-        * discovery_potential  # Only consider unexplored areas  # Prefer areas with high discovery potential
+        (1 / (distance_matrix + 1))  # Prefer closer locations
+        * unexplored  # Only consider unexplored areas
+        * discovery_potential  # Only conside areas with high discovery potential
     )
 
     # Set priority to 0 for unreachable or already visited locations

@@ -7,10 +7,12 @@ from nle_code_wrapper.bot.strategy.strategies.open_doors import open_doors, open
 from nle_code_wrapper.bot.strategy.strategies.pickup_items import pickup_items
 from nle_code_wrapper.bot.strategy.strategies.pray import pray
 from nle_code_wrapper.bot.strategy.strategies.random_move import random_move
+from nle_code_wrapper.bot.strategy.strategies.search import search
 from nle_code_wrapper.bot.strategy.strategies.smart_fight import smart_fight_strategy
 
 __all__ = [
     explore,
+    search,
     explore_items,
     pray,
     goto_stairs,
