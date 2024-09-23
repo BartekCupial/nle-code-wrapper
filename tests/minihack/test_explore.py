@@ -1,11 +1,11 @@
 import pytest
+from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategy import Strategy
 from nle_code_wrapper.bot.strategy.strategies import explore, goto_stairs
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-from nle_code_wrapper.play import play
 
 
 @pytest.mark.usefixtures("register_components")

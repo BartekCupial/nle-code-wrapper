@@ -1,8 +1,9 @@
 import importlib
 from functools import partial
 
+from nle_utils.play import play
+
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args, register_minihack_components
-from nle_code_wrapper.play import play
 
 
 def get_function_by_name(module_name, function_name):
