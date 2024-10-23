@@ -33,7 +33,7 @@ def main():
 
     def run_bot():
         status = play_random_strategy(cfg)
-        succeess = status == "TASK_SUCCESSFUL"
+        succeess = status["end_status"].name == "TASK_SUCCESSFUL"
         if not succeess:
             print(f"seed: {cfg.seed if cfg.seed else 'None'} failed, status: {status}")
 

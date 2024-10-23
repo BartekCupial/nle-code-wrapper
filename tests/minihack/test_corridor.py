@@ -15,7 +15,7 @@ class TestMazewalkMapped(object):
     def test_corridor_open_doors(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         status = play(cfg, strategies=[open_doors, goto_stairs, explore])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["corridor2"])
     @pytest.mark.parametrize("seed", [7])
@@ -42,13 +42,13 @@ class TestMazewalkMapped(object):
                 yield True
 
         status = play(cfg, strategies=[general_kick])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["corridor3"])
     @pytest.mark.parametrize("seed", [9])
     def test_corridor_hidden_doors(self, env, seed):
         # TODO: add search
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
 
         @Strategy.wrap
         def general_kick(bot: "Bot"):
@@ -73,4 +73,4 @@ class TestMazewalkMapped(object):
                 yield True
 
         status = play(cfg, strategies=[general_kick])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"

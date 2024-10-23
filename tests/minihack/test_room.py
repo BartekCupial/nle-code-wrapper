@@ -40,7 +40,7 @@ class TestMazewalkMapped(object):
                 yield True
 
         status = play(cfg, strategies=[general_explore])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
         "env",
@@ -72,7 +72,7 @@ class TestMazewalkMapped(object):
                 yield True
 
         status = play(cfg, strategies=[general_fight])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
         "env, seed",
@@ -101,7 +101,7 @@ class TestMazewalkMapped(object):
                 yield True
 
         status = play(cfg, strategies=[general_traps])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
         "env, seed",
@@ -132,4 +132,4 @@ class TestMazewalkMapped(object):
                 yield True
 
         status = play(cfg, strategies=[general_smart_fight])
-        assert status == "TASK_SUCCESSFUL"
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
