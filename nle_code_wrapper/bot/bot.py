@@ -6,6 +6,7 @@ from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
+from nle_code_wrapper.bot.strategy import Panic, Strategy
 
 
 class Bot:
@@ -13,8 +14,8 @@ class Bot:
         self.env = env
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
-        self.strategies = []
-        self.panics = []
+        self.strategies: list[Strategy] = []
+        self.panics: list[Panic] = []
 
     def strategy(self, func):
         self.strategies.append(func(self))
@@ -48,6 +49,11 @@ class Bot:
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
     def reset(self, **kwargs):
+        for strategy in self.strategies:
+            strategy.reset()
+        for panic in self.panics:
+            panic.reset()
+
         self.levels = {}
         self.steps = 0
         self.reward = 0.0

@@ -1,5 +1,5 @@
 from functools import wraps
-from typing import TYPE_CHECKING, Any, Callable, Generator
+from typing import TYPE_CHECKING, Callable, Generator
 
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.utils.utils import infinite_iterator
