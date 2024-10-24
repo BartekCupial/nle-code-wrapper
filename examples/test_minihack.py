@@ -28,11 +28,10 @@ def main():
     for strategy_name in cfg.strategies:
         strategy_func = get_function_by_name("nle_code_wrapper.bot.strategy.strategies", strategy_name)
         strategies.append(strategy_func)
-
-    play_random_strategy = partial(play, strategies=strategies)
+    cfg.strategies = strategies
 
     def run_bot():
-        status = play_random_strategy(cfg)
+        status = play(cfg)
         succeess = status["end_status"].name == "TASK_SUCCESSFUL"
         if not succeess:
             print(f"seed: {cfg.seed if cfg.seed else 'None'} failed, status: {status}")

@@ -39,7 +39,8 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, strategies=[general_explore])
+        cfg.strategies = [general_explore]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -71,7 +72,8 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, strategies=[general_fight])
+        cfg.strategies = [general_fight]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -100,7 +102,8 @@ class TestMazewalkMapped(object):
 
                 yield True
 
-        status = play(cfg, strategies=[general_traps])
+        cfg.strategies = [general_traps]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -131,5 +134,6 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, strategies=[general_smart_fight])
+        cfg.strategies = [general_smart_fight]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

@@ -14,7 +14,8 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", [0, 1])
     def test_corridor_open_doors(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        status = play(cfg, strategies=[open_doors, goto_stairs, explore])
+        cfg.strategies = [open_doors, goto_stairs, explore]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["MiniHack-Corridor-R2-v0"])
@@ -41,7 +42,8 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, strategies=[general_kick])
+        cfg.strategies = [general_kick]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["MiniHack-Corridor-R3-v0"])
@@ -72,5 +74,6 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, strategies=[general_kick])
+        cfg.strategies = [general_kick]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

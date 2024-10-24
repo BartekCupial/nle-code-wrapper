@@ -39,5 +39,6 @@ class TestMazewalkMapped(object):
                     pass
                 yield True
 
-        status = play(cfg, strategies=[general_explore])
+        cfg.strategies = [general_explore]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

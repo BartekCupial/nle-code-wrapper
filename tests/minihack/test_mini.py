@@ -89,7 +89,8 @@ class TestMazewalkMapped(object):
         # TODO: for some of the variants there are monsters which have to be dealt with
         # TODO: for some of the seeds there are items already worn, which have to be taken off
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        status = play(cfg, strategies=[partial(general_mini, where=where, action=action)])
+        cfg.strategies = [partial(general_mini, where=where, action=action)]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["MiniHack-LockedDoor-Fixed-v0"])
@@ -102,5 +103,6 @@ class TestMazewalkMapped(object):
         bot.strategy(explore)
         bot.strategy(goto_stairs)
 
-        status = play(cfg, strategies=[open_doors_kick, explore, goto_stairs])
+        cfg.strategies = [open_doors_kick, explore, goto_stairs]
+        status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
