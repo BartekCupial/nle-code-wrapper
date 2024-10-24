@@ -1,23 +1,7 @@
-import importlib
-from functools import partial
-
 from nle_utils.play import play
 
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args, register_minihack_components
-
-
-def get_function_by_name(module_name, function_name):
-    try:
-        module = importlib.import_module(module_name)
-        function = getattr(module, function_name)
-        if callable(function):
-            return function
-        else:
-            raise AttributeError(f"{function_name} is not a callable function in {module_name}")
-    except ImportError:
-        raise ImportError(f"Module {module_name} not found")
-    except AttributeError:
-        raise AttributeError(f"Function {function_name} not found in module {module_name}")
+from nle_code_wrapper.utils.utils import get_function_by_name
 
 
 def main():
@@ -26,7 +10,7 @@ def main():
 
     strategies = []
     for strategy_name in cfg.strategies:
-        strategy_func = get_function_by_name("nle_code_wrapper.bot.strategy.strategies", strategy_name)
+        strategy_func = get_function_by_name(cfg.strategies_loc, strategy_name)
         strategies.append(strategy_func)
     cfg.strategies = strategies
 

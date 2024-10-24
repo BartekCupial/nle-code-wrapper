@@ -1,4 +1,5 @@
 import functools
+import importlib
 from itertools import chain
 from typing import Any, Callable, Generator, Iterator
 
@@ -85,3 +86,17 @@ def infinite_iterator(func: Callable[[Any], Generator]) -> Iterator:
 
 def coords(glyphs, obj):
     return list(zip(*isin(glyphs, obj).nonzero()))
+
+
+def get_function_by_name(module_name, function_name):
+    try:
+        module = importlib.import_module(module_name)
+        function = getattr(module, function_name)
+        if callable(function):
+            return function
+        else:
+            raise AttributeError(f"{function_name} is not a callable function in {module_name}")
+    except ImportError:
+        raise ImportError(f"Module {module_name} not found")
+    except AttributeError:
+        raise AttributeError(f"Function {function_name} not found in module {module_name}")

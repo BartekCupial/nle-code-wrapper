@@ -11,7 +11,11 @@ if TYPE_CHECKING:
 class Strategy:
     @classmethod
     def wrap(cls, func):
-        return lambda *a, **k: Strategy(wraps(func)(lambda: func(*a, **k)))
+        @wraps(func)
+        def wrapper(*a, **k):
+            return Strategy(lambda: func(*a, **k))
+
+        return wrapper
 
     def __init__(self, func: Callable[["Bot"], Generator]):
         self.func = func
