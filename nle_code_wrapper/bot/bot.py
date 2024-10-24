@@ -83,8 +83,8 @@ class Bot:
     def strategy_step(self, action):
         self.steps = 0
         self.reward = 0
-        self.terminated = 0
-        self.truncated = 0
+        self.terminated = False
+        self.truncated = False
         self.last_info = {}
 
         strategy = self.strategies[action]
@@ -93,7 +93,13 @@ class Bot:
         except (BotPanic, BotFinished):
             pass
 
-        self.last_info["steps"] = self.steps
+        extra_stats = self.last_info.get("episode_extra_stats", {})
+        new_extra_stats = {
+            "strategy_steps": self.steps,
+            "strategy_reward": self.reward,
+            "strategy_usefull": self.steps > 0,
+        }
+        self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
 
