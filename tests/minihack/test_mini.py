@@ -70,18 +70,18 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env, where, action",
         [
-            ("mini_eat_fixed", G.FOOD_OBJECTS, partial(make_action_and_confirm, command=A.Command.EAT)),
-            ("mini_pray_fixed", G.ALTAR, partial(make_action_and_confirm, command=A.Command.PRAY)),
-            ("mini_sink_fixed", G.SINK, partial(make_action_and_confirm, command=A.Command.QUAFF)),
-            ("mini_read_fixed", G.SCROLL_CLASS, partial(pickup_and_use_item, command=A.Command.READ)),
-            ("mini_zap_fixed", G.WAND_CLASS, partial(pickup_and_use_item, command=A.Command.ZAP)),
+            ("MiniHack-Eat-Fixed-v0", G.FOOD_OBJECTS, partial(make_action_and_confirm, command=A.Command.EAT)),
+            ("MiniHack-Pray-Fixed-v0", G.ALTAR, partial(make_action_and_confirm, command=A.Command.PRAY)),
+            ("MiniHack-Sink-Fixed-v0", G.SINK, partial(make_action_and_confirm, command=A.Command.QUAFF)),
+            ("MiniHack-Read-Fixed-v0", G.SCROLL_CLASS, partial(pickup_and_use_item, command=A.Command.READ)),
+            ("MiniHack-Zap-Fixed-v0", G.WAND_CLASS, partial(pickup_and_use_item, command=A.Command.ZAP)),
             (
-                "mini_puton_fixed",
+                "MiniHack-PutOn-Fixed-v0",
                 frozenset.union(G.AMULET_CLASS, G.RING_CLASS),
                 partial(pickup_and_use_item, command=A.Command.PUTON),
             ),
-            ("mini_wear_fixed", G.ARMOR_CLASS, partial(pickup_and_use_item, command=A.Command.WEAR)),
-            ("mini_wield_fixed", G.WEAPON_CLASS, partial(pickup_and_use_item, command=A.Command.WIELD)),
+            ("MiniHack-Wear-Fixed-v0", G.ARMOR_CLASS, partial(pickup_and_use_item, command=A.Command.WEAR)),
+            ("MiniHack-Wield-Fixed-v0", G.WEAPON_CLASS, partial(pickup_and_use_item, command=A.Command.WIELD)),
         ],
     )
     @pytest.mark.parametrize("seed", [1])
@@ -92,7 +92,7 @@ class TestMazewalkMapped(object):
         status = play(cfg, strategies=[partial(general_mini, where=where, action=action)])
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
-    @pytest.mark.parametrize("env", ["mini_locked_fixed"])
+    @pytest.mark.parametrize("env", ["MiniHack-LockedDoor-Fixed-v0"])
     @pytest.mark.parametrize("seed", [0])
     def test_mini_locked(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])

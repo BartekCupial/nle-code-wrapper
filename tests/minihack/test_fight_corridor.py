@@ -13,8 +13,8 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env",
         [
-            "fight_corridor",
-            "fight_corridor_dark",
+            "MiniHack-CorridorBattle-v0",
+            "MiniHack-CorridorBattle-Dark-v0",
         ],
     )
     @pytest.mark.parametrize("seed", [2])

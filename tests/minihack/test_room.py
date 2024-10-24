@@ -13,12 +13,12 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env",
         [
-            "small_room",
-            "small_room_random",
-            "small_room_dark",
-            "big_room",
-            "big_room_random",
-            "big_room_dark",
+            "MiniHack-Room-5x5-v0",
+            "MiniHack-Room-Random-5x5-v0",
+            "MiniHack-Room-Dark-5x5-v0",
+            "MiniHack-Room-15x15-v0",
+            "MiniHack-Room-Random-15x15-v0",
+            "MiniHack-Room-Dark-15x15-v0",
         ],
     )
     def test_solve_room_explore(self, env):
@@ -45,8 +45,8 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env",
         [
-            "small_room_monster",
-            "big_room_monster",
+            "MiniHack-Room-Monster-5x5-v0",
+            "MiniHack-Room-Monster-15x15-v0",
         ],
     )
     @pytest.mark.parametrize("seed", [4])
@@ -77,8 +77,8 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env, seed",
         [
-            ("small_room_trap", 17),
-            ("big_room_trap", 2),
+            ("MiniHack-Room-Trap-5x5-v0", 17),
+            ("MiniHack-Room-Trap-15x15-v0", 2),
         ],
     )
     def test_solve_room_teleport_traps(self, env, seed):
@@ -106,8 +106,8 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env, seed",
         [
-            ("big_room_monster", 33),
-            ("big_room_ultimate", 4),
+            ("MiniHack-Room-Monster-15x15-v0", 33),
+            ("MiniHack-Room-Ultimate-15x15-v0", 4),
         ],
     )
     def test_solve_room_fight_hard(self, env, seed):

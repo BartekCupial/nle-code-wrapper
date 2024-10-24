@@ -13,12 +13,12 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env",
         [
-            "mazewalk_small",
-            "mazewalk_small_mapped",
-            "mazewalk_big",
-            "mazewalk_big_mapped",
-            "mazewalk_huge",
-            "mazewalk_huge_mapped",
+            "MiniHack-MazeWalk-9x9-v0",
+            "MiniHack-MazeWalk-Mapped-9x9-v0",
+            "MiniHack-MazeWalk-15x15-v0",
+            "MiniHack-MazeWalk-Mapped-15x15-v0",
+            "MiniHack-MazeWalk-45x19-v0",
+            "MiniHack-MazeWalk-Mapped-45x19-v0",
         ],
     )
     def test_solve_mazewalk(self, env):

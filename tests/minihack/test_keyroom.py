@@ -78,11 +78,11 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env, seed",
         [
-            ("keyroom_small_fixed", 7),
-            ("keyroom_small", 7),
-            ("keyroom_big", 7),
-            ("keyroom_small_dark", 7),
-            ("keyroom_big_dark", 7),
+            ("MiniHack-KeyRoom-Fixed-S5-v0", 7),
+            ("MiniHack-KeyRoom-S5-v0", 7),
+            ("MiniHack-KeyRoom-Dark-S5-v0", 7),
+            ("MiniHack-KeyRoom-S15-v0", 7),
+            ("MiniHack-KeyRoom-Dark-S15-v0", 7),
         ],
     )
     def test_keyroom_hard(self, env, seed):
