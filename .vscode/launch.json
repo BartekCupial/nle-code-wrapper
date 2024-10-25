@@ -5,17 +5,85 @@
     "version": "0.2.0",
     "configurations": [
         {
-            "name": "run minihack",
+            "name": "mrunner run",
             "type": "debugpy",
             "request": "launch",
-            "module": "nle_code_wrapper.envs.minihack.run_minihack",
+            "module": "mrunner_run",
             "justMyCode": false,
             "args": [
-                "--env", "mazewalk_small_mapped",
+                "--ex", "experiments/local.py",
             ],
-            "env": {
-                "PYTHONPATH": "${workspaceFolder}/external/nle_utils:${env:PYTHONPATH}",
-            }
-        }
+        },
+        {
+            "name": "enjoy minihack",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.agents.sample_factory.minihack.enjoy",
+            "justMyCode": false,
+            "args": [
+                "--env", "MiniHack-Corridor-R5-v0",
+                "--strategies", "['explore', 'search', 'open_doors_kick', 'goto_stairs', 'fight_closest_monster']",
+                "--code-wrapper", "True",
+                "--gamma", "0.99",
+                // "--num_workers", "1",
+                // "--num_envs_per_worker", "1",
+                // "--worker_num_splits", "1",
+                // "--batch_size", ""
+                // "--verbose", "True",
+                // // "--no-render",
+                // "--seed", "10",
+            ],
+        },
+        {
+            "name": "test minihack",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "examples.test_minihack",
+            "justMyCode": false,
+            "args": [
+                // "--env", "mazewalk_huge",
+                // "--strategies", "['explore', 'open_doors', 'goto_stairs', 'fight_closest_monster']",
+                // "--verbose", "True",
+                "--env", "MiniHack-Corridor-R5-v0",
+                "--strategies", "['explore', 'search', 'open_doors_kick', 'goto_stairs', 'fight_closest_monster']",
+                "--verbose", "True",
+                // "--no-render",
+                // "--seed", "10",
+            ],
+        },
+        {
+            "name": "play minihack",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.envs.minihack.play_minihack",
+            "justMyCode": false,
+            "args": [
+                "--env", "mazewalk_big_mapped",
+                "--code-wrapper", "False",
+                "--verbose", "True",
+                // // "--no-render",
+                // "--seed", "10",
+            ],
+        },
+        {
+            "name": "example minihack",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.random_strategy",
+            "justMyCode": false,
+            "args": [],
+        },
+        {
+            "name": "debug test",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "pytest",
+            "args": [
+                // "${file}",
+                "tests/strategy/test_strategy.py",
+            ],
+            "justMyCode": false,
+        },
+        
     ]
 }
