@@ -21,6 +21,7 @@ config = {
     "wandb_project": "nle_code_wrapper",
     "wandb_group": "ideas-ncbr",
     "with_wandb": True,
+    "decorrelate_envs_on_one_worker": False,
 }
 
 # params different between exps

@@ -29,18 +29,18 @@ setup(
     long_description_content_type="text/markdown",
     version="2.1.2",
     url="https://github.com/BartekCupial/nle-code-wrapper",
-    author="Aleksei Petrenko",
+    author="Bartłomiej Cupiał",
     license="MIT",
     keywords="reinforcement learning ai nlp llm code",
     project_urls={},
-    install_requires=[],
+    install_requires=["sortedcontainers"],
     extras_require={
         # some tests require Atari and Mujoco so let's make sure dev environment has that
         "dev": ["black", "isort>=5.12", "pytest<8.0", "flake8", "pre-commit", "twine"]
         + _docs_deps
     },
     package_dir={"": "./"},
-    packages=setuptools.find_packages(where="./", include=["nle_code_wrapper*"]),
+    packages=setuptools.find_packages(where="./", include=["nle_code_wrapper*", "examples*"]),
     include_package_data=True,
     python_requires=">=3.8",
 )

@@ -41,9 +41,6 @@
             "module": "examples.test_minihack",
             "justMyCode": false,
             "args": [
-                // "--env", "mazewalk_huge",
-                // "--strategies", "['explore', 'open_doors', 'goto_stairs', 'fight_closest_monster']",
-                // "--verbose", "True",
                 "--env", "MiniHack-Corridor-R5-v0",
                 "--strategies", "['explore', 'search', 'open_doors_kick', 'goto_stairs', 'fight_closest_monster']",
                 "--verbose", "True",
