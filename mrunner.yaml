@@ -1,0 +1,16 @@
+contexts:
+  pc_gpu:
+    # account: compute-account
+    backend_type: slurm
+    cmd_type: sbatch
+    cpu: 16
+    mem: 20G
+    gpu: 1
+    nodes: 1
+    ntasks: 1
+    partition: debug
+    nodelist: login01
+    singularity_container: --nv -H $PWD:/homeplaceholder --env WANDBPWD=$PWD -B $TMPDIR:/tmp /home/bartomiej.cupial/dungeons.sif
+    slurm_url: bartlomiej.cupial@10.200.100.207
+    storage_dir: /raid/NFS_SHARE/results/bartlomiej.cupial
+
