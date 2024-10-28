@@ -10,12 +10,11 @@ def quaff_potion_from_inv(bot: "Bot"):
     inv_glyphs = bot.inv_glyphs
     inv_letters = bot.inv_letters
 
-    # find the first potion in the inventory
+    # find the last potion in the inventory
     potion_char = None
     for char, glyph in zip(inv_letters, inv_glyphs):
         if glyph in G.POTION_CLASS:
             potion_char = char
-            break
 
     if potion_char is None:
         yield False
