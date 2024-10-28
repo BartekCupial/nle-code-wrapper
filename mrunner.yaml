@@ -10,6 +10,6 @@ contexts:
     ntasks: 1
     partition: debug
     nodelist: login01
-    singularity_container: --nv -H $PWD:/homeplaceholder --env WANDBPWD=$PWD -B $TMPDIR:/tmp /home/bartomiej.cupial/dungeons.sif
+    singularity_container: --nv -H $PWD:/homeplaceholder --env WANDBPWD=$PWD -B $TMPDIR:/tmp /home/bartlomiej.cupial/ncw.sif
     slurm_url: bartlomiej.cupial@10.200.100.207
-    storage_dir: /raid/NFS_SHARE/results/bartlomiej.cupial
+    storage_dir: /home/bartlomiej.cupial/storage
