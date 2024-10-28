@@ -17,7 +17,7 @@ config = {
     "batch_size": 4096,  # this equals bs = 128, 128 * 32 = 4096
     "async_rl": True,
     "serial_mode": False,
-    "wandb_user": "b-cupial",
+    "wandb_user": "bartekcupial",
     "wandb_project": "nle_code_wrapper",
     "wandb_group": "ideas-ncbr",
     "with_wandb": True,
@@ -30,7 +30,7 @@ params_grid = [
         "seed": list(range(1)),
         "num_workers": [8],
         "batch_size": [512],
-        "with_wandb": [False],
+        "with_wandb": [True],
         "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
         "code-wrapper": [True],
         "gamma": [0.99],
