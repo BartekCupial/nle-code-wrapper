@@ -9,6 +9,7 @@ from nle_code_wrapper.bot.strategy.strategies.pray import pray
 from nle_code_wrapper.bot.strategy.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategy.strategies.search import search
 from nle_code_wrapper.bot.strategy.strategies.smart_fight import smart_fight_strategy
+from nle_code_wrapper.bot.strategy.strategies.quaff import quaff_potion_from_inv
 
 __all__ = [
     explore,
@@ -25,4 +26,5 @@ __all__ = [
     smart_fight_strategy,
     pickup_items,
     goto_items,
+    quaff_potion_from_inv
 ]
