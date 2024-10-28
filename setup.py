@@ -36,8 +36,8 @@ setup(
     install_requires=["sortedcontainers"],
     extras_require={
         # some tests require Atari and Mujoco so let's make sure dev environment has that
-        "dev": ["black", "isort>=5.12", "pytest<8.0", "flake8", "pre-commit", "twine"]
-        + _docs_deps
+        "dev": ["black", "isort>=5.12", "pytest<8.0", "flake8", "pre-commit", "twine"] + _docs_deps,
+        "sample_factory": ["sample_factory"],
     },
     package_dir={"": "./"},
     packages=setuptools.find_packages(where="./", include=["nle_code_wrapper*", "examples*"]),
