@@ -111,6 +111,10 @@ class Bot:
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
+
+        if self.terminated or self.truncated:
+            new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
+
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
