@@ -33,6 +33,8 @@ params_grid = [
         "seed": list(range(1)),
         "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
         "gamma": [0.99],
+        "batch_size": [512],
+        "num_workers": [8],
         "restart_behavior": ["overwrite"],
     },
 ]
