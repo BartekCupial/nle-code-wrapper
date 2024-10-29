@@ -25,6 +25,9 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
         wget \
         make
 
+    # nle dependencies
+    apt-get install -yq autoconf libtool pkg-config libbz2-dev
+
     mkdir conda_setup
     cd conda_setup
     curl -o miniconda.sh https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh && \
@@ -44,12 +47,11 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
 
     conda update -n base -c defaults conda
 
-    export PYTHON_VERSION=$(python3 -c 'import sys; print(f"cp{sys.version_info.major}{sys.version_info.minor}")')
-    pip install  "https://github.com/BartekCupial/nle/releases/download/barlog/nle-0.9.0+a0aa022-${PYTHON_VERSION}-${PYTHON_VERSION}-manylinux_2_17_x86_64.manylinux2014_x86_64.whl"
-    pip install git+https://github.com/BartekCupial/minihack.git
-    
-    # install code wrapper
     cd /dungeons/
+    export PYTHON_VERSION=$(python3 -c 'import sys; print(f"cp{sys.version_info.major}{sys.version_info.minor}")')
+    pip install "https://github.com/BartekCupial/nle/releases/download/fair/nle-0.9.0-${PYTHON_VERSION}-${PYTHON_VERSION}-manylinux_2_17_$(uname -m).manylinux2014_$(uname -m).whl"
+    pip install git+https://github.com/facebookresearch/minihack.git
+    pip install git+https://gitlab.com/awarelab/mrunner.git
     pip install -e external/nle_utils
     pip install -e .[dev,sample_factory,mrunner]
 
