@@ -17,6 +17,7 @@ config = {
     "worker_num_splits": 2,
     "rollout": 32,
     "batch_size": 4096,  # this equals bs = 128, 128 * 32 = 4096
+    "penalty_time": -0.01,
     "async_rl": True,
     "serial_mode": False,
     "wandb_user": "bartekcupial",
@@ -30,9 +31,9 @@ config = {
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(1)),
+        "seed": list(range(5)),
         "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
-        "gamma": [0.99],
+        "gamma": [0.9, 0.99, 0.999, 1.0],
         "restart_behavior": ["overwrite"],
     },
 ]

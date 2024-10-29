@@ -30,9 +30,9 @@ config = {
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(1)),
+        "seed": list(range(5)),
         "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
-        "gamma": [0.99],
+        "gamma": [0.9, 0.99, 0.999, 1.0],
         "restart_behavior": ["overwrite"],
     },
 ]
