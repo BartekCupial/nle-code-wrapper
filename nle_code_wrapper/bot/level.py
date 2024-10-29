@@ -1,7 +1,8 @@
 from collections import defaultdict
 
 import numpy as np
-from nle_utils.glyph import SHOP, C, G, SS
+from nle import nethack
+from nle_utils.glyph import SHOP, SS, C, G
 
 from nle_code_wrapper.utils import utils
 
@@ -62,8 +63,7 @@ class Level:
         self.walkable[mask] = False
 
         # NOTE: adjust for levitation (1024 in blstats)
-        # TODO: not sure if this is the best way to check
-        if blstats.prop_mask & 0b10000000000:
+        if blstats.prop_mask & nethack.BL_MASK_LEV:
             mask = utils.isin(glyphs, [SS.S_lava])
             self.walkable[mask] = True
             self.seen[mask] = True
@@ -72,7 +72,6 @@ class Level:
             mask = utils.isin(glyphs, [SS.S_lava])
             self.walkable[mask] = False
             self.seen[mask] = False
-
 
         self.was_on[blstats.y, blstats.x] = True
 
