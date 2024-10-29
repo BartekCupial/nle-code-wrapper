@@ -1,3 +1,5 @@
+import os
+
 from mrunner.helpers.specification_helper import create_experiments_helper
 
 name = globals()["script"][:-3]
@@ -45,6 +47,9 @@ experiments_list = create_experiments_helper(
     script="python3 mrunner_run.py",
     python_path=".",
     tags=[name],
+    env={
+        "WANDB_API_KEY": os.environ["WANDB_API_KEY"],
+    },
     base_config=config,
     params_grid=params_grid,
     mrunner_ignore=".mrunnerignore",
