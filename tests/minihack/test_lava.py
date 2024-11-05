@@ -1,16 +1,14 @@
 from functools import partial
 
 import pytest
+from nle import nethack
 from nle.nethack import actions as A
 from nle_utils.glyph import G
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.strategy import Strategy
-from nle_code_wrapper.bot.strategy.strategies import (
-    goto_stairs,
-    quaff_potion_from_inv,
-)
+from nle_code_wrapper.bot.strategy.strategies import goto_stairs, quaff_potion_from_inv
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
@@ -35,10 +33,11 @@ def lava_strategy(bot: "Bot"):
         goto_stairs_strat()
         yield
 
+
 @Strategy.wrap
 def pickup(bot: "Bot"):
     bot.step(A.Command.PICKUP)
-    
+
     if bot.message.strip() == "":
         yield False
     else:
@@ -61,25 +60,28 @@ def goto(bot: "Bot", where):
     else:
         yield False
 
+
 @Strategy.wrap
 def put_on_ring_from_inv(bot: "Bot"):
-    inv_glyphs = bot.inv_glyphs
     inv_letters = bot.inv_letters
+    inv_oclasses = bot.inv_oclasses
 
-    # find the first potion in the inventory
-    ring_char = None
-    for char, glyph in zip(inv_letters, inv_glyphs):
-        if glyph in G.RING_CLASS:
-            ring_char = char
-            break
+    ring_letters = inv_letters[inv_oclasses == nethack.RING_CLASS]
 
-    if ring_char is None:
-        yield False
-    else:
+    # find the ring of levitation
+    levitation = False
+    for ring_char in ring_letters:
         bot.step(A.Command.PUTON)
         bot.step(ring_char)
-        bot.type_text('l') # indicates left ring finger - not sure if this matters
-        yield True
+        bot.type_text("l")  # indicates left ring finger - not sure if this matters
+
+        if bot.blstats.prop_mask & nethack.BL_MASK_LEV:
+            levitation = True
+            break
+        else:
+            bot.step(A.Command.REMOVE)
+
+    yield levitation
 
 
 @pytest.mark.usefixtures("register_components")
@@ -93,10 +95,9 @@ class TestMazewalkMapped(object):
             "MiniHack-LavaCross-Levitate-Ring-Pickup-Full-v0",
         ],
     )
-    @pytest.mark.parametrize("seed", [0, 1, 2])
+    @pytest.mark.parametrize("seed", [0, 1, 2, 3, 4])
     def test_lava(self, env, seed):
         # TODO: for some of the variants there are monsters which have to be dealt with
-        # TODO: for some of the seeds there are items already worn, which have to be taken off
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         cfg.strategies = [lava_strategy]
         status = play(cfg)

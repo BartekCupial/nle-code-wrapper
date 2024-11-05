@@ -44,6 +44,18 @@ class Bot:
         return self.last_obs["inv_letters"]
 
     @property
+    def inv_glyphs(self):
+        return self.last_obs["inv_glyphs"]
+
+    @property
+    def inv_letters(self):
+        return self.last_obs["inv_letters"]
+
+    @property
+    def inv_oclasses(self):
+        return self.last_obs["inv_oclasses"]
+
+    @property
     def cursor(self):
         return tuple(self.last_obs["tty_cursor"])
 
@@ -107,6 +119,10 @@ class Bot:
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
+
+        if self.terminated or self.truncated:
+            new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
+
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
