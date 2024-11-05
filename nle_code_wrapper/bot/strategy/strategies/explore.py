@@ -38,7 +38,7 @@ def explore(bot: "Bot"):
     distance_values = np.array(list(distances.values()))
     distance_matrix[distance_indices] = distance_values
 
-    # Factor 2: Unxplored areas
+    # Factor 2: Unexplored areas
     unexplored = ~level.was_on
 
     # Factor 3: Potential for discovering new areas
