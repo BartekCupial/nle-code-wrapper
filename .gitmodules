@@ -1,3 +1,6 @@
 [submodule "external/nle_utils"]
 	path = external/nle_utils
 	url = https://github.com/BartekCupial/nle-utils.git
+[submodule "external/BALROG"]
+	path = external/BALROG
+	url = git@github.com:DavidePaglieri/BALROG.git
