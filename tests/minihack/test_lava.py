@@ -43,6 +43,7 @@ def pickup(bot: "Bot"):
     else:
         yield True
 
+
 @Strategy.wrap
 def goto(bot: "Bot", where):
     coords = utils.coords(bot.glyphs, where)

@@ -34,14 +34,6 @@ class Bot:
     @property
     def message(self):
         return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
-    
-    @property
-    def inv_glyphs(self):
-        return self.last_obs["inv_glyphs"]
-    
-    @property 
-    def inv_letters(self):
-        return self.last_obs["inv_letters"]
 
     @property
     def inv_glyphs(self):
