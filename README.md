@@ -7,8 +7,8 @@ Code Wrapper for [Nethack Learning Environment (NLE)](https://github.com/faceboo
 git submodule update --init --recursive
 
 ```bash
-PYTHON_VERSION=$(python3 -c 'import sys; print(f"cp{sys.version_info.major}{sys.version_info.minor}")')
-pip install "https://github.com/BartekCupial/nle/releases/download/fair/nle-0.9.0-${PYTHON_VERSION}-${PYTHON_VERSION}-manylinux_2_17_$(uname -m).manylinux2014_$(uname -m).whl"
+MINOR=$(python3 -c 'import sys; print(f"cp{sys.version_info.major}{sys.version_info.minor}")')
+pip install "https://github.com/BartekCupial/nle/releases/download/fair/nle-0.9.0-${MINOR}-${MINOR}-manylinux_2_17_$(uname -m).manylinux2014_$(uname -m).whl"
 pip install -e external/nle_utils
 pip install -e .[dev,sample_factory,mrunner,minihack]
 ```
