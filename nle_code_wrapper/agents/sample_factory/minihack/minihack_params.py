@@ -81,4 +81,5 @@ def minihack_override_defaults(_env, parser):
         adam_eps=1e-7,
         seed=22,
         save_every_sec=120,
+        encoder_conv_architecture="resnet_impala",
     )
