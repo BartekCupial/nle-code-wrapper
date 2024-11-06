@@ -26,6 +26,7 @@
                 "cwd": "",
                 "env": {
                     "PYTHONPATH": "${workspaceFolder}/nle_utils:${env:PYTHONPATH}",
+                    "WANDB_API_KEY": "${env:WANDB_API_KEY}"
                 }
             },
             "problemMatcher": [],
