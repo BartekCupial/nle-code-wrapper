@@ -2,12 +2,13 @@
     "python.analysis.extraPaths": [
         "${workspaceFolder}",
         "${workspaceFolder}/external/nle_utils",
+        "${workspaceFolder}/external/sample_factory",
     ],
     "python.testing.pytestArgs": ["tests"],
     "python.testing.unittestEnabled": false,
     "python.testing.nosetestsEnabled": false,
     "python.testing.pytestEnabled": true,
     "terminal.integrated.env.linux": {
-        "PYTHONPATH": "${workspaceFolder}/external/nle_utils:${env:PYTHONPATH}"
+        "PYTHONPATH": "${workspaceFolder}/external/nle_utils:${workspaceFolder}/external/sample_factory:${env:PYTHONPATH}"
     },
 }
