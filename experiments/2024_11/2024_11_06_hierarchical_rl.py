@@ -21,8 +21,9 @@ config = {
     "wandb_project": "nle_code_wrapper",
     "wandb_group": "ideas-ncbr",
     "with_wandb": True,
-    "decorrelate_envs_on_one_worker": False,
-    "code_wrapper": False,
+    "decorrelate_envs_on_one_worker": True,
+    "code_wrapper": True,
+    "hierarchical_gamma": True,  # should be the same as code-wrapper
 }
 
 # params different between exps
@@ -30,6 +31,7 @@ params_grid = [
     {
         "seed": list(range(1)),
         "model": ["default_make_encoder_func", "ScaledNet", "ChaoticDwarvenGPT5"],
+        "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
         "gamma": [0.999],
         "restart_behavior": ["overwrite"],
         "env": [env],
