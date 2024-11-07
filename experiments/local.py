@@ -8,10 +8,9 @@ name = globals()["script"][:-3]
 config = {
     "env": "MiniHack-Corridor-R5-v0",
     "exp_tags": [name],
-    "exp_point": "corridor5",
+    "exp_point": "MiniHack-Corridor-R5-v0",
     "train_for_env_steps": 1_000_000,
-    "group": "corridor5-local",
-    "character": "mon-hum-neu-mal",
+    "group": "MiniHack-Corridor-R5-v0",
     "num_workers": 16,
     "num_envs_per_worker": 32,
     "worker_num_splits": 2,
@@ -22,7 +21,7 @@ config = {
     "wandb_user": "bartekcupial",
     "wandb_project": "nle_code_wrapper",
     "wandb_group": "ideas-ncbr",
-    "with_wandb": True,
+    "with_wandb": False,
     "decorrelate_envs_on_one_worker": False,
     "code-wrapper": True,
 }
@@ -32,9 +31,10 @@ params_grid = [
     {
         "seed": list(range(1)),
         "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
-        "gamma": [0.99],
-        "batch_size": [512],
-        "num_workers": [8],
+        "gamma": [0.999],
+        "batch_size": [128],
+        "num_workers": [4],
+        "num_envs_per_worker": [8],
         "restart_behavior": ["overwrite"],
     },
 ]
