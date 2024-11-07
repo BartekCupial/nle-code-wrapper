@@ -22,7 +22,7 @@ config = {
     "wandb_group": "ideas-ncbr",
     "with_wandb": True,
     "decorrelate_envs_on_one_worker": False,
-    "code-wrapper": False,
+    "code_wrapper": False,
 }
 
 # params different between exps

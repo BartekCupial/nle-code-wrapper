@@ -20,10 +20,10 @@ config = {
     "wandb_user": "bartekcupial",
     "wandb_project": "nle_code_wrapper",
     "wandb_group": "ideas-ncbr",
-    "with_wandb": True,
+    "with_wandb": False,
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
-    "hierarchical_gamma": True,  # should be the same as code-wrapper
+    "hierarchical_gamma": True,  # should be the same as code_wrapper
 }
 
 # params different between exps

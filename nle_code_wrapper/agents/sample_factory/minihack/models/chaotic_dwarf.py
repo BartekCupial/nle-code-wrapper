@@ -261,12 +261,10 @@ class ChaoticDwarvenGPT5(Encoder):
         self.use_prev_action = cfg.use_prev_action
 
         screen_shape = obs_space["tty_chars"].shape
-        self.screen_encoder = torch.jit.script(
-            CharColorEncoder(
-                (screen_shape[0] - 3, screen_shape[1]),
-                char_edim=cfg.char_edim,
-                color_edim=cfg.color_edim,
-            )
+        self.screen_encoder = CharColorEncoder(
+            (screen_shape[0] - 3, screen_shape[1]),
+            char_edim=cfg.char_edim,
+            color_edim=cfg.color_edim,
         )
 
         # top and bottom encoders
