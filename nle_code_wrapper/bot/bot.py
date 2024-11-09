@@ -73,6 +73,15 @@ class Bot:
         self.done = False
 
         self.last_obs, self.last_info = self.env.reset(**kwargs)
+
+        extra_stats = self.last_info.get("episode_extra_stats", {})
+        new_extra_stats = {
+            "strategy_steps": self.steps,
+            "strategy_reward": self.reward,
+            "strategy_usefull": self.steps > 0,
+        }
+        self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
+
         self.update()
 
         return self.last_obs, self.last_info
