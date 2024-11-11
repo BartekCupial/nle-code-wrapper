@@ -15,10 +15,10 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         strategy_func = get_function_by_name(cfg.strategies_loc, strategy_name)
         strategies.append(strategy_func)
 
-    if cfg.model == "default_make_encoder_func":
-        env = AddChanngelDim(env)
-
     if cfg.code_wrapper:
         env = NLECodeWrapper(env, strategies)
+
+    if cfg.model == "default_make_encoder_func":
+        env = AddChanngelDim(env)
 
     return env

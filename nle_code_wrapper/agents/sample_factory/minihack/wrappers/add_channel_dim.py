@@ -27,14 +27,15 @@ class AddChanngelDim(gym.ObservationWrapper):
         self.observation_space = gym.spaces.Dict(new_obs_space)
 
     def observation(self, observation):
+        new_observation = {}
         for obs_key in self.obs_keys:
             shape = observation[obs_key].shape
 
             if len(shape) == 1:
-                pass
+                new_observation[obs_key] = observation[obs_key]
             elif len(shape) > 1:
-                observation[obs_key] = observation[obs_key][None, ...]
+                new_observation[obs_key] = observation[obs_key][None, ...]
             else:
                 raise NotImplementedError("Unsupported observation")
 
-        return observation
+        return new_observation
