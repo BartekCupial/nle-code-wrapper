@@ -25,6 +25,7 @@ SOFTWARE.
 """
 import torch
 from nle import nethack
+from sample_factory.algo.utils.torch_utils import calc_num_elements
 from sample_factory.model.encoder import Encoder
 from sample_factory.utils.typing import Config, ObsSpace
 from torch import nn
@@ -198,8 +199,8 @@ class CharColorEncoder(nn.Module):
         self.hidden_dim = 512
 
         self.conv_filters = [
-            [char_edim + color_edim, 32, 3, 1, 1],
-            [32, 64, 3, 1, 1],
+            [char_edim + color_edim, 32, (3, 5), (1, 2), (1, 2)],
+            [32, 64, (3, 5), (1, 2), (1, 2)],
             [64, 128, 3, 1, 1],
             [128, 128, 3, 1, 1],
         ]
@@ -222,11 +223,8 @@ class CharColorEncoder(nn.Module):
             )
             conv_layers.append(nn.ELU(inplace=True))
 
-            self.h = conv_outdim(self.h, filter_size, padding=0, stride=stride, dilation=dilation)
-            self.w = conv_outdim(self.w, filter_size, padding=0, stride=stride, dilation=dilation)
-
         self.conv_head = nn.Sequential(*conv_layers)
-        self.out_size = self.h * self.w * out_channels
+        self.out_size = calc_num_elements(self.conv_head, (char_edim + color_edim,) + screen_shape)
 
         self.fc_head = nn.Sequential(nn.Linear(self.out_size, self.hidden_dim), nn.ELU(inplace=True))
 
@@ -332,3 +330,15 @@ def selectt(embedding_layer, x, use_index_select):
     else:
         # Use standard embedding forward
         return embedding_layer(x)
+
+
+if __name__ == "__main__":
+    # Test the screen encoder
+    encoder = CharColorEncoder(
+        (21 - 3, 80),
+        char_edim=16,
+        color_edim=16,
+    )
+    tty_chars = torch.zeros(160, 1, 21, 80)
+    tty_colors = torch.zeros(160, 1, 21, 80)
+    print(encoder(tty_chars, tty_colors).shape)
