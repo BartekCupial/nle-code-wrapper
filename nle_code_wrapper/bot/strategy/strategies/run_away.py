@@ -4,6 +4,17 @@ from nle_code_wrapper.bot.strategy import Strategy
 
 @Strategy.wrap
 def run_away(bot: "Bot"):
+    """
+    Executes the run away strategy for the bot.
+    This strategy involves the bot identifying nearby monsters,
+    counting how many are within attack range, and deciding whether
+    to move away to a safer position if there are multiple enemies nearby.
+    Args:
+        bot (Bot): The bot instance executing the strategy.
+    Yields:
+        bool: True if the bot moves to an escape position, False otherwise.
+    """
+
     # Get all nearby monsters
     nearby_monsters = [e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]
 
