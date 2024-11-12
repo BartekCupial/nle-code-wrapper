@@ -10,6 +10,6 @@ def add_code_wrapper_cli_args(p: ArgumentParser):
     p.add_argument(
         "--strategies_loc",
         type=str,
-        default="nle_code_wrapper.bot.strategy.strategies",
+        default="nle_code_wrapper.bot.strategies",
         help="where to search for strategies implementation",
     )

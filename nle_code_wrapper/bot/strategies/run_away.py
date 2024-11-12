@@ -1,8 +1,6 @@
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
 
 
-@Strategy.wrap
 def run_away(bot: "Bot"):
     """
     Executes the run away strategy for the bot.
@@ -22,11 +20,11 @@ def run_away(bot: "Bot"):
         escape_position = find_escape_position(bot, nearby_monsters)
         if escape_position:
             bot.pathfinder.goto(escape_position)
-            yield True
+            return True
         else:
-            yield False
+            return False
     else:
-        yield False
+        return False
 
 
 def find_escape_position(bot: "Bot", monsters):

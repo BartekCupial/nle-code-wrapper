@@ -1,10 +1,8 @@
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
 
 
-@Strategy.wrap
 def goto_stairs(bot: "Bot"):
     """
     Directs the bot to move towards the stairs on the current level.
@@ -22,6 +20,6 @@ def goto_stairs(bot: "Bot"):
     stairs = level.object_coords(G.STAIR_DOWN)
     if len([s for s in stairs if bot.pathfinder.get_path_to(s)]) > 0:
         bot.pathfinder.goto(stairs[0])
-        yield True
+        return True
     else:
-        yield False
+        return False

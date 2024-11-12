@@ -3,8 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategy import Strategy
-from nle_code_wrapper.bot.strategy.strategies import explore, fight_closest_monster, goto_stairs, open_doors, run_away
+from nle_code_wrapper.bot.strategies import explore, fight_closest_monster, goto_stairs, open_doors, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -26,29 +25,21 @@ class TestMazewalkMapped(object):
     def test_solve_multiroom(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render"])
 
-        @Strategy.wrap
         def general(bot: "Bot"):
-            run_strat = run_away(bot)
-            fight_strat = fight_closest_monster(bot)
-            stairs_strat = goto_stairs(bot)
-            doors_strat = open_doors(bot)
-            explore_strat = explore(bot)
-
             while True:
                 try:
-                    if run_strat():
+                    if run_away(bot):
                         pass
-                    elif fight_strat():
+                    elif fight_closest_monster(bot):
                         pass
-                    elif stairs_strat():
+                    elif goto_stairs(bot):
                         pass
-                    elif doors_strat():
+                    elif open_doors(bot):
                         pass
                     else:
-                        explore_strat()
+                        explore(bot)
                 except BotPanic:
                     pass
-                yield True
 
         cfg.strategies = [general]
         status = play(cfg)

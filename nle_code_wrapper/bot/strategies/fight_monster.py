@@ -1,14 +1,12 @@
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
 
 
-@Strategy.wrap
 def fight_closest_monster(bot: "Bot"):
     """
     Directs the bot to fight the closest monster.
     This function finds the closest monster entity that the bot can reach using its pathfinder.
-    If a reachable monster is found, the bot will attack it and the function will yield True.
-    If no reachable monster is found, the function will yield False.
+    If a reachable monster is found, the bot will attack it and the function will return True.
+    If no reachable monster is found, the function will return False.
     Args:
         bot (Bot): The bot instance that will perform the action.
     Yields:
@@ -23,19 +21,14 @@ def fight_closest_monster(bot: "Bot"):
 
     if entity:
         bot.pvp.attack(entity)
-        yield True
+        return True
     else:
-        yield False
+        return False
 
 
-@Strategy.wrap
 def fight_all_monsters(bot: "Bot"):
-    fight_strategy = fight_closest_monster(bot)
-
     # kill all reachable monsters
     while True:
-        fighting = fight_strategy()
+        fighting = fight_closest_monster(bot)
         if not fighting:
             break
-
-    yield
