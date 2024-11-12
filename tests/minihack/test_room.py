@@ -4,7 +4,7 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategy import Strategy
-from nle_code_wrapper.bot.strategy.strategies import explore, fight_closest_monster, goto_stairs, smart_fight_strategy
+from nle_code_wrapper.bot.strategy.strategies import explore, fight_closest_monster, goto_stairs, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -118,13 +118,16 @@ class TestMazewalkMapped(object):
 
         @Strategy.wrap
         def general_smart_fight(bot: "Bot"):
-            fight_strat = smart_fight_strategy(bot)
+            run_strat = run_away(bot)
+            fight_strat = fight_closest_monster(bot)
             stairs_strat = goto_stairs(bot)
             explore_strat = explore(bot)
 
             while True:
                 try:
-                    if fight_strat():
+                    if run_strat():
+                        pass
+                    elif fight_strat():
                         pass
                     elif stairs_strat():
                         pass

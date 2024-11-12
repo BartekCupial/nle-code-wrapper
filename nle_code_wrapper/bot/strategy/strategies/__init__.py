@@ -6,10 +6,10 @@ from nle_code_wrapper.bot.strategy.strategies.goto_stairs import goto_stairs
 from nle_code_wrapper.bot.strategy.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategy.strategies.pickup_items import pickup_items
 from nle_code_wrapper.bot.strategy.strategies.pray import pray
-from nle_code_wrapper.bot.strategy.strategies.random_move import random_move
-from nle_code_wrapper.bot.strategy.strategies.search import search
-from nle_code_wrapper.bot.strategy.strategies.smart_fight import smart_fight_strategy
 from nle_code_wrapper.bot.strategy.strategies.quaff import quaff_potion_from_inv
+from nle_code_wrapper.bot.strategy.strategies.random_move import random_move
+from nle_code_wrapper.bot.strategy.strategies.run_away import run_away
+from nle_code_wrapper.bot.strategy.strategies.search import search
 
 __all__ = [
     explore,
@@ -23,8 +23,8 @@ __all__ = [
     open_doors_kick,
     open_doors_key,
     random_move,
-    smart_fight_strategy,
+    run_away,
     pickup_items,
     goto_items,
-    quaff_potion_from_inv
+    quaff_potion_from_inv,
 ]

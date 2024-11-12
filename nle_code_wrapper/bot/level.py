@@ -16,6 +16,7 @@ class Level:
         self.seen = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.objects = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
         self.objects[:] = -1
+        self.doors = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.was_on = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
 
         self.shop = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
@@ -55,12 +56,19 @@ class Level:
 
         mask = utils.isin(glyphs, G.MONS, G.PETS, G.BODIES, G.OBJECTS, G.STATUES)
         self.seen[mask] = True
-        self.walkable[mask & (self.objects == -1)] = True
+        self.walkable[mask] = True
+        doors_closed_mask = utils.isin(self.objects, G.DOOR_CLOSED)
+        self.objects[doors_closed_mask & mask] = glyphs[doors_closed_mask & mask] + 2  # from closed to opened doors
 
         mask = utils.isin(glyphs, G.WALL, G.DOOR_CLOSED, G.BARS)
         self.seen[mask] = True
         self.objects[mask] = glyphs[mask]
         self.walkable[mask] = False
+
+        # TODO: it would be nice if we would change this to False when doors are destroyed
+        # how to detect that doors were destroyed
+        mask = utils.isin(glyphs, G.DOORS)
+        self.doors[mask] = True
 
         # NOTE: adjust for levitation (1024 in blstats)
         if blstats.prop_mask & nethack.BL_MASK_LEV:
