@@ -18,7 +18,7 @@ class TestMazewalkMapped(object):
         ],
     )
     @pytest.mark.parametrize("seed", [2])
-    def test_solve_room_fight_easy(self, env, seed):
+    def test_solve_fight_corridor(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
 
         @Strategy.wrap

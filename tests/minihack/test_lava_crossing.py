@@ -16,7 +16,7 @@ class TestMazewalkMapped(object):
             "MiniHack-LavaCrossingS11N5-v0",
         ],
     )
-    def test_solve_mazewalk(self, env):
+    def test_solve_lava_crossing(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
 
         @Strategy.wrap
