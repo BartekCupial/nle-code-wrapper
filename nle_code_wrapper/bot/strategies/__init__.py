@@ -1,6 +1,7 @@
 from nle_code_wrapper.bot.strategies.explore import explore
 from nle_code_wrapper.bot.strategies.explore_items import explore_items
 from nle_code_wrapper.bot.strategies.fight_monster import fight_all_monsters, fight_closest_monster
+from nle_code_wrapper.bot.strategies.goto import goto
 from nle_code_wrapper.bot.strategies.goto_items import goto_items
 from nle_code_wrapper.bot.strategies.goto_stairs import goto_stairs
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
@@ -25,4 +26,5 @@ __all__ = [
     pickup_items,
     goto_items,
     quaff_potion_from_inv,
+    goto,
 ]
