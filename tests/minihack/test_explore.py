@@ -17,6 +17,7 @@ class TestMazewalkMapped(object):
             "MiniHack-ExploreMaze-Easy-Mapped-v0",
             "MiniHack-ExploreMaze-Hard-v0",
             "MiniHack-ExploreMaze-Hard-Mapped-v0",
+            "MiniHack-Labyrinth-Small-v0",
         ],
     )
     def test_solve_explore(self, env):
