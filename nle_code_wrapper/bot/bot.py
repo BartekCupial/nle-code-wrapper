@@ -1,3 +1,4 @@
+import inspect
 from typing import Callable
 
 from nle.nethack import actions as A
@@ -61,6 +62,8 @@ class Bot:
         self.levels = {}
         self.steps = 0
         self.reward = 0.0
+        self.current_strategy = None
+        self.current_args = None
 
         self.done = False
 
@@ -99,9 +102,25 @@ class Bot:
         self.truncated = False
         self.last_info = {}
 
-        strategy = self.strategies[action]
         try:
-            strategy(self)
+            if self.current_strategy is None:
+                if action < len(self.strategies):
+                    self.current_strategy = self.strategies[action]
+                    self.current_args = ()
+                else:
+                    # TODO: random move for now
+                    self.pathfinder.random_move()
+            else:
+                self.current_args += (action,)
+
+            # we need this if the strategy was not created because out of bounds
+            if self.current_strategy is not None:
+                strategy_parameters = inspect.signature(self.current_strategy).parameters
+                # If the strategy has all the arguments it needs, call it
+                if len(strategy_parameters) == len(self.current_args) + 1:  # +1 for self
+                    self.current_strategy(self, *self.current_args)
+                    self.current_strategy = None
+                    self.current_args = None
         except (BotPanic, BotFinished):
             pass
 
