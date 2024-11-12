@@ -7,7 +7,7 @@ name = globals()["script"][:-3]
 # params for all exps
 config = {
     "exp_tags": [name],
-    "train_for_env_steps": 100_000_000,
+    "train_for_env_steps": 10_000_000,
     "num_workers": 16,
     "num_envs_per_worker": 32,
     "worker_num_splits": 2,
@@ -22,7 +22,8 @@ config = {
     "wandb_group": "ideas-ncbr",
     "with_wandb": True,
     "decorrelate_envs_on_one_worker": False,
-    "code_wrapper": False,
+    "code_wrapper": True,
+    "hierarchical_gamma": True,  # should be the same as code_wrapper
 }
 
 # params different between exps
@@ -30,6 +31,7 @@ params_grid = [
     {
         "seed": list(range(1)),
         "model": ["default_make_encoder_func", "ScaledNet", "ChaoticDwarvenGPT5"],
+        "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster", "run_away"]],
         "gamma": [0.999],
         "restart_behavior": ["overwrite"],
         "env": [env],
