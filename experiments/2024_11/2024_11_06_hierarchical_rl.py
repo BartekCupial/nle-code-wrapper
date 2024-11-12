@@ -31,9 +31,7 @@ params_grid = [
     {
         "seed": list(range(1)),
         "model": ["default_make_encoder_func", "ScaledNet", "ChaoticDwarvenGPT5"],
-        "strategies": [
-            ["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster", "smart_fight_strategy"]
-        ],
+        "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster", "run_away"]],
         "gamma": [0.999],
         "restart_behavior": ["overwrite"],
         "env": [env],

@@ -54,9 +54,13 @@ class Movements:
         # the character can only move diagonally if his or her total inventory weight is 600 or less.
         # Otherwise, "You are carrying too much to get through."
         walkable = (
+            # can we walk there
             level.walkable[new_pos]
+            # cannot move diagonally throught doors and boulders
             and not level.objects[new_pos] in frozenset.union(G.BOULDER, G.DOOR_OPENED)
-            and not level.objects[pos] in G.DOOR_OPENED
+            and not level.objects[pos] in frozenset.union(G.BOULDER, G.DOOR_OPENED)
+            and not level.doors[new_pos]
+            and not level.doors[pos]
         )
         return walkable
 

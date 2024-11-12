@@ -3,12 +3,7 @@ from nle_code_wrapper.bot.strategy import Strategy
 
 
 @Strategy.wrap
-def smart_fight_strategy(bot: "Bot"):
-    # TODO: smart fight strategy isn't perfect
-    # in the `fight_corridor` case it should stay in the corridor and wait for the enemies
-    # instead it fights and when there are multiple enemies it backs up to the corridor
-    # this means that sometimes it gets hit by multiple enemies at once before backing up
-
+def run_away(bot: "Bot"):
     # Get all nearby monsters
     nearby_monsters = [e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]
 
@@ -27,11 +22,6 @@ def smart_fight_strategy(bot: "Bot"):
             yield True
         else:
             yield False
-    elif nearby_monsters:
-        # Attack the closest monster
-        closest_monster = nearby_monsters[0]
-        bot.pvp.attack(closest_monster)
-        yield True
     else:
         yield False
 
@@ -43,8 +33,10 @@ def find_escape_position(bot: "Bot", monsters):
     def neighbor_to_monsters_distance(n):
         return sum([bot.pathfinder.distance(n, m.position) for m in monsters])
 
+    current_distance = neighbor_to_monsters_distance(bot.entity.position)
+
     escape_position = max(
-        (e for e in neighbors if neighbor_to_monsters_distance(e) >= 1),
+        (e for e in neighbors if neighbor_to_monsters_distance(e) > current_distance),
         key=lambda e: neighbor_to_monsters_distance(e),
         default=None,
     )
