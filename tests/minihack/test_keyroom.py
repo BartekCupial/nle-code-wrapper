@@ -5,8 +5,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategy import Strategy
-from nle_code_wrapper.bot.strategy.strategies import explore, goto_stairs, open_doors_key
+from nle_code_wrapper.bot.strategies import explore, goto_stairs, open_doors_key
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
@@ -36,41 +35,33 @@ def position_of_reachable_adjacent_object(bot: "Bot", obj):
     return reachable
 
 
-@Strategy.wrap
 def pickup_key(bot: "Bot"):
     position = position_of_closest_object(bot, G.TOOL_CLASS)
 
     if position:
         bot.pathfinder.goto(position)
         bot.step(A.Command.PICKUP)
-        yield True
+        return True
     else:
-        yield False
+        return False
 
 
-@Strategy.wrap
 def general_key(bot: "Bot"):
-    stairs_strat = goto_stairs(bot)
-    key_strat = pickup_key(bot)
-    door_strat = open_doors_key(bot)
-    explore_strat = explore(bot)
-
     has_key = False
     while True:
         try:
             closed_doors = position_of_reachable_adjacent_object(bot, G.DOOR_CLOSED)
 
-            if stairs_strat():
+            if goto_stairs(bot):
                 pass
             elif has_key and closed_doors:
-                door_strat()
-            elif key_strat():
+                open_doors_key(bot)
+            elif pickup_key(bot):
                 has_key = True
             else:
-                explore_strat()
+                explore(bot)
         except BotPanic:
             pass
-        yield True
 
 
 @pytest.mark.usefixtures("register_components")

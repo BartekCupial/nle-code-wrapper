@@ -2,7 +2,6 @@ import numpy as np
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
 
 
 def print_boolean_array_ascii(arr):
@@ -24,7 +23,6 @@ def print_boolean_array_ascii(arr):
         print(line)
 
 
-@Strategy.wrap
 def explore(bot: "Bot"):
     """
     Explore the current level using the bot.
@@ -78,7 +76,7 @@ def explore(bot: "Bot"):
     # Navigate to the chosen goal
     if exploration_priority[goal]:
         bot.pathfinder.goto(goal)
-        yield True
+        return True
     else:
         # there is nothing to explore
-        yield False
+        return False

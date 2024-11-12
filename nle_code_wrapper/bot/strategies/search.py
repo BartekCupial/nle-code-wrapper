@@ -2,10 +2,8 @@ import numpy as np
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
 
 
-@Strategy.wrap
 def search(bot: "Bot"):
     """
     Conducts a search operation for the bot to explore the current level.
@@ -51,7 +49,7 @@ def search(bot: "Bot"):
     if search_priority[goal]:
         bot.pathfinder.goto(goal)
         bot.search()
-        yield True
+        return True
     else:
         # there is nothing to explore
-        yield False
+        return False
