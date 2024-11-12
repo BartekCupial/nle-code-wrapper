@@ -11,7 +11,6 @@ config = {
     "exp_point": "corridor5",
     "train_for_env_steps": 1_000_000,
     "group": "corridor5-local",
-    "character": "mon-hum-neu-mal",
     "num_workers": 16,
     "num_envs_per_worker": 32,
     "worker_num_splits": 2,
