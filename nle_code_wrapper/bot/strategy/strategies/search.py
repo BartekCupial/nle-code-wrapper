@@ -7,6 +7,18 @@ from nle_code_wrapper.bot.strategy import Strategy
 
 @Strategy.wrap
 def search(bot: "Bot"):
+    """
+    Conducts a search operation for the bot to explore the current level.
+    The search prioritizes locations based on their distance from the bot's current position
+    and the potential for discovering hidden doors or passages. The bot navigates to the
+    highest priority location and performs a search action.
+    Args:
+        bot (Bot): The bot instance performing the search.
+    Yields:
+        bool: True if the bot navigates to a new location and searches, False if there is
+              nothing to explore.
+    """
+
     level = bot.current_level()
 
     # Factor 1: Distance from current position

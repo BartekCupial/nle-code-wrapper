@@ -26,6 +26,19 @@ def print_boolean_array_ascii(arr):
 
 @Strategy.wrap
 def explore(bot: "Bot"):
+    """
+    Explore the current level using the bot.
+    This function calculates exploration priorities based on several factors
+    such as distance from the current position, unexplored areas, and potential
+    for discovering new areas. It then navigates the bot to the highest priority
+    location.
+    Args:
+        bot (Bot): The bot instance that will perform the exploration.
+    Yields:
+        bool: True if there is a location to explore, False if there is nothing
+        left to explore.
+    """
+
     level = bot.current_level()
 
     # Create a matrix to store exploration priorities
