@@ -1,4 +1,5 @@
 import inspect
+from functools import partial
 from typing import Callable
 
 from nle.nethack import actions as A
@@ -9,6 +10,7 @@ from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
+from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
@@ -114,9 +116,8 @@ class Bot:
 
             # we need this if the strategy was not created because out of bounds
             if self.current_strategy is not None:
-                strategy_parameters = inspect.signature(self.current_strategy).parameters
                 # If the strategy has all the arguments it needs, call it
-                if len(strategy_parameters) == len(self.current_args) + 1:  # +1 for self
+                if check_strategy_parameters(self.current_strategy) == len(self.current_args) + 1:  # +1 for self
                     self.current_strategy(self, *self.current_args)
                     self.current_strategy = None
                     self.current_args = None
