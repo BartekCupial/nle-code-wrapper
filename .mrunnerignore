@@ -141,3 +141,7 @@ artifacts
 
 cmake-build*
 .vscode/*
+external/sample_factory/sf_examples
+external/sample_factory/tests
+external/sample_factory/docs
+external/sample_factory/tmp.pth

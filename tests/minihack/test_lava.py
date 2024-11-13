@@ -7,44 +7,32 @@ from nle_utils.glyph import G
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
-from nle_code_wrapper.bot.strategy.strategies import goto_stairs, quaff_potion_from_inv
+from nle_code_wrapper.bot.strategies import goto_stairs, quaff_potion_from_inv
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
 
-@Strategy.wrap
 def lava_strategy(bot: "Bot"):
-    goto_ring_strat = goto(bot, G.RING_CLASS)
-    goto_potion_strat = goto(bot, G.POTION_CLASS)
-    pickup_strat = pickup(bot)
-    quaff_potion_from_inv_strat = quaff_potion_from_inv(bot)
-    put_on_ring_from_inv_strat = put_on_ring_from_inv(bot)
-    goto_stairs_strat = goto_stairs(bot)
-
     while True:
-        goto_ring_strat()
-        goto_potion_strat()
-        pickup_strat()
-        if put_on_ring_from_inv_strat():
+        goto(bot, G.RING_CLASS)
+        goto(bot, G.POTION_CLASS)
+        pickup(bot)
+        if quaff_potion_from_inv(bot):
             pass
         else:
-            quaff_potion_from_inv_strat()
-        goto_stairs_strat()
-        yield
+            put_on_ring_from_inv(bot)
+        goto_stairs(bot)
 
 
-@Strategy.wrap
 def pickup(bot: "Bot"):
     bot.step(A.Command.PICKUP)
 
     if bot.message.strip() == "":
-        yield False
+        return False
     else:
-        yield True
+        return True
 
 
-@Strategy.wrap
 def goto(bot: "Bot", where):
     coords = utils.coords(bot.glyphs, where)
     distances = bot.pathfinder.distances(bot.entity.position)
@@ -57,12 +45,11 @@ def goto(bot: "Bot", where):
 
     if position:
         bot.pathfinder.goto(position)
-        yield True
+        return True
     else:
-        yield False
+        return False
 
 
-@Strategy.wrap
 def put_on_ring_from_inv(bot: "Bot"):
     inv_letters = bot.inv_letters
     inv_oclasses = bot.inv_oclasses
@@ -82,7 +69,7 @@ def put_on_ring_from_inv(bot: "Bot"):
         else:
             bot.step(A.Command.REMOVE)
 
-    yield levitation
+    return levitation
 
 
 @pytest.mark.usefixtures("register_components")

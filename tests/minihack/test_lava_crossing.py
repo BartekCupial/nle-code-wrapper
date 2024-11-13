@@ -12,14 +12,10 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize(
         "env",
         [
-            "MiniHack-ExploreMaze-Easy-v0",
-            "MiniHack-ExploreMaze-Easy-Mapped-v0",
-            "MiniHack-ExploreMaze-Hard-v0",
-            "MiniHack-ExploreMaze-Hard-Mapped-v0",
-            "MiniHack-Labyrinth-Small-v0",
+            "MiniHack-LavaCrossingS11N5-v0",
         ],
     )
-    def test_solve_explore(self, env):
+    def test_solve_lava_crossing(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
 
         def general_explore(bot: "Bot"):

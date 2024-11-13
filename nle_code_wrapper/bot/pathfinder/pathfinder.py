@@ -50,6 +50,20 @@ class Pathfinder:
         result = self.search.astar(start, goal)
         return result
 
+    def random_move(self):
+        movements = [
+            A.CompassDirection.N,
+            A.CompassDirection.S,
+            A.CompassDirection.E,
+            A.CompassDirection.W,
+            A.CompassDirection.NE,
+            A.CompassDirection.SE,
+            A.CompassDirection.NW,
+            A.CompassDirection.SW,
+        ]
+        action = movements[np.random.choice(len(movements))]
+        self.bot.step(action)
+
     def direction(self, pos):
         bot_pos = self.bot.entity.position
         dir = calc_direction(bot_pos[0], bot_pos[1], pos[0], pos[1])
@@ -118,8 +132,13 @@ class Pathfinder:
         for n in neighbors:
             if n in distances:
                 n_dist.append(distances[n])
+            else:
+                n_dist.append(np.inf)
 
         if len(n_dist) == 0:
+            return False
+
+        if min(n_dist) == np.inf:
             return False
 
         idx = np.argmin(n_dist)

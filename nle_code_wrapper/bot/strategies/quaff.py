@@ -2,10 +2,8 @@ from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategy import State, Strategy
 
 
-@Strategy.wrap
 def quaff_potion_from_inv(bot: "Bot"):
     inv_glyphs = bot.inv_glyphs
     inv_letters = bot.inv_letters
@@ -17,8 +15,8 @@ def quaff_potion_from_inv(bot: "Bot"):
             potion_char = char
 
     if potion_char is None:
-        yield False
+        return False
     else:
         bot.step(A.Command.QUAFF)
         bot.step(potion_char)
-        yield True
+        return True

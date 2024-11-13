@@ -1,3 +1,7 @@
+import inspect
+from functools import partial
+from typing import Callable
+
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
 
@@ -6,7 +10,7 @@ from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
-from nle_code_wrapper.bot.strategy import Panic, Strategy
+from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
@@ -14,14 +18,10 @@ class Bot:
         self.env = env
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
-        self.strategies: list[Strategy] = []
-        self.panics: list[Panic] = []
+        self.strategies: list[Callable] = []
 
     def strategy(self, func):
-        self.strategies.append(func(self))
-
-    def panic(self, func):
-        self.panics.append(func(self))
+        self.strategies.append(func)
 
     @property
     def blstats(self):
@@ -61,14 +61,11 @@ class Bot:
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
     def reset(self, **kwargs):
-        for strategy in self.strategies:
-            strategy.reset()
-        for panic in self.panics:
-            panic.reset()
-
         self.levels = {}
         self.steps = 0
         self.reward = 0.0
+        self.current_strategy = None
+        self.current_args = None
 
         self.done = False
 
@@ -99,7 +96,6 @@ class Bot:
             raise BotFinished
 
         self.update()
-        self.check_panics()
 
     def strategy_step(self, action):
         self.steps = 0
@@ -108,9 +104,23 @@ class Bot:
         self.truncated = False
         self.last_info = {}
 
-        strategy = self.strategies[action]
         try:
-            strategy()
+            if self.current_strategy is None:
+                if action < len(self.strategies):
+                    self.current_strategy = self.strategies[action]
+                    self.current_args = ()
+                # if action is wrong do nothing
+                # TODO: we need to write tests so they sample from correct action space
+            else:
+                self.current_args += (action,)
+
+            # we need this if the strategy was not created because out of bounds
+            if self.current_strategy is not None:
+                # If the strategy has all the arguments it needs, call it
+                if check_strategy_parameters(self.current_strategy) == len(self.current_args) + 1:  # +1 for self
+                    self.current_strategy(self, *self.current_args)
+                    self.current_strategy = None
+                    self.current_args = None
         except (BotPanic, BotFinished):
             pass
 
@@ -138,10 +148,6 @@ class Bot:
 
     def update(self):
         self.current_level().update(self.glyphs, self.blstats)
-
-    def check_panics(self):
-        for panic in self.panics:
-            panic()
 
     def current_level(self) -> Level:
         key = (self.blstats.dungeon_number, self.blstats.level_number)

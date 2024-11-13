@@ -6,7 +6,6 @@ name = globals()["script"][:-3]
 
 # params for all exps
 config = {
-    "env": "MiniHack-Corridor-R5-v0",
     "exp_tags": [name],
     "exp_point": "MiniHack-Corridor-R5-v0",
     "train_for_env_steps": 1_000_000,
@@ -15,7 +14,9 @@ config = {
     "num_envs_per_worker": 32,
     "worker_num_splits": 2,
     "rollout": 32,
-    "batch_size": 4096,  # this equals bs = 128, 128 * 32 = 4096
+    "batch_size": 256,  # this equals bs = 128, 128 * 32 = 4096
+    "penalty_step": -0.001,
+    "penalty_time": 0.0,
     "async_rl": True,
     "serial_mode": False,
     "wandb_user": "bartekcupial",
@@ -23,7 +24,7 @@ config = {
     "wandb_group": "ideas-ncbr",
     "with_wandb": False,
     "decorrelate_envs_on_one_worker": False,
-    "code-wrapper": True,
+    "code_wrapper": False,
 }
 
 # params different between exps
@@ -36,7 +37,13 @@ params_grid = [
         "num_workers": [4],
         "num_envs_per_worker": [8],
         "restart_behavior": ["overwrite"],
-    },
+        "env": [env],
+        "exp_point": [env],
+        "group": [env],
+    }
+    for env in [
+        "MiniHack-Corridor-R2-v0",
+    ]
 ]
 
 experiments_list = create_experiments_helper(

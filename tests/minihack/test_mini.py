@@ -6,35 +6,19 @@ from nle_utils.glyph import G
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategy import Strategy
-from nle_code_wrapper.bot.strategy.strategies import (
-    explore,
-    fight_all_monsters,
-    goto_stairs,
-    open_doors_kick,
-    random_move,
-)
+from nle_code_wrapper.bot.strategies import explore, fight_all_monsters, goto_stairs, open_doors_kick, random_move
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
 
-@Strategy.wrap
 def general_mini(bot: "Bot", where, action):
-    fight_strat = fight_all_monsters(bot)
-    explore_strat = explore(bot)
-    goto_strat = goto(bot, where, action)
-
     while True:
-        fight_strat()
-        explore_strat()
-        goto_strat()
-        yield
+        fight_all_monsters(bot)
+        explore(bot)
+        goto(bot, where, action)
 
 
-@Strategy.wrap
 def goto(bot: "Bot", where, action):
-    random_strat = random_move(bot)
-
     coords = utils.coords(bot.glyphs, where)
     distances = bot.pathfinder.distances(bot.entity.position)
 
@@ -47,10 +31,10 @@ def goto(bot: "Bot", where, action):
     if position:
         bot.pathfinder.goto(position)
         action(bot)
-        yield True
+        return True
     else:
-        random_strat()
-        yield False
+        random_move(bot)
+        return False
 
 
 def make_action_and_confirm(bot, command):

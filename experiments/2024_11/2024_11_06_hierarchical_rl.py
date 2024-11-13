@@ -6,16 +6,15 @@ name = globals()["script"][:-3]
 
 # params for all exps
 config = {
-    "env": "MiniHack-Corridor-R5-v0",
     "exp_tags": [name],
-    "exp_point": "corridor5",
-    "train_for_env_steps": 1_000_000,
-    "group": "corridor5-local",
+    "train_for_env_steps": 10_000_000,
     "num_workers": 16,
     "num_envs_per_worker": 32,
     "worker_num_splits": 2,
     "rollout": 32,
     "batch_size": 4096,  # this equals bs = 128, 128 * 32 = 4096
+    "penalty_step": -0.001,
+    "penalty_time": 0.0,
     "async_rl": True,
     "serial_mode": False,
     "wandb_user": "bartekcupial",
@@ -24,16 +23,29 @@ config = {
     "with_wandb": True,
     "decorrelate_envs_on_one_worker": False,
     "code_wrapper": True,
+    "hierarchical_gamma": True,  # should be the same as code_wrapper
 }
 
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(5)),
-        "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
-        "gamma": [0.9, 0.99, 0.999, 1.0],
+        "seed": list(range(1)),
+        "model": ["default_make_encoder_func", "ScaledNet", "ChaoticDwarvenGPT5"],
+        "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster", "run_away"]],
+        "gamma": [0.999],
         "restart_behavior": ["overwrite"],
-    },
+        "env": [env],
+        "exp_point": [env],
+        "group": [env],
+    }
+    for env in [
+        "MiniHack-Corridor-R2-v0",
+        "MiniHack-Corridor-R3-v0",
+        "MiniHack-Corridor-R5-v0",
+        "MiniHack-CorridorBattle-v0",
+        "MiniHack-CorridorBattle-Dark-v0",
+        "MiniHack-KeyRoom-Dark-S5-v0",
+    ]
 ]
 
 experiments_list = create_experiments_helper(

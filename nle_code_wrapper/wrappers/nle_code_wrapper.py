@@ -13,7 +13,7 @@ class NLECodeWrapper(gym.Wrapper):
 
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)
-        self.action_space = gym.spaces.Discrete(len(self.bot.strategies))
+        self.action_space = gym.spaces.Discrete(100)  # TODO: Change this to the number of actions in the action space
         self.observation_space = gym.spaces.Dict(
             {"strategy_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
         )
