@@ -13,22 +13,15 @@ from nle_code_wrapper.utils import utils
 
 
 def lava_strategy(bot: "Bot"):
-    goto_ring_strat = goto(bot, G.RING_CLASS)
-    goto_potion_strat = goto(bot, G.POTION_CLASS)
-    pickup_strat = pickup(bot)
-    quaff_potion_from_inv_strat = quaff_potion_from_inv(bot)
-    put_on_ring_from_inv_strat = put_on_ring_from_inv(bot)
-    goto_stairs_strat = goto_stairs(bot)
-
     while True:
-        goto_ring_strat()
-        goto_potion_strat()
-        pickup_strat()
-        if put_on_ring_from_inv_strat():
+        goto(bot, G.RING_CLASS)
+        goto(bot, G.POTION_CLASS)
+        pickup(bot)
+        if quaff_potion_from_inv(bot):
             pass
         else:
-            quaff_potion_from_inv_strat()
-        goto_stairs_strat()
+            put_on_ring_from_inv(bot)
+        goto_stairs(bot)
 
 
 def pickup(bot: "Bot"):
