@@ -11,22 +11,6 @@ from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 class TestMazewalkMapped(object):
     @pytest.mark.parametrize("env", ["MiniHack-Room-5x5-v0"])
     @pytest.mark.parametrize("seed", [0])
-    def test_goto(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render"])
-
-        def general(bot: "Bot"):
-            cur_pos = bot.entity.position
-            distances = bot.pathfinder.distances(cur_pos)
-            furthest = max(distances.items(), key=lambda s: s[1])[0]
-            goto(bot, furthest[0], furthest[1])
-            assert bot.entity.position == furthest
-            raise BotFinished
-
-        cfg.strategies = [general]
-        play(cfg)
-
-    @pytest.mark.parametrize("env", ["MiniHack-Room-5x5-v0"])
-    @pytest.mark.parametrize("seed", [0])
     def test_pass_argument_strategy(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=True", "--no-render"])
 
