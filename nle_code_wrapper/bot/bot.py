@@ -107,9 +107,8 @@ class Bot:
                 if action < len(self.strategies):
                     self.current_strategy = self.strategies[action]
                     self.current_args = ()
-                else:
-                    # TODO: random move for now
-                    self.pathfinder.random_move()
+                # if action is wrong do nothing
+                # TODO: we need to write tests so they sample from correct action space
             else:
                 self.current_args += (action,)
 
