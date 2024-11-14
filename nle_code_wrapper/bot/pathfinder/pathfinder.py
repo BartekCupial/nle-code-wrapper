@@ -123,7 +123,8 @@ class Pathfinder:
 
     def move(self, dir: Tuple[int64, int64]) -> None:
         """
-        Move the bot to the given position.
+        Move the bot once to a square in the neighbourhood. Raises BotPanic
+        if the bot position does not match the given position.
 
         Args:
             dir (Tuple[int64, int64]): Position to move
@@ -137,6 +138,15 @@ class Pathfinder:
             )
 
     def goto(self, goal: Tuple[int64, int64], fast: bool = False) -> bool:
+        """
+        Move the bot to the given goal position. If the goal is not reachable, raise BotPanic.
+
+        Args:
+            goal (Tuple[int64, int64]): Goal position.
+            fast (bool): Whether to use fast_goto or not.
+        Returns:
+            bool: True if the bot successfully reaches the goal, False otherwise.
+        """
         cont = True
         while cont and self.bot.entity.position != goal:
             path = self.get_path_to(goal)

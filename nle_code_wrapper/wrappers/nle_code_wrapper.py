@@ -2,7 +2,6 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 
 import gymnasium as gym
 import numpy as np
-from nle.env.tasks.NetHackStaircase import StepStatus
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
