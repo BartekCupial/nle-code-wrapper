@@ -33,6 +33,16 @@ def run_away(bot: "Bot") -> bool:
 
 
 def find_escape_position(bot: "Bot", monsters: List[Entity]) -> Optional[Tuple[int64, int64]]:
+    """
+    Finds the best escape position for the bot given a list of monsters.
+
+    Args:
+        bot (Bot): The bot instance executing the strategy.
+        monsters (List[Entity]): The list of monsters to escape from.
+
+    Returns:
+        Optional[Tuple[int64, int64]]: The escape position if found, None otherwise.
+    """
     current_pos = bot.entity.position
     neighbors = bot.pathfinder.neighbors(current_pos)
 

@@ -5,6 +5,15 @@ from nle_code_wrapper.bot.bot import Bot
 
 
 def quaff_potion_from_inv(bot: "Bot") -> bool:
+    """
+    Quaff a potion from the inventory.
+
+    Args:
+        bot (Bot): The bot object.
+
+    Returns:
+        bool: True if a potion was quaffed, False otherwise.
+    """
     inv_glyphs = bot.inv_glyphs
     inv_letters = bot.inv_letters
 

@@ -5,6 +5,15 @@ from nle_code_wrapper.utils.utils import coords
 
 
 def goto_items(bot: "Bot"):
+    """
+    Go to the closest item which is reachable and unexplored.
+
+    Args:
+        bot (Bot): The bot instance.
+
+    Returns:
+        bool: Whether the bot has found an item to go to.
+    """
     item_coords = coords(bot.glyphs, G.OBJECTS)
     distances = bot.pathfinder.distances(bot.entity.position)
 

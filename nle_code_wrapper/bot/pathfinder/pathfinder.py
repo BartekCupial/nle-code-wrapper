@@ -1,4 +1,4 @@
-from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 from nle.nethack import actions as A
@@ -32,12 +32,18 @@ def calc_direction(from_y: int64, from_x: int64, to_y: int64, to_x: int64) -> st
 
 
 class Pathfinder:
+    """
+    Pathfinder class to handle pathfinding and movement.
+    """
+
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
         self.movements: Movements = Movements(bot)
         self.search = ChebyshevSearch(self.movements)
 
-    def astar(self, start, goal):
+    def astar(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
+    ) -> Union[Iterable[Tuple[int64, int64]], None]:
         return self.search.astar(start, goal)
 
     def distances(self, start: Tuple[int64, int64]) -> Dict[Tuple[int64, int64], float]:
@@ -47,11 +53,26 @@ class Pathfinder:
         result = self.get_path_from_to(self.bot.entity.position, goal)
         return result
 
-    def get_path_from_to(self, start: Tuple[int64, int64], goal: Tuple[int64, int64]) -> None:
+    def get_path_from_to(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
+    ) -> Union[Iterable[Tuple[int64, int64]], None]:
+        """
+        Get path from start to goal using the A* algorithm.
+
+        Args:
+            start (Tuple[int64, int64]): Start position.
+            goal (Tuple[int64, int64]): Goal position.
+
+        Returns:
+            List[Tuple[int64, int64]]: Path from start
+        """
         result = self.search.astar(start, goal)
         return result
 
-    def random_move(self):
+    def random_move(self) -> None:
+        """
+        Randomly move the bot in any direction.
+        """
         movements = [
             A.CompassDirection.N,
             A.CompassDirection.S,
@@ -66,6 +87,12 @@ class Pathfinder:
         self.bot.step(action)
 
     def direction(self, pos: Tuple[int64, int64]) -> None:
+        """
+        Move the bot in the direction of the given position.
+
+        Args:
+            pos (Tuple[int64, int64]): Position to move
+        """
         bot_pos = self.bot.entity.position
         dir = calc_direction(bot_pos[0], bot_pos[1], pos[0], pos[1])
 
@@ -86,6 +113,12 @@ class Pathfinder:
         self.bot.step(action)
 
     def move(self, dir: Tuple[int64, int64]) -> None:
+        """
+        Move the bot to the given position.
+
+        Args:
+            dir (Tuple[int64, int64]): Position to move
+        """
         self.direction(dir)
 
         if self.bot.entity.position != dir:
@@ -128,6 +161,16 @@ class Pathfinder:
     def reachable_adjacent(
         self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
     ) -> Union[Tuple[int64, int64], bool]:
+        """
+        Check if the goal is reachable from the start position.
+
+        Args:
+            start (Tuple[int64, int64]): Start position.
+            goal (Tuple[int64, int64]): Goal position.
+        Returns:
+            Union[Tuple[int64, int64], bool]: Return the position of the reachable adjacent node or False if not reachable.
+        """
+
         distances = self.distances(start)
         neighbors = self.neighbors(goal)
 
