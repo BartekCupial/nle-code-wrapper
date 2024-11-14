@@ -49,13 +49,22 @@ class Pathfinder:
     def distances(self, start: Tuple[int64, int64]) -> Dict[Tuple[int64, int64], float]:
         return self.search.distances(start)
 
-    def get_path_to(self, goal: Tuple[int64, int64]) -> None:
+    def get_path_to(self, goal: Tuple[int64, int64]) -> Union[List[Tuple[int64, int64]], None]:
+        """
+        Get path to goal using the A* algorithm.
+
+        Args:
+            goal (Tuple[int64, int64]): Goal position.
+        Returns:
+            Union[List[Tuple[int64, int64]], None]: Path to goal if exists, otherwise None.
+        """
+
         result = self.get_path_from_to(self.bot.entity.position, goal)
         return result
 
     def get_path_from_to(
         self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
-    ) -> Union[Iterable[Tuple[int64, int64]], None]:
+    ) -> Union[List[Tuple[int64, int64]], None]:
         """
         Get path from start to goal using the A* algorithm.
 
