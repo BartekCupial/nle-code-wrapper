@@ -97,5 +97,9 @@ class Level:
         return utils.coords(self.objects, obj)
 
     @property
-    def stairs(self):
+    def stairs(self) -> List[Tuple[int64, int64]]:
+        """
+        Returns the coordinates of the down stairs on the current level.
+        """
+
         return self.object_coords(G.STAIR_DOWN)
