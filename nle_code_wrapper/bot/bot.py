@@ -3,7 +3,6 @@ from argparse import Namespace
 from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
 
-from nle.env.tasks.NetHackStaircase import StepStatus
 from nle.nethack import actions as A
 from nle.nethack.actions import Command, CompassDirection
 from nle_utils.blstats import BLStats
@@ -21,7 +20,7 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 class Bot:
     def __init__(self, env: Union[GymV21CompatibilityV0, Namespace]) -> None:
         """
-        :param env: Gym environment or Namespace with the same attributes as the gym environment
+        Gym environment or Namespace with the same attributes as the gym environment
         """
 
         self.env = env
@@ -32,29 +31,30 @@ class Bot:
     def strategy(self, func: Union[partial, Callable]) -> None:
         """
         Decorator to add a strategy to the bot
-        :param func: strategy function
-        :return: None
+
+        Args:
+            func: function to add as a strategy
         """
         self.strategies.append(func)
 
     @property
     def blstats(self) -> BLStats:
-        """
-        :return: BLStats object
-        """
         return BLStats(*self.last_obs["blstats"])
 
     @property
     def glyphs(self) -> ndarray:
         """
-        :return: 2D numpy array with the glyphs
+
+        Returns:
+            2D numpy array with the glyphs
         """
         return self.last_obs["glyphs"]
 
     @property
     def message(self) -> str:
         """
-        :return: str with the message
+        Returns:
+            str with the message
         """
         return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
@@ -77,7 +77,8 @@ class Bot:
     @property
     def entity(self) -> Entity:
         """
-        :return: Entity object with the player
+        Returns:
+            Entity object with the player
         """
         position = (self.blstats.y, self.blstats.x)
         return Entity(position, self.glyphs[position])
@@ -85,7 +86,8 @@ class Bot:
     @property
     def entities(self) -> List[Union[Any, Entity]]:
         """
-        :return: list of Entity objects with the monsters
+        Returns:
+            List of Entity objects with the monsters
         """
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
@@ -93,8 +95,10 @@ class Bot:
         """
         Reset the environment and the bot. It also updates the last_obs and last_info.
 
-        :param kwargs: parameters to reset the environment
-        :return: observation and info
+        Args:
+            **kwargs -parameters to reset the environment
+        Returns:
+            observation and info
         """
 
         self.levels = {}
@@ -123,8 +127,8 @@ class Bot:
         """
         Take a step in the environment
 
-        :param action: action to take
-        :return: None
+        Args:
+            action: action to take
         """
         self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
             self.env.actions.index(action)
@@ -144,8 +148,10 @@ class Bot:
         Take a step in the environment using the strategies defined in the bot. If no strategy is chosen, the action
         will decide the strategy to use. If a strategy is chosen, the action will be passed as an argument to the strategy.
 
-        :param action: action to take
-        :return: observation, reward, terminated, truncated
+        Args:
+            action: action to take
+        Returns:
+            observation, reward, done, info
         """
         self.steps = 0
         self.reward = 0
