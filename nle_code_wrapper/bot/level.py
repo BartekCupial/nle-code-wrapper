@@ -1,14 +1,17 @@
 from collections import defaultdict
+from typing import Any, List, Tuple, Union
 
 import numpy as np
 from nle import nethack
+from nle_utils.blstats import BLStats
 from nle_utils.glyph import SHOP, SS, C, G
+from numpy import int64, ndarray
 
 from nle_code_wrapper.utils import utils
 
 
 class Level:
-    def __init__(self, dungeon_number, level_number):
+    def __init__(self, dungeon_number: int64, level_number: int64) -> None:
         self.dungeon_number = dungeon_number
         self.level_number = level_number
 
@@ -43,7 +46,7 @@ class Level:
     def key(self):
         return (self.dungeon_number, self.level_number)
 
-    def update(self, glyphs, blstats):
+    def update(self, glyphs: ndarray, blstats: BLStats) -> None:
         if utils.isin(glyphs, G.SWALLOW).any():
             return
 
@@ -83,7 +86,7 @@ class Level:
 
         self.was_on[blstats.y, blstats.x] = True
 
-    def object_coords(self, obj):
+    def object_coords(self, obj: frozenset) -> List[Union[Any, Tuple[int64, int64]]]:
         return utils.coords(self.objects, obj)
 
     @property

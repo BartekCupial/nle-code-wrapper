@@ -1,7 +1,7 @@
 from nle_code_wrapper.bot.bot import Bot
 
 
-def fight_closest_monster(bot: "Bot"):
+def fight_closest_monster(bot: "Bot") -> bool:
     """
     Directs the bot to fight the closest monster.
     This function finds the closest monster entity that the bot can reach using its pathfinder.
@@ -26,7 +26,7 @@ def fight_closest_monster(bot: "Bot"):
         return False
 
 
-def fight_all_monsters(bot: "Bot"):
+def fight_all_monsters(bot: "Bot") -> None:
     # kill all reachable monsters
     while True:
         fighting = fight_closest_monster(bot)

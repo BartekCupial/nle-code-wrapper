@@ -4,7 +4,7 @@ from nle_utils.glyph import G
 from nle_code_wrapper.bot.bot import Bot
 
 
-def quaff_potion_from_inv(bot: "Bot"):
+def quaff_potion_from_inv(bot: "Bot") -> bool:
     inv_glyphs = bot.inv_glyphs
     inv_letters = bot.inv_letters
 

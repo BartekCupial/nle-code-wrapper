@@ -3,7 +3,7 @@ from nle_utils.glyph import G
 from nle_code_wrapper.bot import Bot
 
 
-def goto_stairs(bot: "Bot"):
+def goto_stairs(bot: "Bot") -> bool:
     """
     Directs the bot to move towards the stairs on the current level.
     This function attempts to find the coordinates of the stairs down on the current level
