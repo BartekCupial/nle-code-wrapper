@@ -9,7 +9,7 @@ def fight_closest_monster(bot: "Bot") -> bool:
     If no reachable monster is found, the function will return False.
     Args:
         bot (Bot): The bot instance that will perform the action.
-    Yields:
+    Returns:
         bool: True if the bot attacks a monster, False otherwise.
     """
 

@@ -3,6 +3,8 @@ class BotFinished(BaseException):
 
 
 class BotPanic(BaseException):
+    """TODO(@bcupial): Add description."""
+
     pass
 
 

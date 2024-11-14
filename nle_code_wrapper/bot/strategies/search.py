@@ -12,7 +12,7 @@ def search(bot: "Bot"):
     highest priority location and performs a search action.
     Args:
         bot (Bot): The bot instance performing the search.
-    Yields:
+    Returns:
         bool: True if the bot navigates to a new location and searches, False if there is
               nothing to explore.
     """

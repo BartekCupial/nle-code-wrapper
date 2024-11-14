@@ -11,6 +11,10 @@ from nle_code_wrapper.utils import utils
 
 
 class Level:
+    """
+    Level class to store information about the current level.
+    """
+
     def __init__(self, dungeon_number: int64, level_number: int64) -> None:
         self.dungeon_number = dungeon_number
         self.level_number = level_number
@@ -47,6 +51,9 @@ class Level:
         return (self.dungeon_number, self.level_number)
 
     def update(self, glyphs: ndarray, blstats: BLStats) -> None:
+        """
+        Update the level with the new glyphs and blstats.
+        """
         if utils.isin(glyphs, G.SWALLOW).any():
             return
 

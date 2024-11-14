@@ -20,24 +20,42 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 class Bot:
     def __init__(self, env: Union[GymV21CompatibilityV0, Namespace]) -> None:
+        """
+        :param env: Gym environment or Namespace with the same attributes as the gym environment
+        """
+
         self.env = env
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
 
     def strategy(self, func: Union[partial, Callable]) -> None:
+        """
+        Decorator to add a strategy to the bot
+        :param func: strategy function
+        :return: None
+        """
         self.strategies.append(func)
 
     @property
     def blstats(self) -> BLStats:
+        """
+        :return: BLStats object
+        """
         return BLStats(*self.last_obs["blstats"])
 
     @property
     def glyphs(self) -> ndarray:
+        """
+        :return: 2D numpy array with the glyphs
+        """
         return self.last_obs["glyphs"]
 
     @property
     def message(self) -> str:
+        """
+        :return: str with the message
+        """
         return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
     @property
@@ -58,14 +76,27 @@ class Bot:
 
     @property
     def entity(self) -> Entity:
+        """
+        :return: Entity object with the player
+        """
         position = (self.blstats.y, self.blstats.x)
         return Entity(position, self.glyphs[position])
 
     @property
     def entities(self) -> List[Union[Any, Entity]]:
+        """
+        :return: list of Entity objects with the monsters
+        """
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
     def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Dict[str, Any]]]:
+        """
+        Reset the environment and the bot. It also updates the last_obs and last_info.
+
+        :param kwargs: parameters to reset the environment
+        :return: observation and info
+        """
+
         self.levels = {}
         self.steps = 0
         self.reward = 0.0
@@ -88,7 +119,13 @@ class Bot:
 
         return self.last_obs, self.last_info
 
-    def step(self, action: Union[CompassDirection, int, Command, uint8]) -> None:
+    def step(self, action: int) -> None:
+        """
+        Take a step in the environment
+
+        :param action: action to take
+        :return: None
+        """
         self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
             self.env.actions.index(action)
         )
@@ -103,6 +140,13 @@ class Bot:
         self.update()
 
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
+        """
+        Take a step in the environment using the strategies defined in the bot. If no strategy is chosen, the action
+        will decide the strategy to use. If a strategy is chosen, the action will be passed as an argument to the strategy.
+
+        :param action: action to take
+        :return: observation, reward, terminated, truncated
+        """
         self.steps = 0
         self.reward = 0
         self.terminated = False
@@ -155,6 +199,9 @@ class Bot:
         self.current_level().update(self.glyphs, self.blstats)
 
     def current_level(self) -> Level:
+        """
+        :return: Level object of the current level
+        """
         key = (self.blstats.dungeon_number, self.blstats.level_number)
         if key not in self.levels:
             self.levels[key] = Level(*key)
