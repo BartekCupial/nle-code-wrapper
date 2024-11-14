@@ -1,9 +1,14 @@
 import inspect
+from argparse import Namespace
 from functools import partial
-from typing import Callable
+from typing import Any, Callable, Dict, List, Tuple, Union
 
+from nle.env.tasks.NetHackStaircase import StepStatus
 from nle.nethack import actions as A
+from nle.nethack.actions import Command, CompassDirection
 from nle_utils.blstats import BLStats
+from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
+from numpy import int64, ndarray, uint8
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
@@ -14,37 +19,37 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
-    def __init__(self, env):
+    def __init__(self, env: Union[GymV21CompatibilityV0, Namespace]) -> None:
         self.env = env
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
 
-    def strategy(self, func):
+    def strategy(self, func: Union[partial, Callable]) -> None:
         self.strategies.append(func)
 
     @property
-    def blstats(self):
+    def blstats(self) -> BLStats:
         return BLStats(*self.last_obs["blstats"])
 
     @property
-    def glyphs(self):
+    def glyphs(self) -> ndarray:
         return self.last_obs["glyphs"]
 
     @property
-    def message(self):
+    def message(self) -> str:
         return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
     @property
-    def inv_glyphs(self):
+    def inv_glyphs(self) -> ndarray:
         return self.last_obs["inv_glyphs"]
 
     @property
-    def inv_letters(self):
+    def inv_letters(self) -> ndarray:
         return self.last_obs["inv_letters"]
 
     @property
-    def inv_oclasses(self):
+    def inv_oclasses(self) -> ndarray:
         return self.last_obs["inv_oclasses"]
 
     @property
@@ -52,15 +57,15 @@ class Bot:
         return tuple(self.last_obs["tty_cursor"])
 
     @property
-    def entity(self):
+    def entity(self) -> Entity:
         position = (self.blstats.y, self.blstats.x)
         return Entity(position, self.glyphs[position])
 
     @property
-    def entities(self):
+    def entities(self) -> List[Union[Any, Entity]]:
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
-    def reset(self, **kwargs):
+    def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Dict[str, Any]]]:
         self.levels = {}
         self.steps = 0
         self.reward = 0.0
@@ -83,7 +88,7 @@ class Bot:
 
         return self.last_obs, self.last_info
 
-    def step(self, action):
+    def step(self, action: Union[CompassDirection, int, Command, uint8]) -> None:
         self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
             self.env.actions.index(action)
         )
@@ -97,7 +102,7 @@ class Bot:
 
         self.update()
 
-    def strategy_step(self, action):
+    def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         self.steps = 0
         self.reward = 0
         self.terminated = False
@@ -138,15 +143,15 @@ class Bot:
 
         return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
 
-    def search(self):
+    def search(self) -> None:
         self.step(A.Command.SEARCH)
         self.current_level().search_count[self.blstats.y, self.blstats.x] += 1
 
-    def type_text(self, text):
+    def type_text(self, text: str) -> None:
         for char in text:
             self.step(ord(char))
 
-    def update(self):
+    def update(self) -> None:
         self.current_level().update(self.glyphs, self.blstats)
 
     def current_level(self) -> Level:

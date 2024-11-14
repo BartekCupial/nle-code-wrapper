@@ -1,7 +1,12 @@
+from typing import List, Optional, Tuple
+
+from numpy import int64
+
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.bot.entity import Entity
 
 
-def run_away(bot: "Bot"):
+def run_away(bot: "Bot") -> bool:
     """
     Executes the run away strategy for the bot.
     This strategy involves the bot identifying nearby monsters,
@@ -27,7 +32,7 @@ def run_away(bot: "Bot"):
         return False
 
 
-def find_escape_position(bot: "Bot", monsters):
+def find_escape_position(bot: "Bot", monsters: List[Entity]) -> Optional[Tuple[int64, int64]]:
     current_pos = bot.entity.position
     neighbors = bot.pathfinder.neighbors(current_pos)
 

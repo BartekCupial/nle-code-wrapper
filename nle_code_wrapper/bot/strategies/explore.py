@@ -23,7 +23,7 @@ def print_boolean_array_ascii(arr):
         print(line)
 
 
-def explore(bot: "Bot"):
+def explore(bot: "Bot") -> bool:
     """
     Explore the current level using the bot.
     This function calculates exploration priorities based on several factors

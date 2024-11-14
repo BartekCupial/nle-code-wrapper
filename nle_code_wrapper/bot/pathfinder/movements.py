@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
 from nle_utils.glyph import C, G
 from nle_utils.level import Level as DungeonLevel
+from numpy import bool_, int64
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
@@ -22,21 +23,23 @@ intermediate_directions = [
 
 
 class Movements:
-    def __init__(self, bot: "Bot", allow_walking_through_traps=True):
+    def __init__(self, bot: "Bot", allow_walking_through_traps: bool = True) -> None:
         self.bot: "Bot" = bot
         self.allow_walking_through_traps = allow_walking_through_traps
 
     @property
-    def walkable_diagonally(self):
+    def walkable_diagonally(self) -> bool_:
         level = self.bot.current_level()
         return level.dungeon_number != DungeonLevel.SOKOBAN
 
-    def walkable_cardinal(self, pos):
+    def walkable_cardinal(self, pos: Tuple[int64, int64]) -> Union[bool_, bool]:
         level = self.bot.current_level()
         walkable = level.walkable[pos] and not (level.objects[pos] in G.BOULDER)
         return walkable
 
-    def get_move_cardinal(self, pos, dir, neighbors):
+    def get_move_cardinal(
+        self, pos: Tuple[int64, int64], dir: Tuple[int, int], neighbors: List[Union[Any, Tuple[int64, int64]]]
+    ) -> None:
         new_pos = (pos[0] + dir[0], pos[1] + dir[1])
 
         # out of bounds
@@ -47,7 +50,7 @@ class Movements:
         if self.walkable_cardinal(new_pos):
             neighbors.append(new_pos)
 
-    def walkable_intermediate(self, pos, new_pos):
+    def walkable_intermediate(self, pos: Tuple[int64, int64], new_pos: Tuple[int64, int64]) -> Union[bool_, bool]:
         level = self.bot.current_level()
         # we restrict diagonal movements in the doors
         # TODO: handle moving diagonally when heavy
@@ -64,7 +67,9 @@ class Movements:
         )
         return walkable
 
-    def get_move_intermediate(self, pos, dir, neighbors):
+    def get_move_intermediate(
+        self, pos: Tuple[int64, int64], dir: Tuple[int, int], neighbors: List[Union[Any, Tuple[int64, int64]]]
+    ) -> None:
         new_pos = (pos[0] + dir[0], pos[1] + dir[1])
 
         # out of bounds
@@ -75,7 +80,7 @@ class Movements:
         if self.walkable_intermediate(pos, new_pos):
             neighbors.append(new_pos)
 
-    def neighbors(self, node):
+    def neighbors(self, node: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         neighbors = []
 
         for dir in cardinal_directions:
