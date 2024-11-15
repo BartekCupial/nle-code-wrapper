@@ -13,7 +13,7 @@ def run_away(bot: "Bot") -> bool:
     moving away to a safer position if possible.
     Args:
         bot (Bot): The bot instance executing the strategy.
-    Yields:
+    Returns:
         bool: True if the bot moves to an escape position, False otherwise.
     """
 
