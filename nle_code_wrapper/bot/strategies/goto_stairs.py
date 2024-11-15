@@ -11,7 +11,7 @@ def goto_stairs(bot: "Bot") -> bool:
     the stairs is found, the bot will move towards the first set of stairs found.
     Args:
         bot (Bot): The bot instance that will be directed to the stairs.
-    Yields:
+    Returns:
         bool: True if the bot successfully finds a path to the stairs and starts moving
               towards them, False otherwise.
     """

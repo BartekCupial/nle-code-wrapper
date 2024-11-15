@@ -74,7 +74,7 @@ def open_doors_key(bot: "Bot") -> bool:
 
     Args:
         bot (Bot): The bot instance that will perform the action.
-    Yields:
+    Returns:
         bool: True if a reachable closed door was found and attempted to be opened with a key, False otherwise.
     """
     level = bot.current_level()

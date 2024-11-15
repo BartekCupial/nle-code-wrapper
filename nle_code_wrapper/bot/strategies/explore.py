@@ -32,7 +32,7 @@ def explore(bot: "Bot") -> bool:
     location.
     Args:
         bot (Bot): The bot instance that will perform the exploration.
-    Yields:
+    Returns:
         bool: True if there is a location to explore, False if there is nothing
         left to explore.
     """
