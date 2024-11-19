@@ -24,7 +24,7 @@ contexts:
     nodes: 1
     ntasks: 1
     partition: standard-g
-    singularity_container: -H $PWD:/homeplaceholder --env WANDBPWD=$PWD -B /scratch/project_465001230/bcupial:/scratch/  -B /scratch/project_465001230/bcupial/tmpdir:/tmp -B /mnt:/mnt /pfs/lustrep3/projappl/project_465001230/bcupial/cnw_rocm.sif
+    singularity_container: -H $PWD:/homeplaceholder --env WANDBPWD=$PWD -B /scratch/project_465001230/bcupial:/scratch/ -B /scratch/project_465001230/bcupial/tmpdir:/tmp /pfs/lustrep3/projappl/project_465001230/bcupial/cnw_rocm.sif
     slurm_url: bartomie@lumi.csc.fi
     storage_dir: /scratch/project_465001230/bcupial
     time: 2880

@@ -7,9 +7,9 @@ from nle_code_wrapper.bot import Bot
 
 
 class NLECodeWrapper(gym.Wrapper):
-    def __init__(self, env, strategies: List[Callable]):
+    def __init__(self, env, strategies: List[Callable], gamma: float = 0.99):
         super().__init__(env)
-        self.bot = Bot(env)
+        self.bot = Bot(env, gamma=gamma)
 
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)

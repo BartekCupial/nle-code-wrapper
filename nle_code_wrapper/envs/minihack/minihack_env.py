@@ -17,6 +17,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         cfg.strategies = strategies
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, cfg.strategies)
+        env = NLECodeWrapper(env, cfg.strategies, gamma=cfg.gamma)
 
     return env

@@ -14,8 +14,9 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
-    def __init__(self, env):
+    def __init__(self, env, gamma: float = 0.99):
         self.env = env
+        self.gamma = gamma
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
@@ -89,7 +90,8 @@ class Bot:
         )
 
         self.steps += 1
-        self.reward += reward
+        self.reward += reward * self.current_discount
+        self.current_discount *= self.gamma
 
         if self.terminated or self.truncated:
             self.done = True
@@ -100,6 +102,7 @@ class Bot:
     def strategy_step(self, action):
         self.steps = 0
         self.reward = 0
+        self.current_discount = 1.0
         self.terminated = False
         self.truncated = False
         self.last_info = {}
