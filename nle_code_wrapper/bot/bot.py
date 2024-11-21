@@ -177,7 +177,8 @@ class Bot:
                     self.current_strategy = None
                     self.current_args = None
         except (BotPanic, BotFinished):
-            pass
+            self.current_strategy = None
+            self.current_args = None
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
