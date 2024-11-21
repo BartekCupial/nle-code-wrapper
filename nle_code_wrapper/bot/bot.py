@@ -1,4 +1,5 @@
 import inspect
+import itertools
 from argparse import Namespace
 from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
@@ -196,7 +197,11 @@ class Bot:
 
     def search(self) -> None:
         self.step(A.Command.SEARCH)
-        self.current_level.search_count[self.blstats.y, self.blstats.x] += 1
+
+        blstats = self.blstats
+        x, y = blstats.x, blstats.y
+        for i, j in itertools.product([-1, 0, 1], repeat=2):
+            self.current_level.search_count[y + i, x + j] += 1
 
     def type_text(self, text: str) -> None:
         for char in text:
