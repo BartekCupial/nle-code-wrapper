@@ -3,7 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import general_explore, goto_stairs, open_doors, open_doors_kick, search
+from nle_code_wrapper.bot.strategies import general_explore, general_search, goto_stairs, open_doors, open_doors_kick
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -53,7 +53,7 @@ class TestMazewalkMapped(object):
                     elif general_explore(bot):
                         pass
                     else:
-                        search(bot)
+                        general_search(bot)
                 except BotPanic:
                     pass
 
