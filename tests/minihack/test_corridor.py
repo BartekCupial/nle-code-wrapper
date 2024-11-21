@@ -3,7 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore, goto_stairs, open_doors, open_doors_kick, search
+from nle_code_wrapper.bot.strategies import general_explore, goto_stairs, open_doors, open_doors_kick, search
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -13,7 +13,7 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", [0, 1])
     def test_corridor_open_doors(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        cfg.strategies = [open_doors, goto_stairs, explore]
+        cfg.strategies = [open_doors, goto_stairs, general_explore]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
@@ -30,7 +30,7 @@ class TestMazewalkMapped(object):
                     elif open_doors(bot):
                         open_doors_kick(bot)
                     else:
-                        explore(bot)
+                        general_explore(bot)
                 except BotPanic:
                     pass
 
@@ -50,7 +50,7 @@ class TestMazewalkMapped(object):
                         pass
                     elif open_doors(bot):
                         open_doors_kick(bot)
-                    elif explore(bot):
+                    elif general_explore(bot):
                         pass
                     else:
                         search(bot)
