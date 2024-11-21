@@ -25,6 +25,8 @@ class Level:
         self.objects[:] = -1
         self.doors = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.was_on = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
+        self.known_traps = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
+        self.known_traps[:] = -1
 
         self.shop = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.shop_interior = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
@@ -79,6 +81,9 @@ class Level:
         # how to detect that doors were destroyed
         mask = utils.isin(glyphs, G.DOORS)
         self.doors[mask] = True
+
+        mask = utils.isin(glyphs, G.TRAPS)
+        self.known_traps[mask] = glyphs[mask]
 
         # NOTE: adjust for levitation (1024 in blstats)
         if blstats.prop_mask & nethack.BL_MASK_LEV:
