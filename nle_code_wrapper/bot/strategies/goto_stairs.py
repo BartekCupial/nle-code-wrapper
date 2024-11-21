@@ -16,7 +16,7 @@ def goto_stairs(bot: "Bot") -> bool:
               towards them, False otherwise.
     """
 
-    level = bot.current_level()
+    level = bot.current_level
     stairs = level.object_coords(G.STAIR_DOWN)
     if len([s for s in stairs if bot.pathfinder.get_path_to(s)]) > 0:
         bot.pathfinder.goto(stairs[0])

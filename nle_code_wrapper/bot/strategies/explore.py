@@ -37,7 +37,7 @@ def explore(bot: "Bot") -> bool:
         left to explore.
     """
 
-    level = bot.current_level()
+    level = bot.current_level
 
     # Create a matrix to store exploration priorities
     exploration_priority = np.zeros(level.seen.shape)
