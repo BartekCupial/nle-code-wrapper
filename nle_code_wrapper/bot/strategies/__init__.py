@@ -21,7 +21,14 @@ from nle_code_wrapper.bot.strategies.run_away import run_away
 from nle_code_wrapper.bot.strategies.search import search
 
 __all__ = [
+    explore_corridor,
+    explore_room,
+    explore_room_systematically,
     general_explore,
+    goto_next_unexplored_room,
+    search_corridor_for_hidden_doors,
+    search_for_traps,
+    search_room_for_hidden_doors,
     search,
     explore_items,
     goto_stairs,
