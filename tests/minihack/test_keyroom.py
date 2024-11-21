@@ -5,7 +5,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore, goto_stairs, open_doors_key
+from nle_code_wrapper.bot.strategies import general_explore, goto_stairs, open_doors_key
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
@@ -59,7 +59,7 @@ def general_key(bot: "Bot"):
             elif pickup_key(bot):
                 has_key = True
             else:
-                explore(bot)
+                general_explore(bot)
         except BotPanic:
             pass
 

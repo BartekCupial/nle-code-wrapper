@@ -6,7 +6,13 @@ from nle_utils.glyph import G
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategies import explore, fight_all_monsters, goto_stairs, open_doors_kick, random_move
+from nle_code_wrapper.bot.strategies import (
+    fight_all_monsters,
+    general_explore,
+    goto_stairs,
+    open_doors_kick,
+    random_move,
+)
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
@@ -14,7 +20,7 @@ from nle_code_wrapper.utils import utils
 def general_mini(bot: "Bot", where, action):
     while True:
         fight_all_monsters(bot)
-        explore(bot)
+        general_explore(bot)
         goto(bot, where, action)
 
 
@@ -84,10 +90,10 @@ class TestMazewalkMapped(object):
         bot = Bot(cfg)
 
         bot.strategy(open_doors_kick)
-        bot.strategy(explore)
+        bot.strategy(general_explore)
         bot.strategy(goto_stairs)
 
-        cfg.strategies = [open_doors_kick, explore, goto_stairs]
+        cfg.strategies = [open_doors_kick, general_explore, goto_stairs]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
@@ -98,10 +104,10 @@ class TestMazewalkMapped(object):
         bot = Bot(cfg)
 
         bot.strategy(open_doors_kick)
-        bot.strategy(explore)
+        bot.strategy(general_explore)
         bot.strategy(goto_stairs)
 
-        cfg.strategies = [open_doors_kick, explore, goto_stairs]
+        cfg.strategies = [open_doors_kick, general_explore, goto_stairs]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
