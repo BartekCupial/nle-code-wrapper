@@ -17,7 +17,7 @@ def open_doors(bot: "Bot") -> bool:
               False if no reachable closed doors were found.
     """
 
-    level = bot.current_level()
+    level = bot.current_level
     closed_doors = level.object_coords(G.DOOR_CLOSED)
 
     reachable_door = min(
@@ -48,7 +48,7 @@ def open_doors_kick(bot: "Bot") -> bool:
         bool: True if a reachable closed door was found and kicked, False otherwise.
     """
 
-    level = bot.current_level()
+    level = bot.current_level
     closed_doors = level.object_coords(G.DOOR_CLOSED)
 
     reachable_door = min(
@@ -77,7 +77,7 @@ def open_doors_key(bot: "Bot") -> bool:
     Returns:
         bool: True if a reachable closed door was found and attempted to be opened with a key, False otherwise.
     """
-    level = bot.current_level()
+    level = bot.current_level
     closed_doors = level.object_coords(G.DOOR_CLOSED)
 
     reachable_door = min(

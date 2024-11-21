@@ -195,15 +195,16 @@ class Bot:
 
     def search(self) -> None:
         self.step(A.Command.SEARCH)
-        self.current_level().search_count[self.blstats.y, self.blstats.x] += 1
+        self.current_level.search_count[self.blstats.y, self.blstats.x] += 1
 
     def type_text(self, text: str) -> None:
         for char in text:
             self.step(ord(char))
 
     def update(self) -> None:
-        self.current_level().update(self.glyphs, self.blstats)
+        self.current_level.update(self.glyphs, self.blstats)
 
+    @property
     def current_level(self) -> Level:
         """
         :return: Level object of the current level

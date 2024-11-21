@@ -14,7 +14,7 @@ def explore_items(bot: "Bot"):
     Returns:
         bool: True if there is an item to explore, False otherwise.
     """
-    level = bot.current_level()
+    level = bot.current_level
     item_coords = coords(bot.glyphs, G.OBJECTS)
     distances = bot.pathfinder.distances(bot.entity.position)
 

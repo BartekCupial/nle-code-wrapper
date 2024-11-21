@@ -162,7 +162,7 @@ class Pathfinder:
 
             for point in path:
                 # TODO: check if there is peaceful monster
-                if not self.bot.current_level().walkable[point]:
+                if not self.bot.current_level.walkable[point]:
                     cont = True
                     break
                 self.move(point)

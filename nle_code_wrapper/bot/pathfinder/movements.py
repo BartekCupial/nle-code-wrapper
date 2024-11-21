@@ -39,11 +39,11 @@ class Movements:
 
     @property
     def walkable_diagonally(self) -> bool:
-        level = self.bot.current_level()
+        level = self.bot.current_level
         return level.dungeon_number != DungeonLevel.SOKOBAN
 
     def walkable_cardinal(self, pos: Tuple[int64, int64]) -> bool:
-        level = self.bot.current_level()
+        level = self.bot.current_level
         walkable = level.walkable[pos] and not (level.objects[pos] in G.BOULDER)
         return walkable
 
@@ -79,7 +79,7 @@ class Movements:
         Returns:
             bool: True if the player can move to the new position, False otherwise
         """
-        level = self.bot.current_level()
+        level = self.bot.current_level
         # we restrict diagonal movements in the doors
         # TODO: handle moving diagonally when heavy
         # the character can only move diagonally if his or her total inventory weight is 600 or less.

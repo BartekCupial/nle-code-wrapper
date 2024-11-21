@@ -17,7 +17,7 @@ def search(bot: "Bot"):
               nothing to explore.
     """
 
-    level = bot.current_level()
+    level = bot.current_level
 
     # Factor 1: Distance from current position
     distances = bot.pathfinder.distances(bot.entity.position)
