@@ -12,7 +12,7 @@ from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
 
-def lava_strategy(bot: "Bot"):
+def solve(bot: "Bot"):
     while True:
         goto(bot, G.RING_CLASS)
         goto(bot, G.POTION_CLASS)
@@ -83,10 +83,10 @@ class TestMazewalkMapped(object):
             "MiniHack-LavaCross-Levitate-Ring-Pickup-Full-v0",
         ],
     )
-    @pytest.mark.parametrize("seed", [0, 1, 2, 3, 4])
+    @pytest.mark.parametrize("seed", list(range(5)))
     def test_lava(self, env, seed):
         # TODO: for some of the variants there are monsters which have to be dealt with
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        cfg.strategies = [lava_strategy]
+        cfg.strategies = [solve]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
