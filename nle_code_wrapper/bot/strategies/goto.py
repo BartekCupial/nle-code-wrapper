@@ -62,6 +62,48 @@ def goto_items(bot: "Bot"):
         return False
 
 
+def goto_closest_room(bot: "Bot") -> bool:
+    """
+    Directs the bot to the closest room in the level.
+
+    Args:
+        bot (Bot): The bot instance that will perform the room navigation.
+
+    Returns:
+        bool: True if an room is found and the bot is directed to it,
+              False if there is no room to visite.
+
+    Details:
+        - Detects and labels different rooms in the level
+        - Identifies rooms (no tiles marked as was_on)
+        - For each room, finds the closest position to the bot
+        - Directs the bot to the closest position in the nearest room using pathfinding
+        - Background (label 0) is excluded from room consideration
+    """
+    labeled_rooms, num_rooms = room_detection(bot)
+
+    my_position = bot.entity.position
+    level = bot.current_level
+    unvisited_rooms = []
+    # exclude 0 because this is background
+    for label in range(1, num_rooms + 1):
+        room = labeled_rooms == label
+        room = np.logical_and(room, level.walkable)
+        # consider rooms which we are not in
+        if not label == labeled_rooms[my_position]:
+            room_positions = np.argwhere(room)
+            distances = np.sum(np.abs(room_positions - my_position), axis=1)
+            unvisited_rooms.append((np.min(distances), tuple(room_positions[np.argmin(distances)])))
+
+    closest_position = min((position for distance, position in unvisited_rooms), key=lambda x: x[0], default=None)
+
+    if closest_position:
+        bot.pathfinder.goto(closest_position)
+        return True
+    else:
+        return False
+
+
 def goto_closest_unexplored_room(bot: "Bot") -> bool:
     """
     Directs the bot to the closest unexplored room in the level.
@@ -114,4 +156,4 @@ def goto_closest_unexplored_room(bot: "Bot") -> bool:
 # goto closest corridor east
 # goto closest corridor south
 # goto closest corridor north
-# goto closest unexplored room
+# goto closest unexplored room (done)
