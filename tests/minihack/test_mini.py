@@ -9,7 +9,7 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.strategies import (
     fight_all_monsters,
     general_explore,
-    goto_stairs,
+    goto_closest_staircase_down,
     open_doors_kick,
     random_move,
 )
@@ -91,9 +91,9 @@ class TestMazewalkMapped(object):
 
         bot.strategy(open_doors_kick)
         bot.strategy(general_explore)
-        bot.strategy(goto_stairs)
+        bot.strategy(goto_closest_staircase_down)
 
-        cfg.strategies = [open_doors_kick, general_explore, goto_stairs]
+        cfg.strategies = [open_doors_kick, general_explore, goto_closest_staircase_down]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
@@ -105,9 +105,9 @@ class TestMazewalkMapped(object):
 
         bot.strategy(open_doors_kick)
         bot.strategy(general_explore)
-        bot.strategy(goto_stairs)
+        bot.strategy(goto_closest_staircase_down)
 
-        cfg.strategies = [open_doors_kick, general_explore, goto_stairs]
+        cfg.strategies = [open_doors_kick, general_explore, goto_closest_staircase_down]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 

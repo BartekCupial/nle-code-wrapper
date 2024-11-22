@@ -13,7 +13,20 @@ def goto(bot: "Bot", y: int, x: int) -> bool:
     return bot.pathfinder.goto(position)
 
 
-def goto_stairs(bot: "Bot") -> bool:
+def goto_closest(bot, positions):
+    # If no positions, return False
+    if len(positions) == 0:
+        return False
+
+    # Go to the closest position
+    distances = np.sum(np.abs(positions - bot.entity.position), axis=1)
+    closest_position = positions[np.argmin(distances)]
+    bot.pathfinder.goto(tuple(closest_position))
+
+    return True
+
+
+def goto_closest_staircase_down(bot: "Bot") -> bool:
     """
     Directs the bot to move towards the stairs on the current level.
     This function attempts to find the coordinates of the stairs down on the current level
@@ -25,14 +38,41 @@ def goto_stairs(bot: "Bot") -> bool:
         bool: True if the bot successfully finds a path to the stairs and starts moving
               towards them, False otherwise.
     """
+    stair = utils.isin(bot.glyphs, G.STAIR_DOWN)
+    stair_positions = np.argwhere(stair)
+    goto_closest(bot, stair_positions)
 
-    level = bot.current_level
-    stairs = level.object_coords(G.STAIR_DOWN)
-    if len([s for s in stairs if bot.pathfinder.get_path_to(s)]) > 0:
-        bot.pathfinder.goto(stairs[0])
-        return True
-    else:
-        return False
+
+def goto_closest_staircase_up(bot: "Bot") -> bool:
+    """
+    Directs the bot to move towards the stairs on the current level.
+    This function attempts to find the coordinates of the stairs down on the current level
+    and directs the bot to move towards them using the bot's pathfinder. If a path to
+    the stairs is found, the bot will move towards the first set of stairs found.
+    Args:
+        bot (Bot): The bot instance that will be directed to the stairs.
+    Returns:
+        bool: True if the bot successfully finds a path to the stairs and starts moving
+              towards them, False otherwise.
+    """
+    stair = utils.isin(bot.glyphs, G.STAIR_UP)
+    stair_positions = np.argwhere(stair)
+    goto_closest(bot, stair_positions)
+
+
+def goto_closest_corridor(bot: "Bot") -> bool:
+    """
+
+    Args:
+        bot (Bot): The bot instance that will perform the room navigation.
+
+    Returns:
+        bool: True if there is corridor and the bot is directed to it,
+              False if there is no corridors.
+    """
+    corridors = utils.isin(bot.glyphs, frozenset({SS.S_corr, SS.S_litcorr}))
+    corridor_positions = np.argwhere(corridors)
+    goto_closest(bot, corridor_positions)
 
 
 def goto_items(bot: "Bot"):
@@ -79,6 +119,9 @@ def goto_closest_room(bot: "Bot") -> bool:
         - For each room, finds the closest position to the bot
         - Directs the bot to the closest position in the nearest room using pathfinding
         - Background (label 0) is excluded from room consideration
+
+    Note: it's possible that closest room will not be reachable!
+    This will result in BotPanic and this is by design.
     """
     labeled_rooms, num_rooms = room_detection(bot)
 
@@ -146,8 +189,10 @@ def goto_closest_unexplored_room(bot: "Bot") -> bool:
 
 
 # TODO:
-# goto closest room
-# goto closest corridor
+# goto closest staricase_down (done)
+# goto closest staricase_up (done)
+# goto closest room (done)
+# goto closest corridor (done)
 # goto closest room west
 # goto closest room east
 # goto closest room south

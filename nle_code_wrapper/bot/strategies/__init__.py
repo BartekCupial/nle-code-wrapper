@@ -8,10 +8,12 @@ from nle_code_wrapper.bot.strategies.explore_items import explore_items
 from nle_code_wrapper.bot.strategies.fight_monster import fight_all_monsters, fight_closest_monster
 from nle_code_wrapper.bot.strategies.goto import (
     goto,
+    goto_closest_corridor,
     goto_closest_room,
+    goto_closest_staircase_down,
+    goto_closest_staircase_up,
     goto_closest_unexplored_room,
     goto_items,
-    goto_stairs,
 )
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup_items import pickup_items
@@ -37,7 +39,9 @@ __all__ = [
     search_room_for_hidden_doors,
     general_search,
     explore_items,
-    goto_stairs,
+    goto_closest_corridor,
+    goto_closest_staircase_down,
+    goto_closest_staircase_up,
     fight_closest_monster,
     fight_all_monsters,
     open_doors,
