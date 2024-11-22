@@ -107,7 +107,7 @@ def corridor_detection(bot: "Bot"):
 
     # treat corridors as everything what is floor and not room
     labeled_rooms, num_rooms = room_detection(bot)
-    floor = utils.isin(bot.glyphs, G.FLOOR, G.DOOR_OPENED)
+    floor = utils.isin(bot.current_level.objects, G.FLOOR, G.DOOR_OPENED)
     corridors = np.logical_and(floor, labeled_rooms == 0)
 
     # include our position as part of the room
