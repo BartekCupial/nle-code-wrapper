@@ -5,7 +5,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import general_explore, goto_stairs, open_doors_key
+from nle_code_wrapper.bot.strategies import general_explore, goto_closest_staircase_down, open_doors_key
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
@@ -52,7 +52,7 @@ def general_key(bot: "Bot"):
         try:
             closed_doors = position_of_reachable_adjacent_object(bot, G.DOOR_CLOSED)
 
-            if goto_stairs(bot):
+            if goto_closest_staircase_down(bot):
                 pass
             elif has_key and closed_doors:
                 open_doors_key(bot)

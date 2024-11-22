@@ -3,7 +3,13 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import fight_closest_monster, general_explore, goto_stairs, open_doors, run_away
+from nle_code_wrapper.bot.strategies import (
+    fight_closest_monster,
+    general_explore,
+    goto_closest_staircase_down,
+    open_doors,
+    run_away,
+)
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -32,7 +38,7 @@ class TestMazewalkMapped(object):
                         pass
                     elif fight_closest_monster(bot):
                         pass
-                    elif goto_stairs(bot):
+                    elif goto_closest_staircase_down(bot):
                         pass
                     elif open_doors(bot):
                         pass

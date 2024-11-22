@@ -7,7 +7,7 @@ from nle_utils.glyph import G
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategies import goto_stairs, quaff_potion_from_inv
+from nle_code_wrapper.bot.strategies import goto_closest_staircase_down, quaff_potion_from_inv
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
@@ -21,7 +21,7 @@ def lava_strategy(bot: "Bot"):
             pass
         else:
             put_on_ring_from_inv(bot)
-        goto_stairs(bot)
+        goto_closest_staircase_down(bot)
 
 
 def pickup(bot: "Bot"):
