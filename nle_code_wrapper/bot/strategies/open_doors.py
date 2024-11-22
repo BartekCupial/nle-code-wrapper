@@ -2,8 +2,10 @@ from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 
 
+@strategy
 def open_doors(bot: "Bot") -> bool:
     """
     Attempts to open the nearest reachable closed door for the given bot.
@@ -36,6 +38,7 @@ def open_doors(bot: "Bot") -> bool:
         return False
 
 
+@strategy
 def open_doors_kick(bot: "Bot") -> bool:
     """
     Attempts to open closed doors by kicking them if they are reachable.
@@ -68,6 +71,7 @@ def open_doors_kick(bot: "Bot") -> bool:
         return False
 
 
+@strategy
 def open_doors_key(bot: "Bot") -> bool:
     """
     Attempts to open closed doors by using a key if one is available.

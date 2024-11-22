@@ -1,9 +1,11 @@
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils.utils import coords
 
 
+@strategy
 def explore_items(bot: "Bot"):
     """
     Explore the map by going to the closest item which is reachable and unexplored.

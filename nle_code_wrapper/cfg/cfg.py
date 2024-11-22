@@ -13,4 +13,4 @@ def add_code_wrapper_cli_args(p: ArgumentParser) -> None:
         default="nle_code_wrapper.bot.strategies",
         help="where to search for strategies implementation",
     )
-    p.add_argument("--max_strategy_steps", type=int, default=100, help="Strategy episode horizon.")
+    p.add_argument("--max_strategy_steps", type=int, default=1000, help="Strategy episode horizon.")

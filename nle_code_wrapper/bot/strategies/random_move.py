@@ -1,8 +1,10 @@
 import numpy as np
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 
 
+@strategy
 def random_move(bot: "Bot") -> bool:
     """
     Randomly move to a neighbor position.

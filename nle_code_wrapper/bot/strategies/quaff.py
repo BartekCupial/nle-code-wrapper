@@ -2,8 +2,10 @@ from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 
 
+@strategy
 def quaff_potion_from_inv(bot: "Bot") -> bool:
     """
     Quaff a potion from the inventory.
