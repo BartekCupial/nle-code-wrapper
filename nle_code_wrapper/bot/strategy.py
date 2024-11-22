@@ -1,3 +1,5 @@
+from functools import wraps
+
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotFinished
 
@@ -13,6 +15,7 @@ def strategy(func):
         wrapper: The wrapped function that increments strategy_step before execution
     """
 
+    @wraps(func)
     def wrapper(bot: "Bot", *args, **kwargs):
         bot.strategy_steps += 1
 

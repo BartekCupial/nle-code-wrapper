@@ -1,11 +1,11 @@
 import numpy as np
-from nle_utils.glyph import SS
+from nle_utils.glyph import SS, G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
+from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
 
 
 @strategy
@@ -101,12 +101,10 @@ def explore_room(bot: "Bot") -> bool:
 
 @strategy
 def explore_corridor(bot: "Bot") -> bool:
-    # Move through corridor (if you are in one)
-    # TODO: until you reach a room
     my_position = bot.entity.position
     level = bot.current_level
 
-    corridors = utils.isin(bot.glyphs, frozenset({SS.S_corr, SS.S_litcorr}))
+    corridors = corridor_detection(bot)
     unexplored_corridors = np.logical_and(corridors, ~level.was_on)
     unexplored_positions = np.argwhere(unexplored_corridors)
 
