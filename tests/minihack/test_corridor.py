@@ -19,7 +19,16 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", [0, 1])
     def test_corridor_open_doors(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        cfg.strategies = [open_doors, goto_closest_staircase_down, general_explore]
+
+        def general_solve(bot: "Bot"):
+            while True:
+                for strategy in [goto_closest_staircase_down, open_doors_kick, general_explore]:
+                    try:
+                        strategy(bot)
+                    except BotPanic:
+                        pass
+
+        cfg.strategies = [general_solve]
         status = play(cfg)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
