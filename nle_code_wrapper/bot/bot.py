@@ -19,7 +19,7 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
-    def __init__(self, env: Union[GymV21CompatibilityV0, Namespace]) -> None:
+    def __init__(self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 100) -> None:
         """
         Gym environment or Namespace with the same attributes as the gym environment
         """
@@ -28,6 +28,7 @@ class Bot:
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
+        self.max_strategy_steps = max_strategy_steps
 
     def strategy(self, func: Union[partial, Callable]) -> None:
         """
@@ -107,6 +108,7 @@ class Bot:
         self.reward = 0.0
         self.current_strategy = None
         self.current_args = None
+        self.strategy_steps = 0
 
         self.done = False
 
@@ -177,9 +179,11 @@ class Bot:
                     self.current_strategy(self, *self.current_args)
                     self.current_strategy = None
                     self.current_args = None
+                    self.strategy_steps += 1
         except (BotPanic, BotFinished):
             self.current_strategy = None
             self.current_args = None
+            self.strategy_steps += 1
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -187,6 +191,9 @@ class Bot:
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
+
+        if self.strategy_steps >= self.max_strategy_steps:
+            self.truncated = True
 
         if self.terminated or self.truncated:
             new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
