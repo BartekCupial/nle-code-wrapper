@@ -5,7 +5,7 @@ from scipy import ndimage
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
+from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
 from nle_code_wrapper.utils.utils import coords
 
 
@@ -74,7 +74,7 @@ def goto_closest_corridor(bot: "Bot") -> bool:
         bool: True if there is corridor and the bot is directed to it,
               False if there is no corridors.
     """
-    corridors = utils.isin(bot.glyphs, frozenset({SS.S_corr, SS.S_litcorr}))
+    corridors = corridor_detection(bot)
     corridor_positions = np.argwhere(corridors)
     goto_closest(bot, corridor_positions)
 

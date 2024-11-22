@@ -1,3 +1,4 @@
+import itertools
 from typing import Tuple
 
 import numpy as np
@@ -71,16 +72,52 @@ def room_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
         - labeled_rooms: numpy array where each room has a unique integer label
         - num_rooms: number of distinct rooms found
     """
+    level = bot.current_level
+    position = bot.entity.position
 
     room_floor = frozenset({SS.S_room, SS.S_darkroom})  # TODO: use also SS.S_ndoor?
-    rooms = utils.isin(bot.glyphs, G.WALL, G.DOORS, G.BARS, room_floor)
-    structure = ndimage.generate_binary_structure(2, 2)
-    rooms = ndimage.binary_closing(rooms, structure=structure)
-    slices = ndimage.find_objects(ndimage.label(rooms)[0])
-    if slices:
-        for bbox in slices:
-            rooms[bbox] = 1
+    rooms = utils.isin(level.objects, room_floor)
 
+    structure = ndimage.generate_binary_structure(2, 2)
     labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
 
+    # include our position as part of the room
+    # if all neighbors which are room floor have the same label
+    neighbors = []
+    for x, y in itertools.product([-1, 0, 1], repeat=2):
+        if x == 0 and y == 0:
+            continue
+
+        neighbor = labeled_rooms[position[0] + y, position[1] + x]
+        if neighbor != 0:
+            neighbors.append(neighbor)
+
+    if neighbors and np.all(neighbors == neighbors[0]):
+        labeled_rooms[position] = neighbors[0]
+
+    # save_boolean_array_pillow(labeled_rooms)
     return labeled_rooms, num_rooms
+
+
+def corridor_detection(bot: "Bot"):
+    position = bot.entity.position
+
+    # treat corridors as everything what is floor and not room
+    labeled_rooms, num_rooms = room_detection(bot)
+    floor = utils.isin(bot.glyphs, G.FLOOR)
+    corridors = np.logical_and(floor, labeled_rooms == 0)
+
+    # include our position as part of the room
+    # if all neighbors which are corridor have the same label
+    neighbors = []
+    for x, y in itertools.product([-1, 0, 1], repeat=2):
+        if x == 0 and y == 0:
+            continue
+
+        neighbor = labeled_rooms[position[0] + y, position[1] + x]
+        neighbors.append(neighbor)
+
+    if neighbors and np.all(neighbors == neighbors[0]):
+        corridors[position] = True
+
+    return corridors

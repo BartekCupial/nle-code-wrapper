@@ -5,7 +5,7 @@ from scipy import ndimage
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
+from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
 from nle_code_wrapper.utils.utils import coords
 
 
@@ -77,14 +77,15 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
 def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     my_position = bot.entity.position
     level = bot.current_level
-    corridors = utils.isin(bot.glyphs, frozenset({SS.S_corr, SS.S_litcorr}))
+
+    corridors = corridor_detection(bot)
 
     # look at dead ends, i.e. positions with only one neighbor
     searchable_positions = np.array(
         [
             n
             for n in np.argwhere(corridors)
-            if len(bot.pathfinder.neighbors(tuple(n))) == 1 and level.search_count[tuple(n)] < 20
+            if len(bot.pathfinder.neighbors(tuple(n), cardinal_only=True)) == 1 and level.search_count[tuple(n)] < 40
         ]
     )
 
@@ -102,7 +103,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     bot.pathfinder.goto(tuple(best_position))
 
     for _ in range(5):
-        new_corridors = utils.isin(bot.glyphs, frozenset({SS.S_corr, SS.S_litcorr}))
+        new_corridors = corridor_detection(bot)
         if not (corridors == new_corridors).all():
             break
         bot.search()
