@@ -76,7 +76,7 @@ def room_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
     position = bot.entity.position
 
     room_floor = frozenset({SS.S_room, SS.S_darkroom})  # TODO: use also SS.S_ndoor?
-    rooms = utils.isin(level.objects, room_floor)
+    rooms = utils.isin(level.objects, room_floor, G.STAIR_DOWN, G.STAIR_UP)
 
     structure = ndimage.generate_binary_structure(2, 2)
     labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
