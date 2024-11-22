@@ -92,8 +92,11 @@ def room_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
         if neighbor != 0:
             neighbors.append(neighbor)
 
-    if neighbors and np.all(neighbors == neighbors[0]):
-        labeled_rooms[position] = neighbors[0]
+    # if we are standing inside the room treat my place as part of the room
+    # then we need to recompute closest components (if we were stading on the doors)
+    if neighbors:
+        rooms[position] = neighbors[0]
+        labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
 
     # save_boolean_array_pillow(labeled_rooms)
     return labeled_rooms, num_rooms
