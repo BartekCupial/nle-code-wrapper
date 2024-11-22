@@ -9,9 +9,9 @@ from nle_code_wrapper.bot import Bot
 
 
 class NLECodeWrapper(gym.Wrapper):
-    def __init__(self, env: GymV21CompatibilityV0, strategies: List[Callable]) -> None:
+    def __init__(self, env: GymV21CompatibilityV0, strategies: List[Callable], max_strategy_steps: int = 100) -> None:
         super().__init__(env)
-        self.bot = Bot(env)
+        self.bot = Bot(env, max_strategy_steps=max_strategy_steps)
 
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)

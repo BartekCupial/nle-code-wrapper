@@ -9,6 +9,6 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     env = make_env(env_name=env_name, cfg=cfg, env_config=env_config, render_mode=render_mode)
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, cfg.strategies)
+        env = NLECodeWrapper(env, cfg.strategies, max_strategy_steps=cfg.max_strategy_steps)
 
     return env

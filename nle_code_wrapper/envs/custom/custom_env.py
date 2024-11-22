@@ -63,6 +63,6 @@ def make_custom_env(env_name, cfg, env_config, render_mode: Optional[str] = None
         cfg.strategies = strategies
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, cfg.strategies)
+        env = NLECodeWrapper(env, cfg.strategies, max_strategy_steps=cfg.max_strategy_steps)
 
     return env
