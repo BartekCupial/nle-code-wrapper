@@ -3,6 +3,7 @@ from nle_utils.glyph import SS, G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
 from nle_code_wrapper.utils.utils import coords
@@ -26,6 +27,7 @@ def goto_closest(bot, positions):
     return True
 
 
+@strategy
 def goto_closest_staircase_down(bot: "Bot") -> bool:
     """
     Directs the bot to move towards the stairs on the current level.
@@ -43,6 +45,7 @@ def goto_closest_staircase_down(bot: "Bot") -> bool:
     goto_closest(bot, stair_positions)
 
 
+@strategy
 def goto_closest_staircase_up(bot: "Bot") -> bool:
     """
     Directs the bot to move towards the stairs on the current level.
@@ -60,6 +63,7 @@ def goto_closest_staircase_up(bot: "Bot") -> bool:
     goto_closest(bot, stair_positions)
 
 
+@strategy
 def goto_closest_corridor(bot: "Bot") -> bool:
     """
 
@@ -75,6 +79,7 @@ def goto_closest_corridor(bot: "Bot") -> bool:
     goto_closest(bot, corridor_positions)
 
 
+@strategy
 def goto_items(bot: "Bot"):
     """
     Go to the closest item which is reachable and unexplored.
@@ -102,6 +107,7 @@ def goto_items(bot: "Bot"):
         return False
 
 
+@strategy
 def goto_closest_room(bot: "Bot") -> bool:
     """
     Directs the bot to the closest room in the level.
@@ -147,6 +153,7 @@ def goto_closest_room(bot: "Bot") -> bool:
         return False
 
 
+@strategy
 def goto_closest_unexplored_room(bot: "Bot") -> bool:
     """
     Directs the bot to the closest unexplored room in the level.

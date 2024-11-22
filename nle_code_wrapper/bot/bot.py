@@ -110,8 +110,6 @@ class Bot:
         self.current_args = None
         self.strategy_steps = 0
 
-        self.done = False
-
         self.last_obs, self.last_info = self.env.reset(**kwargs)
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
@@ -141,7 +139,6 @@ class Bot:
         self.reward += reward
 
         if self.terminated or self.truncated:
-            self.done = True
             raise BotFinished
 
         self.update()
@@ -179,11 +176,9 @@ class Bot:
                     self.current_strategy(self, *self.current_args)
                     self.current_strategy = None
                     self.current_args = None
-                    self.strategy_steps += 1
         except (BotPanic, BotFinished):
             self.current_strategy = None
             self.current_args = None
-            self.strategy_steps += 1
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -191,9 +186,6 @@ class Bot:
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
-
-        if self.strategy_steps >= self.max_strategy_steps:
-            self.truncated = True
 
         if self.terminated or self.truncated:
             new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"

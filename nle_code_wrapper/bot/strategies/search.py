@@ -3,11 +3,13 @@ from nle_utils.glyph import SS, G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
 from nle_code_wrapper.utils.utils import coords
 
 
+@strategy
 def search_room_for_hidden_doors(bot: "Bot") -> bool:
     """
     Searches the current room's walls for hidden doors by directing the bot to inspect suspicious spots.
@@ -71,6 +73,7 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     return True
 
 
+@strategy
 def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     my_position = bot.entity.position
     level = bot.current_level
@@ -105,6 +108,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         bot.search()
 
 
+@strategy
 def search_for_traps(bot: "Bot") -> bool:
     """
     Search the current position repeatedly for traps.
@@ -114,6 +118,7 @@ def search_for_traps(bot: "Bot") -> bool:
     """
     initial_traps = set(bot.current_level.object_coords(G.TRAPS))
 
+    # TODO: make use of search counter
     # Search 20 times
     for _ in range(20):
         bot.search()
@@ -126,6 +131,7 @@ def search_for_traps(bot: "Bot") -> bool:
     return False
 
 
+@strategy
 def general_search(bot: "Bot"):
     """
     Conducts a search operation for the bot to explore the current level.

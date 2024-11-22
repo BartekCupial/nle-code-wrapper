@@ -4,8 +4,10 @@ from numpy import int64
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.entity import Entity
+from nle_code_wrapper.bot.strategy import strategy
 
 
+@strategy
 def run_away(bot: "Bot") -> bool:
     """
     Executes the run away strategy for the bot.

@@ -1,6 +1,8 @@
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 
 
+@strategy
 def fight_closest_monster(bot: "Bot") -> bool:
     """
     Directs the bot to fight the closest monster.

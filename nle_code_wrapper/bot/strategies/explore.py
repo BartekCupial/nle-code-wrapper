@@ -3,10 +3,12 @@ from nle_utils.glyph import SS
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
 
 
+@strategy
 def explore_room_systematically(bot: "Bot") -> bool:
     """
     Systematically explores the current room by directing the bot to walkable tiles.
@@ -48,6 +50,7 @@ def explore_room_systematically(bot: "Bot") -> bool:
     return True
 
 
+@strategy
 def explore_room(bot: "Bot") -> bool:
     """
     Explores the current room by directing the bot to positions that unvail new tiles.
@@ -96,6 +99,7 @@ def explore_room(bot: "Bot") -> bool:
     return True
 
 
+@strategy
 def explore_corridor(bot: "Bot") -> bool:
     # Move through corridor (if you are in one)
     # TODO: until you reach a room
@@ -118,6 +122,7 @@ def explore_corridor(bot: "Bot") -> bool:
     return True
 
 
+@strategy
 def general_explore(bot: "Bot") -> bool:
     """
     Explore the current level using the bot.
