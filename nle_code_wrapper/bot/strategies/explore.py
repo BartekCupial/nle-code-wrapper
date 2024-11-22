@@ -32,6 +32,10 @@ def explore_room_systematically(bot: "Bot") -> bool:
     my_position = bot.entity.position
     current_room = labeled_rooms == labeled_rooms[my_position]
 
+    # Check if we are in the room
+    if labeled_rooms[my_position] == 0:
+        return False
+
     # get unexplored positions of the room
     level = bot.current_level
     room_walkable = np.logical_and(current_room, level.walkable)
