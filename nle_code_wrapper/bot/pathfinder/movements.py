@@ -116,7 +116,9 @@ class Movements:
         if self.walkable_intermediate(pos, new_pos):
             neighbors.append(new_pos)
 
-    def neighbors(self, node: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
+    def neighbors(
+        self, node: Tuple[int64, int64], cardinal_only: bool = False
+    ) -> List[Union[Any, Tuple[int64, int64]]]:
         """
         This method calculates the possible moves for the player.
 
@@ -130,8 +132,9 @@ class Movements:
         for dir in cardinal_directions:
             self.get_move_cardinal(node, dir, neighbors)
 
-        if self.walkable_diagonally:
-            for dir in intermediate_directions:
-                self.get_move_intermediate(node, dir, neighbors)
+        if not cardinal_only:
+            if self.walkable_diagonally:
+                for dir in intermediate_directions:
+                    self.get_move_intermediate(node, dir, neighbors)
 
         return neighbors

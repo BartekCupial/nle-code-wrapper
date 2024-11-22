@@ -174,8 +174,8 @@ class Pathfinder:
     def distance(self, n1: Tuple[int64, int64], n2: Tuple[int64, int64]) -> int64:
         return chebyshev_distance(n1, n2)
 
-    def neighbors(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
-        return self.movements.neighbors(pos)
+    def neighbors(self, pos: Tuple[int64, int64], cardinal_only: bool = False) -> List[Union[Any, Tuple[int64, int64]]]:
+        return self.movements.neighbors(pos, cardinal_only=cardinal_only)
 
     def reachable_adjacent(
         self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
