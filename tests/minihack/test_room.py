@@ -3,13 +3,13 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import (
-    fight_closest_monster,
-    general_explore,
-    goto_closest_staircase_down,
-    run_away,
-)
+from nle_code_wrapper.bot.strategies import explore_room, fight_closest_monster, goto_closest_staircase_down, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
+
+
+def multiple_monsters_adjacent(bot: "Bot") -> bool:
+    if len([e for e in bot.entities if bot.pathfinder.distance(e.position, bot.entity.position) == 1]) > 1:
+        run_away(bot)
 
 
 @pytest.mark.usefixtures("register_components")
@@ -34,7 +34,7 @@ class TestMazewalkMapped(object):
                     if goto_closest_staircase_down(bot):
                         pass
                     else:
-                        general_explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
@@ -61,7 +61,7 @@ class TestMazewalkMapped(object):
                     elif goto_closest_staircase_down(bot):
                         pass
                     else:
-                        general_explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
@@ -85,7 +85,7 @@ class TestMazewalkMapped(object):
                     if goto_closest_staircase_down(bot):
                         pass
                     else:
-                        general_explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
@@ -106,14 +106,14 @@ class TestMazewalkMapped(object):
         def general_smart_fight(bot: "Bot"):
             while True:
                 try:
-                    if run_away(bot):
+                    if multiple_monsters_adjacent(bot):
                         pass
                     elif fight_closest_monster(bot):
                         pass
                     elif goto_closest_staircase_down(bot):
                         pass
                     else:
-                        general_explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
