@@ -40,7 +40,7 @@ def goto_closest_staircase_down(bot: "Bot") -> bool:
         bool: True if the bot successfully finds a path to the stairs and starts moving
               towards them, False otherwise.
     """
-    stair = utils.isin(bot.glyphs, G.STAIR_DOWN)
+    stair = utils.isin(bot.current_level.objects, G.STAIR_DOWN)
     stair_positions = np.argwhere(stair)
     goto_closest(bot, stair_positions)
 
@@ -58,7 +58,7 @@ def goto_closest_staircase_up(bot: "Bot") -> bool:
         bool: True if the bot successfully finds a path to the stairs and starts moving
               towards them, False otherwise.
     """
-    stair = utils.isin(bot.glyphs, G.STAIR_UP)
+    stair = utils.isin(bot.current_level.objects, G.STAIR_UP)
     stair_positions = np.argwhere(stair)
     goto_closest(bot, stair_positions)
 
