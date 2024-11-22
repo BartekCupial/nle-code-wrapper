@@ -138,7 +138,7 @@ def goto_closest_room(bot: "Bot") -> bool:
             distances = np.sum(np.abs(room_positions - my_position), axis=1)
             unvisited_rooms.append((np.min(distances), tuple(room_positions[np.argmin(distances)])))
 
-    closest_position = min((position for distance, position in unvisited_rooms), key=lambda x: x[0], default=None)
+    closest_position = min(unvisited_rooms, key=lambda x: x[0])[1] if unvisited_rooms else None
 
     if closest_position:
         bot.pathfinder.goto(closest_position)
@@ -179,7 +179,7 @@ def goto_closest_unexplored_room(bot: "Bot") -> bool:
             distances = np.sum(np.abs(room_positions - bot.entity.position), axis=1)
             unvisited_rooms.append((np.min(distances), tuple(room_positions[np.argmin(distances)])))
 
-    closest_position = min((position for distance, position in unvisited_rooms), key=lambda x: x[0], default=None)
+    closest_position = min(unvisited_rooms, key=lambda x: x[0])[1] if unvisited_rooms else None
 
     if closest_position:
         bot.pathfinder.goto(closest_position)
