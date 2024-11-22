@@ -164,8 +164,10 @@ class Bot:
                 if action < len(self.strategies):
                     self.current_strategy = self.strategies[action]
                     self.current_args = ()
-                # if action is wrong do nothing
-                # TODO: we need to write tests so they sample from correct action space
+                else:
+                    # if action is wrong do nothing, but also increment strategy_step
+                    # TODO: turn off for tests?
+                    self.strategy_steps += 1
             else:
                 self.current_args += (action,)
 
