@@ -3,6 +3,7 @@ from nle_utils.glyph import SS, G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategies.goto import goto_closest
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
@@ -42,16 +43,7 @@ def explore_room_systematically(bot: "Bot") -> bool:
     room_unexplored = np.logical_and(room_walkable, ~level.was_on)
     unexplored_positions = np.argwhere(room_unexplored)
 
-    # If no unexplored positions, return False
-    if len(unexplored_positions) == 0:
-        return False
-
-    # Go to the closest unexplored position
-    distances = np.sum(np.abs(unexplored_positions - my_position), axis=1)
-    closest_position = unexplored_positions[np.argmin(distances)]
-    bot.pathfinder.goto(tuple(closest_position))
-
-    return True
+    goto_closest(bot, unexplored_positions)
 
 
 @strategy
@@ -91,37 +83,25 @@ def explore_room(bot: "Bot") -> bool:
     room_unexplored = np.logical_and(current_room, discovery_potential)
     unexplored_positions = np.argwhere(room_unexplored)
 
-    # If no unexplored positions, return False
-    if len(unexplored_positions) == 0:
-        return False
-
-    # Go to the closest unexplored position
-    distances = np.sum(np.abs(unexplored_positions - my_position), axis=1)
-    closest_position = unexplored_positions[np.argmin(distances)]
-    bot.pathfinder.goto(tuple(closest_position))
-
-    return True
+    goto_closest(bot, unexplored_positions)
 
 
 @strategy
 def explore_corridor(bot: "Bot") -> bool:
+    labeled_corridors, num_labels = corridor_detection(bot)
+
+    # get current corridor
     my_position = bot.entity.position
-    level = bot.current_level
+    current_corridor = labeled_corridors == labeled_corridors[my_position]
 
-    corridors = corridor_detection(bot)
-    unexplored_corridors = np.logical_and(corridors, ~level.was_on)
-    unexplored_positions = np.argwhere(unexplored_corridors)
-
-    # If no unexplored positions, return False
-    if len(unexplored_positions) == 0:
+    # Check if we are in the corridor
+    if labeled_corridors[my_position] == 0:
         return False
 
-    # Go to the closest unexplored position
-    distances = np.sum(np.abs(unexplored_positions - my_position), axis=1)
-    closest_position = unexplored_positions[np.argmin(distances)]
-    bot.pathfinder.goto(tuple(closest_position))
+    unexplored_corridors = np.logical_and(current_corridor, ~bot.current_level.was_on)
+    unexplored_positions = np.argwhere(unexplored_corridors)
 
-    return True
+    goto_closest(bot, unexplored_positions)
 
 
 @strategy
