@@ -4,7 +4,7 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
-    explore_corridor,
+    explore_corridor_systematically,
     explore_room,
     goto_closest_corridor,
     goto_closest_staircase_down,
@@ -28,7 +28,7 @@ class TestMazewalkMapped(object):
                 for strategy in [
                     goto_closest_staircase_down,
                     explore_room,
-                    explore_corridor,
+                    explore_corridor_systematically,
                     goto_closest_corridor,
                     open_doors_kick,
                     goto_closest_unexplored_room,

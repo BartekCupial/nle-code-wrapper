@@ -6,7 +6,7 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
-    explore_corridor,
+    explore_corridor_systematically,
     explore_room,
     goto_closest_staircase_down,
     goto_closest_unexplored_corridor,
@@ -67,7 +67,7 @@ def solve(bot: "Bot"):
                 has_key = True
             elif explore_room(bot):
                 pass
-            elif explore_corridor(bot):
+            elif explore_corridor_systematically(bot):
                 pass
             elif goto_closest_unexplored_room(bot):
                 pass

@@ -1,107 +1,103 @@
 import numpy as np
-from nle_utils.glyph import SS, G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategies.goto import goto_closest
 from nle_code_wrapper.bot.strategy import strategy
-from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
 
 
 @strategy
-def explore_room_systematically(bot: "Bot") -> bool:
+def explore(bot: "Bot", feature_detection):
     """
-    Systematically explores the current room by directing the bot to walkable tiles.
-
-    Args:
-        bot (Bot): The bot instance that will perform the exploration.
-
-    Returns:
-        bool: True if there are unexplored positions and the bot is directed to one,
-              False if all positions in the current room have been explored.
-
-    Details:
-        - Detects and labels different rooms in the level
-        - Identifies the current room based on bot's position
-        - Finds walkable tiles that haven't been explored yet
-        - Directs the bot to the closest unexplored position using pathfinding
-    """
-    labeled_rooms, num_rooms = room_detection(bot)
-
-    # get current room
-    my_position = bot.entity.position
-    current_room = labeled_rooms == labeled_rooms[my_position]
-
-    # Check if we are in the room
-    if labeled_rooms[my_position] == 0:
-        return False
-
-    # get unexplored positions of the room
-    level = bot.current_level
-    room_walkable = np.logical_and(current_room, level.walkable)
-    room_unexplored = np.logical_and(room_walkable, ~level.was_on)
-    unexplored_positions = np.argwhere(room_unexplored)
-
-    return goto_closest(bot, unexplored_positions)
-
-
-@strategy
-def explore_room(bot: "Bot") -> bool:
-    """
-    Explores the current room by directing the bot to positions that unvail new tiles.
+    Explores the current feature by directing the bot to positions that unvail new tiles.
 
     Args:
         bot (Bot): The bot instance that will perform the exploration.
 
     Returns:
         bool: True if there are unexplored positions with discovery potential and the bot is directed to one,
-              False if all positions in the current room have been explored.
+              False if all positions in the current feature have been explored.
 
     Details:
-        - Detects and labels distinct rooms in the level
-        - Identifies the current room based on bot's position
+        - Detects and labels distinct features in the level
+        - Identifies the current feature based on bot's position
         - Finds walkable tiles that unvail new areas, based on the edges
         - Directs the bot to the closest unexplored position using pathfinding
     """
-    labeled_rooms, num_rooms = room_detection(bot)
+    feature_labels, num_labels = feature_detection(bot)
 
-    # get current room
+    # get current feature
     my_position = bot.entity.position
-    current_room = labeled_rooms == labeled_rooms[my_position]
+    level = bot.current_level
+    current_feature = feature_labels == feature_labels[my_position]
 
-    # Check if we are in the room
-    if labeled_rooms[my_position] == 0:
+    # Check if we are in the feature
+    if feature_labels[my_position] == 0:
         return False
 
     # get unexplored positions of the room
-    level = bot.current_level
     structure = ndimage.generate_binary_structure(2, 2)
     unexplored_edges = np.logical_and(ndimage.binary_dilation(~level.seen, structure), level.seen)
     walkable_edges = np.logical_and(unexplored_edges, level.walkable)  # we use level.walkable to exclude walls etc.
     discovery_potential = np.logical_and(walkable_edges, ~level.was_on)
-    room_unexplored = np.logical_and(current_room, discovery_potential)
-    unexplored_positions = np.argwhere(room_unexplored)
+    feature_unexplored = np.logical_and(current_feature, discovery_potential)
+    unexplored_positions = np.argwhere(feature_unexplored)
 
     return goto_closest(bot, unexplored_positions)
 
 
 @strategy
-def explore_corridor(bot: "Bot") -> bool:
-    labeled_corridors, num_labels = corridor_detection(bot)
+def explore_systematically(bot: "Bot", feature_detection):
+    """
+    Systematically explores the current feature by directing the bot to walkable tiles.
 
-    # get current corridor
+    Args:
+        bot (Bot): The bot instance that will perform the exploration.
+
+    Returns:
+        bool: True if there are unexplored positions and the bot is directed to one,
+              False if all positions in the current feature have been explored.
+
+    Details:
+        - Detects and labels different features in the level
+        - Identifies the current feature based on bot's position
+        - Finds walkable tiles that haven't been explored yet
+        - Directs the bot to the closest unexplored position using pathfinding
+    """
+    labeled_features, num_labels = feature_detection(bot)
+
+    # get current feature
     my_position = bot.entity.position
-    current_corridor = labeled_corridors == labeled_corridors[my_position]
+    level = bot.current_level
+    current_feature = labeled_features == labeled_features[my_position]
 
-    # Check if we are in the corridor
-    if labeled_corridors[my_position] == 0:
+    # Check if we are in the feature
+    if labeled_features[my_position] == 0:
         return False
 
-    unexplored_corridors = np.logical_and(current_corridor, ~bot.current_level.was_on)
-    unexplored_positions = np.argwhere(unexplored_corridors)
+    # get unexplored positions of the room
+    feature_walkable = np.logical_and(current_feature, level.walkable)
+    feature_unexplored = np.logical_and(feature_walkable, ~level.was_on)
+    unexplored_positions = np.argwhere(feature_unexplored)
 
     return goto_closest(bot, unexplored_positions)
+
+
+def explore_room(bot: "Bot") -> bool:
+    return explore(bot, room_detection)
+
+
+def explore_corridor(bot: "Bot") -> bool:
+    return explore(bot, corridor_detection)
+
+
+def explore_room_systematically(bot: "Bot") -> bool:
+    return explore_systematically(bot, room_detection)
+
+
+def explore_corridor_systematically(bot: "Bot") -> bool:
+    return explore_systematically(bot, corridor_detection)
 
 
 @strategy
