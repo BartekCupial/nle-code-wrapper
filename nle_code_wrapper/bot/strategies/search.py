@@ -113,6 +113,8 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
             break
         bot.search()
 
+    return True
+
 
 @strategy
 def search_for_traps(bot: "Bot") -> bool:

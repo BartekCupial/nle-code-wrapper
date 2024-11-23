@@ -20,6 +20,7 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_closest_room_west,
     goto_closest_staircase_down,
     goto_closest_staircase_up,
+    goto_closest_unexplored_corridor,
     goto_closest_unexplored_room,
     goto_items,
 )
@@ -41,6 +42,7 @@ __all__ = [
     goto_closest_corridor_east,
     goto_closest_corridor_north,
     goto_closest_corridor_south,
+    goto_closest_unexplored_corridor,
     explore_room,
     explore_room_systematically,
     general_explore,

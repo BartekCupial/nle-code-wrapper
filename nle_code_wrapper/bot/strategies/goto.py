@@ -140,6 +140,7 @@ def goto_closest_corridor_direction(bot: "Bot", direction) -> bool:
         bool: True if there is corridor and the bot is directed to it,
               False if there is no corridors.
     """
+    unvisited_corridors = get_other_corridors(bot)
 
     direction_filters = {
         "west": lambda pos: pos[1] < bot.entity.position[1],
@@ -151,7 +152,9 @@ def goto_closest_corridor_direction(bot: "Bot", direction) -> bool:
 
     filter_func = direction_filters.get(direction.lower())
     if filter_func:
-        unvisited_corridors = get_other_corridors(bot)
+        unvisited_corridors = np.array(
+            [room_position for room_position in unvisited_corridors if filter_func(room_position)]
+        )
         return goto_closest(bot, unvisited_corridors)
     return False
 
@@ -196,85 +199,88 @@ def goto_closest_room_direction(bot: "Bot", direction: str) -> bool:
 
 
 @strategy
-def goto_closest_unexplored_room(bot: "Bot") -> bool:
+def goto_closest_unexplored_feature(bot: "Bot", feature_detection) -> bool:
     """
-    Directs the bot to the closest unexplored room in the level.
+    Directs the bot to the closest unexplored feature in the level.
 
     Args:
         bot (Bot): The bot instance that will perform the room navigation.
 
     Returns:
-        bool: True if an unexplored room is found and the bot is directed to it,
-              False if all rooms have been visited.
+        bool: True if an unexplored feature is found and the bot is directed to it,
+              False if all features have been visited.
 
     Details:
-        - Detects and labels different rooms in the level
-        - Identifies rooms that haven't been visited yet (no tiles marked as was_on)
-        - For each unvisited room, finds the closest position to the bot
-        - Directs the bot to the closest position in the nearest unexplored room using pathfinding
-        - Background (label 0) is excluded from room consideration
+        - Detects and labels different features in the level
+        - Identifies features that haven't been visited yet (no tiles marked as was_on)
+        - For each unvisited features, finds the closest position to the bot
+        - Directs the bot to the closest position in the nearest unexplored features using pathfinding
+        - Background (label 0) is excluded from features consideration
     """
-    labeled_rooms, num_rooms = room_detection(bot)
+    labeled_features, num_labels = feature_detection(bot)
 
     level = bot.current_level
-    unvisited_rooms = []
+    unvisited_features = []
     # exclude 0 because this is background
-    for label in range(1, num_rooms + 1):
-        room = labeled_rooms == label
-        room = np.logical_and(room, level.walkable)
-        # consider only unexplored rooms
-        if not np.any(np.logical_and(room, level.was_on)):
-            room_positions = np.argwhere(room)
-            distances = np.sum(np.abs(room_positions - bot.entity.position), axis=1)
-            unvisited_rooms.append((np.min(distances), tuple(room_positions[np.argmin(distances)])))
+    for label in range(1, num_labels + 1):
+        feature = labeled_features == label
+        feature = np.logical_and(feature, level.walkable)
+        # consider only unexplored features
+        if not np.any(np.logical_and(feature, level.was_on)):
+            feature_positions = np.argwhere(feature)
+            distances = np.sum(np.abs(feature_positions - bot.entity.position), axis=1)
+            unvisited_features.append(tuple(feature_positions[np.argmin(distances)]))
+    unvisited_features = np.array(unvisited_features)
 
-    closest_position = min(unvisited_rooms, key=lambda x: x[0])[1] if unvisited_rooms else None
-    # TODO: use goto_closest
-    if closest_position:
-        bot.pathfinder.goto(closest_position)
-        return True
-    else:
-        return False
+    return goto_closest(bot, unvisited_features)
+
+
+def goto_closest_unexplored_room(bot: "Bot") -> bool:
+    return goto_closest_unexplored_feature(bot, room_detection)
+
+
+def goto_closest_unexplored_corridor(bot: "Bot") -> bool:
+    return goto_closest_unexplored_feature(bot, corridor_detection)
 
 
 def goto_closest_corridor_west(bot: "Bot") -> bool:
-    goto_closest_corridor_direction(bot, "west")
+    return goto_closest_corridor_direction(bot, "west")
 
 
 def goto_closest_corridor_east(bot: "Bot") -> bool:
-    goto_closest_corridor_direction(bot, "east")
+    return goto_closest_corridor_direction(bot, "east")
 
 
 def goto_closest_corridor_north(bot: "Bot") -> bool:
-    goto_closest_corridor_direction(bot, "north")
+    return goto_closest_corridor_direction(bot, "north")
 
 
 def goto_closest_corridor_south(bot: "Bot") -> bool:
-    goto_closest_corridor_direction(bot, "south")
+    return goto_closest_corridor_direction(bot, "south")
 
 
 def goto_closest_corridor(bot: "Bot") -> bool:
-    goto_closest_corridor_direction(bot, "all")
+    return goto_closest_corridor_direction(bot, "all")
 
 
 def goto_closest_room_west(bot: "Bot") -> bool:
-    goto_closest_room_direction(bot, "west")
+    return goto_closest_room_direction(bot, "west")
 
 
 def goto_closest_room_east(bot: "Bot") -> bool:
-    goto_closest_room_direction(bot, "east")
+    return goto_closest_room_direction(bot, "east")
 
 
 def goto_closest_room_north(bot: "Bot") -> bool:
-    goto_closest_room_direction(bot, "north")
+    return goto_closest_room_direction(bot, "north")
 
 
 def goto_closest_room_south(bot: "Bot") -> bool:
-    goto_closest_room_direction(bot, "south")
+    return goto_closest_room_direction(bot, "south")
 
 
 def goto_closest_room(bot: "Bot") -> bool:
-    goto_closest_room_direction(bot, "all")
+    return goto_closest_room_direction(bot, "all")
 
 
 # TODO:
