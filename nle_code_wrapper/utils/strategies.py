@@ -104,6 +104,8 @@ def label_dungeon_features(bot: "Bot"):
 
     # we include doors only at the end to be able to detect if we are standing on the door, overall we treat doors as part of the corridor
     corridors[doors] = True
+    rooms[doors] = False  # we have to exclude doors from rooms as well, because we could stand on the door
+
     labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
     labeled_corridors, num_corridors = ndimage.label(corridors, structure=structure)
     labeled_features = np.zeros_like(level.objects)

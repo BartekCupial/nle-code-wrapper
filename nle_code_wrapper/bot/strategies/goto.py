@@ -42,7 +42,7 @@ def goto_closest_staircase_down(bot: "Bot") -> bool:
     """
     stair = utils.isin(bot.current_level.objects, G.STAIR_DOWN)
     stair_positions = np.argwhere(stair)
-    goto_closest(bot, stair_positions)
+    return goto_closest(bot, stair_positions)
 
 
 @strategy
@@ -60,7 +60,7 @@ def goto_closest_staircase_up(bot: "Bot") -> bool:
     """
     stair = utils.isin(bot.current_level.objects, G.STAIR_UP)
     stair_positions = np.argwhere(stair)
-    goto_closest(bot, stair_positions)
+    return goto_closest(bot, stair_positions)
 
 
 @strategy
