@@ -6,6 +6,7 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_corridor,
     explore_room,
+    goto_closest_corridor,
     goto_closest_staircase_down,
     goto_closest_unexplored_room,
     open_doors_kick,
@@ -28,14 +29,14 @@ class TestMazewalkMapped(object):
                     goto_closest_staircase_down,
                     explore_room,
                     explore_corridor,
+                    goto_closest_corridor,
                     open_doors_kick,
                     goto_closest_unexplored_room,
                     search_corridor_for_hidden_doors,
                     search_room_for_hidden_doors,
                 ]:
                     try:
-                        if strategy(bot):
-                            break
+                        strategy(bot)
                     except BotPanic:
                         pass
 

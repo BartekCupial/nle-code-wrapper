@@ -78,13 +78,18 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     my_position = bot.entity.position
     level = bot.current_level
 
-    corridors = corridor_detection(bot)
+    labeled_corridors, num_labels = corridor_detection(bot)
+    current_corridor = labeled_corridors == labeled_corridors[my_position]
+
+    # Check if we are in the corridor
+    if labeled_corridors[my_position] == 0:
+        return False
 
     # look at dead ends, i.e. positions with only one neighbor
     searchable_positions = np.array(
         [
             n
-            for n in np.argwhere(corridors)
+            for n in np.argwhere(current_corridor)
             if len(bot.pathfinder.neighbors(tuple(n), cardinal_only=True)) == 1 and level.search_count[tuple(n)] < 40
         ]
     )
@@ -103,8 +108,8 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     bot.pathfinder.goto(tuple(best_position))
 
     for _ in range(5):
-        new_corridors = corridor_detection(bot)
-        if not (corridors == new_corridors).all():
+        new_labeled_corridors, _ = corridor_detection(bot)
+        if not (labeled_corridors == new_labeled_corridors).all():
             break
         bot.search()
 

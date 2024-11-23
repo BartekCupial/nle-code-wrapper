@@ -11,15 +11,22 @@ from nle_utils.utils.attr_dict import AttrDict
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.strategies import (
+    explore_corridor,
     goto_closest_corridor,
     goto_closest_room,
     goto_closest_staircase_down,
     goto_closest_staircase_up,
     goto_closest_unexplored_room,
 )
+from nle_code_wrapper.bot.strategies.goto import goto_closest_room_direction
 from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.strategies import room_detection, save_boolean_array_pillow
+from nle_code_wrapper.utils.strategies import (
+    corridor_detection,
+    label_dungeon_features,
+    room_detection,
+    save_boolean_array_pillow,
+)
 
 
 def create_bot(cfg):
@@ -60,6 +67,33 @@ class TestGoTo(object):
         current_room = room_detection(bot)[0][bot.entity.position]
 
         assert starting_room != current_room
+
+    @pytest.mark.parametrize("env", ["CustomMiniHack-Premapped-Corridor-R5-v0"])
+    @pytest.mark.parametrize("compass,seed", [("east", 1), ("west", 1), ("north", 4), ("south", 1)])
+    def test_goto_closest_room_direction(self, env, seed, compass):
+        """
+        This tests checks if we were able to go to the closest unexplored room,
+        we delibrately stard with Premapped Environment so we can be sure that the room labeling will be the same
+        and that multiple rooms will be visible from the start
+
+        Note: for different seed this can fail.
+        TODO: save map, create mock for bot, this will robustify tests
+        """
+        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        position = bot.entity.position
+        goto_closest_room_direction(bot, compass)
+        new_position = bot.entity.position
+        if compass == "east":
+            assert new_position[1] > position[1]
+        elif compass == "west":
+            assert new_position[1] < position[1]
+        elif compass == "north":
+            assert new_position[0] < position[0]
+        elif compass == "south":
+            assert new_position[0] > position[0]
 
     @pytest.mark.parametrize("env", ["CustomMiniHack-Premapped-Corridor-R3-v0"])
     @pytest.mark.parametrize("seed", [0])

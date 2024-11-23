@@ -60,67 +60,70 @@ def save_boolean_array_pillow(arr):
     img.save("labeled_rooms.png")
 
 
-def room_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
-    """
-    Detect rooms in the dungeon using connected components analysis.
-
-    Args:
-        bot: Bot
-
-    Returns:
-        Tuple containing:
-        - labeled_rooms: numpy array where each room has a unique integer label
-        - num_rooms: number of distinct rooms found
-    """
+def label_dungeon_features(bot: "Bot"):
     level = bot.current_level
     position = bot.entity.position
-
-    room_floor = frozenset({SS.S_room, SS.S_darkroom})  # TODO: use also SS.S_ndoor?
-    rooms = utils.isin(level.objects, room_floor, G.STAIR_DOWN, G.STAIR_UP)
-
     structure = ndimage.generate_binary_structure(2, 2)
+
+    # rooms
+    room_floor = frozenset({SS.S_room, SS.S_darkroom})
+    rooms = utils.isin(level.objects, room_floor, G.STAIR_DOWN, G.STAIR_UP)
     labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
 
-    # include our position as part of the room
-    # if all neighbors which are room floor have the same label
+    # corridors
+    corridor_floor = frozenset({SS.S_corr, SS.S_litcorr})
+    corridors = utils.isin(level.objects, corridor_floor)
+    labeled_corridors, num_corridors = ndimage.label(corridors, structure=structure)
+
+    # doors
+    doors = utils.isin(level.objects, frozenset({SS.S_ndoor}), G.DOOR_OPENED)
+
+    # combine rooms and corridors
+    labeled_features = np.zeros_like(level.objects)
+    labeled_features[rooms] = labeled_rooms[rooms]
+    labeled_features[corridors] = labeled_corridors[corridors] + num_rooms
+
+    # include our position
+    # if all neighbors which are dungeon features have the same label
     neighbors = []
     for x, y in itertools.product([-1, 0, 1], repeat=2):
         if x == 0 and y == 0:
             continue
 
-        neighbor = labeled_rooms[position[0] + y, position[1] + x]
+        neighbor = labeled_features[position[0] + y, position[1] + x]
         if neighbor != 0:
             neighbors.append(neighbor)
+    neighbors = np.array(neighbors)
 
-    # if we are standing inside the room treat my place as part of the room
-    # then we need to recompute closest components (if we were stading on the doors)
-    if neighbors:
-        rooms[position] = neighbors[0]
-        labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
+    if len(neighbors) > 0:
+        # if all neighbors are rooms or corridors
+        if np.all(neighbors <= num_rooms):
+            rooms[position] = True
+        else:
+            corridors[position] = True
 
-    # save_boolean_array_pillow(labeled_rooms)
-    return labeled_rooms, num_rooms
+    # we include doors only at the end to be able to detect if we are standing on the door, overall we treat doors as part of the corridor
+    corridors[doors] = True
+    labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
+    labeled_corridors, num_corridors = ndimage.label(corridors, structure=structure)
+    labeled_features = np.zeros_like(level.objects)
+    labeled_features[rooms] = labeled_rooms[rooms]
+    labeled_features[corridors] = labeled_corridors[corridors] + num_rooms
+
+    return labeled_features, num_rooms, num_corridors
 
 
-def corridor_detection(bot: "Bot"):
-    position = bot.entity.position
+def room_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
+    labeled_features, num_rooms, num_corridors = label_dungeon_features(bot)
+    labeled_features[labeled_features > num_rooms] = 0
 
-    # treat corridors as everything what is floor and not room
-    labeled_rooms, num_rooms = room_detection(bot)
-    floor = utils.isin(bot.current_level.objects, G.FLOOR, G.DOOR_OPENED)
-    corridors = np.logical_and(floor, labeled_rooms == 0)
+    return labeled_features, num_rooms
 
-    # include our position as part of the room
-    # if all neighbors which are corridor have the same label
-    neighbors = []
-    for x, y in itertools.product([-1, 0, 1], repeat=2):
-        if x == 0 and y == 0:
-            continue
 
-        neighbor = labeled_rooms[position[0] + y, position[1] + x]
-        neighbors.append(neighbor)
+def corridor_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
+    labeled_features, num_rooms, num_corridors = label_dungeon_features(bot)
+    labeled_features[labeled_features <= num_rooms] = 0
+    labeled_features -= num_rooms
+    labeled_features[labeled_features < 0] = 0
 
-    if neighbors and np.all(neighbors == neighbors[0]):
-        corridors[position] = True
-
-    return corridors
+    return labeled_features, num_corridors
