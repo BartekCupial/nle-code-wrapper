@@ -5,7 +5,7 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_corridor,
-    explore_room_systematically,
+    explore_room,
     fight_closest_monster,
     goto_closest_room,
     goto_closest_staircase_down,
@@ -41,7 +41,7 @@ class TestMazewalkMapped(object):
                         pass
                     elif goto_closest_staircase_down(bot):
                         pass
-                    elif explore_room_systematically(bot):
+                    elif explore_room(bot):
                         pass
                     elif explore_corridor(bot):
                         pass

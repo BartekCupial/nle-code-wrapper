@@ -9,6 +9,7 @@ from nle_code_wrapper.bot.strategies import (
     explore_corridor,
     explore_room,
     goto_closest_staircase_down,
+    goto_closest_unexplored_corridor,
     goto_closest_unexplored_room,
     open_doors_key,
 )
@@ -68,8 +69,10 @@ def solve(bot: "Bot"):
                 pass
             elif explore_corridor(bot):
                 pass
+            elif goto_closest_unexplored_room(bot):
+                pass
             else:
-                goto_closest_unexplored_room(bot)
+                goto_closest_unexplored_corridor(bot)
 
         except BotPanic:
             pass

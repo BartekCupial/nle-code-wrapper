@@ -43,7 +43,7 @@ def explore_room_systematically(bot: "Bot") -> bool:
     room_unexplored = np.logical_and(room_walkable, ~level.was_on)
     unexplored_positions = np.argwhere(room_unexplored)
 
-    goto_closest(bot, unexplored_positions)
+    return goto_closest(bot, unexplored_positions)
 
 
 @strategy
@@ -83,7 +83,7 @@ def explore_room(bot: "Bot") -> bool:
     room_unexplored = np.logical_and(current_room, discovery_potential)
     unexplored_positions = np.argwhere(room_unexplored)
 
-    goto_closest(bot, unexplored_positions)
+    return goto_closest(bot, unexplored_positions)
 
 
 @strategy
@@ -101,7 +101,7 @@ def explore_corridor(bot: "Bot") -> bool:
     unexplored_corridors = np.logical_and(current_corridor, ~bot.current_level.was_on)
     unexplored_positions = np.argwhere(unexplored_corridors)
 
-    goto_closest(bot, unexplored_positions)
+    return goto_closest(bot, unexplored_positions)
 
 
 @strategy

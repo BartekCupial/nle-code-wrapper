@@ -6,8 +6,8 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_room,
     fight_closest_monster,
-    goto_closest_corridor,
     goto_closest_staircase_down,
+    goto_closest_unexplored_corridor,
     goto_closest_unexplored_room,
     open_doors,
     run_away,
@@ -45,7 +45,7 @@ class TestMazewalkMapped(object):
                         pass
                     elif explore_room(bot):
                         pass
-                    elif goto_closest_corridor(bot):
+                    elif goto_closest_unexplored_corridor(bot):
                         pass
                     else:
                         goto_closest_unexplored_room(bot)
@@ -79,7 +79,7 @@ class TestMazewalkMapped(object):
                     fight_closest_monster,
                     goto_closest_staircase_down,
                     open_doors,
-                    goto_closest_corridor,
+                    goto_closest_unexplored_corridor,
                     explore_room,
                     goto_closest_unexplored_room,
                 ]:
