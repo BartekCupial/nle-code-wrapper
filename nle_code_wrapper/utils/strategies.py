@@ -39,7 +39,6 @@ def save_boolean_array_pillow(arr):
         normalized = (arr - min_val) / (max_val - min_val)
 
     normalized = (normalized * 255).astype(np.uint8)
-    Image.fromarray(normalized).save("array.png")
 
     # Create a random colormap (one color for each label)
     unique_values = np.unique(arr)
