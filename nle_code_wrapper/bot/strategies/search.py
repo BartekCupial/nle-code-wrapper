@@ -127,8 +127,7 @@ def search_for_traps(bot: "Bot") -> bool:
     initial_traps = set(bot.current_level.object_coords(G.TRAPS))
 
     # TODO: make use of search counter
-    # Search 20 times
-    for _ in range(20):
+    for _ in range(5):
         bot.search()
 
         # Check if new traps were discovered
