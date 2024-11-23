@@ -91,76 +91,27 @@ def goto_items(bot: "Bot"):
         return False
 
 
-def get_other_corridors(bot: "Bot"):
-    labeled_corridors, num_labels = corridor_detection(bot)
+def get_other_features(bot: "Bot", feature_detection):
+    labeled_features, num_labels = feature_detection(bot)
 
     my_position = bot.entity.position
     level = bot.current_level
-    unvisited_corridors = []
+    unvisited_features = []
     # exclude 0 because this is background
     for label in range(1, num_labels + 1):
-        corridor = labeled_corridors == label
-        corridor = np.logical_and(corridor, level.walkable)
+        feature = labeled_features == label
+        feature = np.logical_and(feature, level.walkable)
         # consider rooms which we are not in
-        if not label == labeled_corridors[my_position]:
-            corridor_positions = np.argwhere(corridor)
-            distances = np.sum(np.abs(corridor_positions - my_position), axis=1)
-            unvisited_corridors.append(tuple(corridor_positions[np.argmin(distances)]))
+        if not label == labeled_features[my_position]:
+            feature_positions = np.argwhere(feature)
+            distances = np.sum(np.abs(feature_positions - my_position), axis=1)
+            unvisited_features.append(tuple(feature_positions[np.argmin(distances)]))
 
-    return np.array(unvisited_corridors)
-
-
-def get_other_rooms(bot: "Bot"):
-    labeled_rooms, num_rooms = room_detection(bot)
-
-    my_position = bot.entity.position
-    level = bot.current_level
-    unvisited_rooms = []
-    # exclude 0 because this is background
-    for label in range(1, num_rooms + 1):
-        room = labeled_rooms == label
-        room = np.logical_and(room, level.walkable)
-        # consider rooms which we are not in
-        if not label == labeled_rooms[my_position]:
-            room_positions = np.argwhere(room)
-            distances = np.sum(np.abs(room_positions - my_position), axis=1)
-            unvisited_rooms.append(tuple(room_positions[np.argmin(distances)]))
-
-    return np.array(unvisited_rooms)
+    return np.array(unvisited_features)
 
 
 @strategy
-def goto_closest_corridor_direction(bot: "Bot", direction) -> bool:
-    """
-
-    Args:
-        bot (Bot): The bot instance that will perform the room navigation.
-
-    Returns:
-        bool: True if there is corridor and the bot is directed to it,
-              False if there is no corridors.
-    """
-    unvisited_corridors = get_other_corridors(bot)
-
-    direction_filters = {
-        "west": lambda pos: pos[1] < bot.entity.position[1],
-        "east": lambda pos: pos[1] > bot.entity.position[1],
-        "north": lambda pos: pos[0] < bot.entity.position[0],
-        "south": lambda pos: pos[0] > bot.entity.position[0],
-        "all": lambda pos: True,
-    }
-
-    filter_func = direction_filters.get(direction.lower())
-    if filter_func:
-        unvisited_corridors = np.array(
-            [room_position for room_position in unvisited_corridors if filter_func(room_position)]
-        )
-        return goto_closest(bot, unvisited_corridors)
-    return False
-
-
-@strategy
-def goto_closest_room_direction(bot: "Bot", direction: str) -> bool:
+def goto_closest_feature_direction(bot: "Bot", direction: str, feature_detection) -> bool:
     """
     Directs the bot to the closest room in the level.
 
@@ -181,7 +132,7 @@ def goto_closest_room_direction(bot: "Bot", direction: str) -> bool:
     Note: it's possible that closest room will not be reachable!
     This will result in BotPanic and this is by design.
     """
-    unvisited_rooms = get_other_rooms(bot)
+    unvisited_rooms = get_other_features(bot, feature_detection)
 
     direction_filters = {
         "west": lambda pos: pos[1] < bot.entity.position[1],
@@ -244,56 +195,40 @@ def goto_closest_unexplored_corridor(bot: "Bot") -> bool:
 
 
 def goto_closest_corridor_west(bot: "Bot") -> bool:
-    return goto_closest_corridor_direction(bot, "west")
+    return goto_closest_feature_direction(bot, "west", corridor_detection)
 
 
 def goto_closest_corridor_east(bot: "Bot") -> bool:
-    return goto_closest_corridor_direction(bot, "east")
+    return goto_closest_feature_direction(bot, "east", corridor_detection)
 
 
 def goto_closest_corridor_north(bot: "Bot") -> bool:
-    return goto_closest_corridor_direction(bot, "north")
+    return goto_closest_feature_direction(bot, "north", corridor_detection)
 
 
 def goto_closest_corridor_south(bot: "Bot") -> bool:
-    return goto_closest_corridor_direction(bot, "south")
+    return goto_closest_feature_direction(bot, "south", corridor_detection)
 
 
 def goto_closest_corridor(bot: "Bot") -> bool:
-    return goto_closest_corridor_direction(bot, "all")
+    return goto_closest_feature_direction(bot, "all", corridor_detection)
 
 
 def goto_closest_room_west(bot: "Bot") -> bool:
-    return goto_closest_room_direction(bot, "west")
+    return goto_closest_feature_direction(bot, "west", room_detection)
 
 
 def goto_closest_room_east(bot: "Bot") -> bool:
-    return goto_closest_room_direction(bot, "east")
+    return goto_closest_feature_direction(bot, "east", room_detection)
 
 
 def goto_closest_room_north(bot: "Bot") -> bool:
-    return goto_closest_room_direction(bot, "north")
+    return goto_closest_feature_direction(bot, "north", room_detection)
 
 
 def goto_closest_room_south(bot: "Bot") -> bool:
-    return goto_closest_room_direction(bot, "south")
+    return goto_closest_feature_direction(bot, "south", room_detection)
 
 
 def goto_closest_room(bot: "Bot") -> bool:
-    return goto_closest_room_direction(bot, "all")
-
-
-# TODO:
-# goto closest staricase_down (done)
-# goto closest staricase_up (done)
-# goto closest room (done)
-# goto closest corridor (done)
-# goto closest room west (done)
-# goto closest room east (done)
-# goto closest room south (done)
-# goto closest room north (done)
-# goto closest corridor west (done)
-# goto closest corridor east (done)
-# goto closest corridor south (done)
-# goto closest corridor north (done)
-# goto closest unexplored room (done)
+    return goto_closest_feature_direction(bot, "all", room_detection)
