@@ -60,6 +60,16 @@ def save_boolean_array_pillow(arr):
 
 
 def label_dungeon_features(bot: "Bot"):
+    """
+    Labels the dungeon features (rooms, corridors, and doors) in the current level of the bot.
+    Args:
+        bot (Bot): The bot instance containing the current level and entity position.
+    Returns:
+        tuple: A tuple containing:
+            - labeled_features (np.ndarray): An array with labeled rooms and corridors.
+            - num_rooms (int): The number of labeled rooms.
+            - num_corridors (int): The number of labeled corridors.
+    """
     level = bot.current_level
     position = bot.entity.position
     structure = ndimage.generate_binary_structure(2, 2)
