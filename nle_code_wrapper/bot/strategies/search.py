@@ -46,7 +46,7 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     adjacent_to_walls = np.logical_and(room_walkable, ndimage.binary_dilation(walls))
 
     # Exclude already thoroughly searched walls
-    searchable_walls = np.logical_and(adjacent_to_walls, level.search_count < 20)  # Assume walls need 20 searches
+    searchable_walls = np.logical_and(adjacent_to_walls, level.search_count < 40)  # Assume walls need 40 searches
 
     # Prioritize walls that haven't been searched much
     search_positions = np.argwhere(searchable_walls)
@@ -67,7 +67,12 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     bot.pathfinder.goto(tuple(best_position))
 
     # Search the spot multiple times
+    walls = utils.isin(bot.glyphs, G.WALL)
     for _ in range(5):
+        # break if doors are found
+        new_walls = utils.isin(bot.glyphs, G.WALL)
+        if not (walls == new_walls).all():
+            break
         bot.search()
 
     return True
@@ -107,7 +112,10 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     best_position = searchable_positions[np.argmin(scores)]
     bot.pathfinder.goto(tuple(best_position))
 
+    # Search the spot multiple times
+    labeled_corridors, num_labels = corridor_detection(bot)
     for _ in range(5):
+        # break if doors are found
         new_labeled_corridors, _ = corridor_detection(bot)
         if not (labeled_corridors == new_labeled_corridors).all():
             break
