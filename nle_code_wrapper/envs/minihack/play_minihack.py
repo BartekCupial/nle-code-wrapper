@@ -1,3 +1,5 @@
+from functools import partial
+
 from nle_utils.cfg.arguments import parse_args, parse_full_cfg
 from nle_utils.envs.env_utils import register_env
 from nle_utils.envs.minihack.minihack_env import MINIHACK_ENVS
@@ -7,7 +9,7 @@ from nle_utils.scripts.play_nethack import get_action as play_using_nethack
 
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 from nle_code_wrapper.envs.minihack.minihack_env import make_minihack_env
-from nle_code_wrapper.utils.play import play_using_strategies
+from nle_code_wrapper.utils.play import completer, play_using_strategies_autocomplete, setup_autocomplete
 
 
 def register_minihack_envs():
@@ -32,7 +34,8 @@ def main():
     cfg = parse_minihack_args()
 
     if cfg.code_wrapper:
-        play(cfg, get_action=play_using_strategies)
+        setup_autocomplete(partial(completer, commands=cfg.strategies))
+        play(cfg, get_action=play_using_strategies_autocomplete)
     else:
         play(cfg, get_action=play_using_nethack)
 

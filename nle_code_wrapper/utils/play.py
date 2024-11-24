@@ -1,4 +1,5 @@
 import os
+import readline
 import sys
 import termios
 import tty
@@ -29,5 +30,41 @@ def play_using_strategies(env, action_mode="human", obs=None):
             except ValueError:
                 print(f"Selected action '{ch}' is not in action list. " "Please try again.")
                 continue
+
+    return action
+
+
+def completer(text, state, commands=[]):
+    options = [cmd for cmd in commands if cmd.startswith(text)]
+    return options[state] if state < len(options) else None
+
+
+def setup_autocomplete(completer_fn):
+    readline.parse_and_bind("tab: complete")
+    print("Type commands and use TAB to autocomplete.")
+    print("To see strategies use command: `help`")
+    readline.set_completer(completer_fn)
+
+
+def play_using_strategies_autocomplete(env, action_mode="human", obs=None):
+    if action_mode == "random":
+        action = env.action_space.sample()
+    elif action_mode == "human":
+        names = [strategy.__name__ for strategy in env.bot.strategies]
+
+        while True:
+            command = input("> ")
+
+            if command == "help":
+                for name in names:
+                    print(name)
+                continue
+            else:
+                try:
+                    action = names.index(command)
+                    break
+                except ValueError:
+                    print(f"Selected action '{command}' is not in action list. Please try again.")
+                    continue
 
     return action

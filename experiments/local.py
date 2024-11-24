@@ -27,22 +27,41 @@ config = {
     "code_wrapper": True,
 }
 
+strategies = [
+    "explore_corridor",
+    "explore_corridor_systematically",
+    "explore_room",
+    "explore_room_systematically",
+    "fight_closest_monster",
+    "goto_closest_corridor",
+    "goto_closest_corridor_east",
+    "goto_closest_corridor_north",
+    "goto_closest_corridor_south",
+    "goto_closest_corridor_west",
+    "goto_closest_room",
+    "goto_closest_room_east",
+    "goto_closest_room_north",
+    "goto_closest_room_south",
+    "goto_closest_room_west",
+    "goto_closest_staircase_down",
+    "goto_closest_staircase_up",
+    "goto_closest_unexplored_corridor",
+    "goto_closest_unexplored_room",
+    "open_doors",
+    "open_doors_kick",
+    "open_doors_key",
+    "random_move",
+    "run_away",
+    "search_corridor_for_hidden_doors",
+    "search_for_traps",
+    "search_room_for_hidden_doors",
+]
+
 # params different between exps
 params_grid = [
     {
         "seed": list(range(1)),
-        "strategies": [
-            [
-                "goto_closest_staircase_down",
-                "explore_room",
-                "explore_corridor_systematically",
-                "goto_closest_corridor",
-                "open_doors_kick",
-                "goto_closest_unexplored_room",
-                "search_corridor_for_hidden_doors",
-                "search_room_for_hidden_doors",
-            ]
-        ],
+        "strategies": [strategies],
         "gamma": [0.999],
         "batch_size": [128],
         "num_workers": [4],
