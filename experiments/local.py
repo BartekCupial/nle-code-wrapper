@@ -24,14 +24,25 @@ config = {
     "wandb_group": "ideas-ncbr",
     "with_wandb": False,
     "decorrelate_envs_on_one_worker": False,
-    "code_wrapper": False,
+    "code_wrapper": True,
 }
 
 # params different between exps
 params_grid = [
     {
         "seed": list(range(1)),
-        "strategies": [["explore", "search", "open_doors_kick", "goto_stairs", "fight_closest_monster"]],
+        "strategies": [
+            [
+                "goto_closest_staircase_down",
+                "explore_room",
+                "explore_corridor_systematically",
+                "goto_closest_corridor",
+                "open_doors_kick",
+                "goto_closest_unexplored_room",
+                "search_corridor_for_hidden_doors",
+                "search_room_for_hidden_doors",
+            ]
+        ],
         "gamma": [0.999],
         "batch_size": [128],
         "num_workers": [4],

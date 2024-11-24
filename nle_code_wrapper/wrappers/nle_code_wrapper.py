@@ -17,17 +17,17 @@ class NLECodeWrapper(gym.Wrapper):
             self.bot.strategy(strategy_func)
         self.action_space = gym.spaces.Discrete(len(strategies))
         self.observation_space = gym.spaces.Dict(
-            {"strategy_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
+            {"env_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
         )
 
     def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Any]]:
         obs, info = self.bot.reset(**kwargs)
-        obs["strategy_steps"] = np.array([info["episode_extra_stats"]["strategy_steps"]])
+        obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
 
         return obs, info
 
     def step(self, action: Union[int64, int]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         obs, reward, terminated, truncated, info = self.bot.strategy_step(action)
-        obs["strategy_steps"] = np.array([info["episode_extra_stats"]["strategy_steps"]])
+        obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
 
         return obs, reward, terminated, truncated, info

@@ -114,7 +114,7 @@ class Bot:
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
-            "strategy_steps": self.steps,
+            "env_steps": self.steps,
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
@@ -165,8 +165,8 @@ class Bot:
                     self.current_strategy = self.strategies[action]
                     self.current_args = ()
                 else:
-                    # if action is wrong do nothing, but also increment strategy_step
-                    # TODO: turn off for tests?
+                    # if action is wrong do nothing, we still should increment strategy_step
+                    # this is only relevant for multiple arguments strategies
                     self.strategy_steps += 1
             else:
                 self.current_args += (action,)
@@ -187,13 +187,14 @@ class Bot:
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
-            "strategy_steps": self.steps,
+            "env_steps": self.steps,
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
 
         if self.terminated or self.truncated:
             new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
+            new_extra_stats["strategy_steps"] = self.strategy_steps
 
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
