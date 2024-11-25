@@ -4,6 +4,7 @@ from argparse import Namespace
 from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
 
+from nle.env.base import NLE
 from nle.nethack import actions as A
 from nle.nethack.actions import Command, CompassDirection
 from nle_utils.blstats import BLStats
@@ -179,7 +180,9 @@ class Bot:
             # we need this if the strategy was not created because out of bounds
             if self.current_strategy is not None:
                 # TODO: support in the future, keep in mind action space will have to be changed
-                assert check_strategy_parameters(self.current_strategy) == 1, "For now ban on strategies with arguments"
+                assert (
+                    check_strategy_parameters(self.current_strategy) == 1
+                ), f"For now ban on strategies with arguments, {self.current_strategy.__name__}"
 
                 # If the strategy has all the arguments it needs, call it
                 if check_strategy_parameters(self.current_strategy) == len(self.current_args) + 1:  # +1 for self
@@ -196,6 +199,10 @@ class Bot:
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
+
+        if "end_status" not in self.last_info:
+            # this will happen when we exceed max_strategy_steps
+            self.last_info["end_status"] = NLE.StepStatus.ABORTED
 
         if self.terminated or self.truncated:
             new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
