@@ -19,12 +19,15 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
-    def __init__(self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 100) -> None:
+    def __init__(
+        self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 100, gamma: float = 0.99
+    ) -> None:
         """
         Gym environment or Namespace with the same attributes as the gym environment
         """
 
         self.env = env
+        self.gamma = gamma
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
@@ -136,7 +139,8 @@ class Bot:
         )
 
         self.steps += 1
-        self.reward += reward
+        self.reward += reward * self.current_discount
+        self.current_discount *= self.gamma
 
         if self.terminated or self.truncated:
             raise BotFinished
@@ -155,6 +159,7 @@ class Bot:
         """
         self.steps = 0
         self.reward = 0
+        self.current_discount = 1.0
         self.terminated = False
         self.truncated = False
         self.last_info = {}

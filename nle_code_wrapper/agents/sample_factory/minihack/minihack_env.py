@@ -16,7 +16,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         strategies.append(strategy_func)
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, strategies, max_strategy_steps=cfg.max_strategy_steps)
+        env = NLECodeWrapper(env, strategies, max_strategy_steps=cfg.max_strategy_steps, gamma=cfg.gamma)
 
     if cfg.model == "default_make_encoder_func":
         env = AddChanngelDim(env)
