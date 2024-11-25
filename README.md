@@ -28,5 +28,5 @@ python -m nle_code_wrapper.envs.nethack.play_nethack --env NetHackChallenge-v0 -
 
 MiniHack
 ```bash
-python -m nle_code_wrapper.envs.nethack.play_nethack --env MiniHack-Corridor-R3-v0 --code_wrapper True
+python -m nle_code_wrapper.envs.minihack.play_minihack --env MiniHack-Corridor-R3-v0 --code_wrapper True
 ```
