@@ -39,7 +39,6 @@ def make_custom_env(env_name, cfg, env_config, render_mode: Optional[str] = None
         penalty_mode=cfg.fn_penalty_step,
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
-        autopickup=cfg.autopickup,
     )
 
     if cfg.max_episode_steps is not None:
@@ -47,6 +46,9 @@ def make_custom_env(env_name, cfg, env_config, render_mode: Optional[str] = None
 
     if cfg.character is not None:
         kwargs["character"] = cfg.character
+
+    if cfg.autopickup is not None:
+        kwargs["autopickup"] = cfg.autopickup
 
     env = gym.make(env_name, **kwargs)
 

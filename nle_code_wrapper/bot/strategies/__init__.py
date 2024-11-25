@@ -30,6 +30,7 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_closest_corridor_north,
     goto_closest_corridor_south,
     goto_closest_corridor_west,
+    goto_closest_item,
     goto_closest_room,
     goto_closest_room_east,
     goto_closest_room_north,
@@ -39,7 +40,6 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_closest_staircase_up,
     goto_closest_unexplored_corridor,
     goto_closest_unexplored_room,
-    goto_items,
 )
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup_items import pickup_items
@@ -93,7 +93,7 @@ __all__ = [
     goto_closest_staircase_up,
     goto_closest_unexplored_corridor,
     goto_closest_unexplored_room,
-    goto_items,
+    goto_closest_item,
     open_doors,
     open_doors_kick,
     open_doors_key,

@@ -27,68 +27,53 @@ def goto_closest(bot, positions):
     return True
 
 
+def goto_closest_object(bot: "Bot", object_type: frozenset[int]) -> bool:
+    """
+    Directs the bot to move towards the object on the current level.
+    This function attempts to find the coordinates of the object on the current level
+    and directs the bot to move towards them using the bot's pathfinder. If a path to
+    the object is found, the bot will move towards the first object found.
+    Args:
+        bot (Bot): The bot instance that will be directed to the object.
+    Returns:
+        bool: True if the bot successfully finds a path to the object and starts moving
+              towards it, False otherwise.
+    """
+    item = utils.isin(bot.current_level.objects, object_type)
+    item_positions = np.argwhere(item)
+    return goto_closest(bot, item_positions)
+
+
+def goto_closest_glyph(bot: "Bot", object_type: frozenset[int]) -> bool:
+    """
+    Directs the bot to move towards the object on the current level.
+    This function attempts to find the coordinates of the object on the current level
+    and directs the bot to move towards them using the bot's pathfinder. If a path to
+    the object is found, the bot will move towards the first object found.
+    Args:
+        bot (Bot): The bot instance that will be directed to the object.
+    Returns:
+        bool: True if the bot successfully finds a path to the object and starts moving
+              towards it, False otherwise.
+    """
+    item = utils.isin(bot.glyphs, object_type)
+    item_positions = np.argwhere(item)
+    return goto_closest(bot, item_positions)
+
+
+@strategy
+def goto_closest_item(bot: "Bot") -> bool:
+    return goto_closest_glyph(bot, G.ITEMS)
+
+
 @strategy
 def goto_closest_staircase_down(bot: "Bot") -> bool:
-    """
-    Directs the bot to move towards the stairs on the current level.
-    This function attempts to find the coordinates of the stairs down on the current level
-    and directs the bot to move towards them using the bot's pathfinder. If a path to
-    the stairs is found, the bot will move towards the first set of stairs found.
-    Args:
-        bot (Bot): The bot instance that will be directed to the stairs.
-    Returns:
-        bool: True if the bot successfully finds a path to the stairs and starts moving
-              towards them, False otherwise.
-    """
-    stair = utils.isin(bot.current_level.objects, G.STAIR_DOWN)
-    stair_positions = np.argwhere(stair)
-    return goto_closest(bot, stair_positions)
+    return goto_closest_object(bot, G.STAIR_DOWN)
 
 
 @strategy
 def goto_closest_staircase_up(bot: "Bot") -> bool:
-    """
-    Directs the bot to move towards the stairs on the current level.
-    This function attempts to find the coordinates of the stairs down on the current level
-    and directs the bot to move towards them using the bot's pathfinder. If a path to
-    the stairs is found, the bot will move towards the first set of stairs found.
-    Args:
-        bot (Bot): The bot instance that will be directed to the stairs.
-    Returns:
-        bool: True if the bot successfully finds a path to the stairs and starts moving
-              towards them, False otherwise.
-    """
-    stair = utils.isin(bot.current_level.objects, G.STAIR_UP)
-    stair_positions = np.argwhere(stair)
-    return goto_closest(bot, stair_positions)
-
-
-@strategy
-def goto_items(bot: "Bot"):
-    """
-    Go to the closest item which is reachable and unexplored.
-
-    Args:
-        bot (Bot): The bot instance.
-
-    Returns:
-        bool: Whether the bot has found an item to go to.
-    """
-    item_coords = coords(bot.glyphs, G.OBJECTS)
-    distances = bot.pathfinder.distances(bot.entity.position)
-
-    # go to closest item which is reachable and unexplored
-    item = min(
-        (i for i in item_coords if i in distances),
-        key=lambda i: distances[i],
-        default=None,
-    )
-
-    if item:
-        bot.pathfinder.goto(item)
-        return True
-    else:
-        return False
+    return goto_closest_object(bot, G.STAIR_UP)
 
 
 def get_other_features(bot: "Bot", feature_detection):
