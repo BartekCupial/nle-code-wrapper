@@ -6,6 +6,7 @@ from nle_code_wrapper.bot.strategies.goto_items import goto_items
 from nle_code_wrapper.bot.strategies.goto_stairs import goto_stairs
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup_items import pickup_items
+from nle_code_wrapper.bot.strategies.pickup_key import pickup_key
 from nle_code_wrapper.bot.strategies.quaff import quaff_potion_from_inv
 from nle_code_wrapper.bot.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategies.run_away import run_away
@@ -27,4 +28,5 @@ __all__ = [
     goto_items,
     quaff_potion_from_inv,
     goto,
+    pickup_key,
 ]
