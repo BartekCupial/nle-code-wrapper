@@ -54,6 +54,18 @@ tasks:
   minihack_tasks:
     - "MiniHack-Corridor-R3-v0"
 
+# language wrapper
+use_language_action: True
+
+# nle code wrapper
+code_wrapper: False # Do we want to wrap the env with code wrapper?
+strategies: # List of strategy names that the agent can use
+  - goto_stairs
+  - open_doors_kick
+  - explore
+  - search
+strategies_loc: nle_code_wrapper.bot.strategies # Where to search for strategies implementation.
+
 hydra:
   run:
     dir: .                     # Set the working directory to the current directory
