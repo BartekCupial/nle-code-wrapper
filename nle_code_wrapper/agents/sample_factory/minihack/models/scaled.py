@@ -4,6 +4,7 @@ from typing import List
 
 import torch
 from nle import nethack  # noqa: E402
+from nle.nethack import INV_SIZE
 from nle.nethack.nethack import TERMINAL_SHAPE
 from sample_factory.model.encoder import Encoder
 from sample_factory.utils.typing import Config, ObsSpace
@@ -18,7 +19,7 @@ NUM_CHARS = 256
 
 
 class ScaledNet(Encoder):
-    def __init__(self, cfg: Config, obs_space: ObsSpace):
+    def __init__(self, cfg: Config, obs_space: ObsSpace, ignore_option: bool = False):
         super().__init__(cfg)
 
         self.obs_keys = list(sorted(obs_space.keys()))  # always the same order
@@ -55,6 +56,8 @@ class ScaledNet(Encoder):
         self.blstats_hdim = cfg.blstats_hdim if cfg.blstats_hdim else cfg.hidden_dim
         self.fc_after_cnn_hdim = cfg.fc_after_cnn_hdim if cfg.fc_after_cnn_hdim else cfg.hidden_dim
 
+        self.ignore_option = ignore_option
+
         # NOTE: -3 because we cut the topline and bottom two lines
         if self.use_crop:
             self.crop = Crop(self.screen_shape[0] - 3, self.screen_shape[1], self.crop_dim, self.crop_dim)
@@ -88,8 +91,15 @@ class ScaledNet(Encoder):
         else:
             self.crop_out_dim = 0
 
-        self.topline_encoder = TopLineEncoder(msg_hdim=self.msg_hdim)
-        self.bottomline_encoder = BottomLinesEncoder(h_dim=self.blstats_hdim // 4)
+        # Inventory encoders
+        if cfg.use_inventory:
+            self.inventory_encoder = InventoryNet(inv_edim=cfg.inv_edim, inv_hdim=cfg.inv_hdim)
+
+        if cfg.use_topline:
+            self.topline_encoder = TopLineEncoder(msg_hdim=self.msg_hdim)
+
+        if cfg.use_bottomline:
+            self.bottomline_encoder = BottomLinesEncoder(h_dim=self.blstats_hdim // 4)
 
         self.screen_encoder = CharColorEncoderResnet(
             (self.screen_shape[0] - 3, self.screen_shape[1]),
@@ -115,13 +125,17 @@ class ScaledNet(Encoder):
 
         self.out_dim = sum(
             [
-                self.topline_encoder.msg_hdim,
-                self.bottomline_encoder.h_dim,
+                self.topline_encoder.msg_hdim if cfg.use_topline else 0,
+                self.bottomline_encoder.h_dim if cfg.use_bottomline else 0,
                 self.screen_encoder.h_dim,
                 self.prev_actions_dim,
                 self.crop_out_dim,
+                self.inventory_encoder.inv_hdim if cfg.use_inventory else 0,
             ]
         )
+
+        if "option" in self.obs_keys and not ignore_option:
+            self.out_dim += cfg.duplicate_skills * obs_space["option"].shape[0]
 
         fc_layers = [nn.Linear(self.out_dim, self.h_dim), nn.ReLU()]
         for _ in range(self.num_fc_layers - 1):
@@ -130,6 +144,8 @@ class ScaledNet(Encoder):
         self.fc = nn.Sequential(*fc_layers)
 
         self.encoder_out_size = self.h_dim
+        if "option" in self.obs_keys and not ignore_option:
+            self.encoder_out_size += cfg.duplicate_skills * obs_space["option"].shape[0]
 
     def get_out_size(self) -> int:
         return self.encoder_out_size
@@ -145,17 +161,19 @@ class ScaledNet(Encoder):
         # to process images with CNNs we need channels dim
         C = 1
 
+        encodings = []
+
         # Take last channel for now
         topline = obs_dict["tty_chars"][:, 0].contiguous()
         bottom_line = obs_dict["tty_chars"][:, -2:].contiguous()
 
-        # Blstats
-        blstats_rep = self.bottomline_encoder(bottom_line.float(memory_format=torch.contiguous_format).view(B, -1))
+        if self.cfg.use_topline:
+            encodings.append(self.topline_encoder(topline.float(memory_format=torch.contiguous_format).view(B, -1)))
 
-        encodings = [
-            self.topline_encoder(topline.float(memory_format=torch.contiguous_format).view(B, -1)),
-            blstats_rep,
-        ]
+        if self.cfg.use_bottomline:
+            # Blstats
+            blstats_rep = self.bottomline_encoder(bottom_line.float(memory_format=torch.contiguous_format).view(B, -1))
+            encodings.append(blstats_rep)
 
         # Main obs encoding
         tty_chars = (
@@ -186,9 +204,54 @@ class ScaledNet(Encoder):
             crop_obs = torch.cat([crop_chars, crop_colors], dim=-1)
             encodings.append(self.extract_crop_representation(crop_obs.permute(0, 3, 1, 2).contiguous()).view(B, -1))
 
+        # Encode inventory if using
+        if self.cfg.use_inventory:
+            inv_rep = self.inventory_encoder(
+                obs_dict["inv_glyphs"].contiguous().int().view(B, -1),
+            )
+            encodings.append(inv_rep)
+
+        if "option" in obs_dict and not self.ignore_option:
+            for _ in range(self.cfg.duplicate_skills):
+                encodings.append(obs_dict["option"])
+
         encodings = self.fc(torch.cat(encodings, dim=1))
 
+        if "option" in obs_dict and not self.ignore_option:
+            to_be_catted = [encodings]
+            for _ in range(self.cfg.duplicate_skills):
+                to_be_catted.append(obs_dict["option"])
+            encodings = torch.cat(to_be_catted, dim=1)
+
         return encodings
+
+
+class InventoryNet(nn.Module):
+    """
+    Encodes the inventory strings.
+    """
+
+    def __init__(self, inv_edim: int, inv_hdim: int):
+        super(InventoryNet, self).__init__()
+
+        self.inv_edim = inv_edim
+        self.inv_hdim = inv_hdim
+
+        self.emb = nn.Embedding(nethack.MAX_GLYPH + 1, self.inv_edim)
+        self.mlp = nn.Sequential(
+            nn.Linear(INV_SIZE[0] * self.inv_edim, self.inv_hdim),
+            nn.LayerNorm(self.inv_hdim),
+            nn.ELU(),
+            nn.Linear(self.inv_hdim, self.inv_hdim),
+        )
+
+    def forward(self, inv_glyphs: torch.Tensor):
+        B = inv_glyphs.shape[0]
+        inv_emb = selectt(self.emb, inv_glyphs, True)
+        inv_emb = inv_emb.view(B, INV_SIZE[0] * self.inv_edim)
+        inv_rep = self.mlp(inv_emb)
+
+        return inv_rep
 
 
 class CharColorEncoderResnet(nn.Module):
