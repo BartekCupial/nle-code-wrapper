@@ -10,7 +10,7 @@ from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
     minihack_override_defaults,
 )
 from nle_code_wrapper.agents.sample_factory.minihack.train import register_minihack_components
-from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
+from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args, add_skill_wrapper_cli_args
 
 
 def main():  # pragma: no cover
@@ -22,6 +22,7 @@ def main():  # pragma: no cover
     add_extra_params_model(parser)
     add_extra_params_general(parser)
     add_code_wrapper_cli_args(parser)
+    add_skill_wrapper_cli_args(parser)
     minihack_override_defaults(cfg.env, parser)
     cfg = parse_full_cfg(parser)
 
