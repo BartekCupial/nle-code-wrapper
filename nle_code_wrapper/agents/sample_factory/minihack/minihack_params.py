@@ -23,6 +23,11 @@ def add_extra_params_model(parser):
     p.add_argument("--blstats_hdim", type=int, default=512)
     p.add_argument("--fc_after_cnn_hdim", type=int, default=512)
     p.add_argument("--use_resnet", type=str2bool, default=False)
+    p.add_argument("--inv_edim", type=int, default=16)
+    p.add_argument("--inv_hdim", type=int, default=64)
+    p.add_argument("--use_inventory", type=str2bool, default=True)
+    p.add_argument("--use_topline", type=str2bool, default=True)
+    p.add_argument("--use_bottomline", type=str2bool, default=True)
 
 
 def add_extra_params_general(parser):
