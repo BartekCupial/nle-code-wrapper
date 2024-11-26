@@ -25,31 +25,75 @@ class Bot:
 
     @property
     def blstats(self):
-        return BLStats(*self.last_obs["blstats"])
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return BLStats(*self.last_obs["obs"]["blstats"])
+        else:
+            return BLStats(*self.last_obs["blstats"])
+
+    @property
+    def raw_blstats(self):
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["blstats"]
+        else:
+            return self.last_obs["blstats"]
 
     @property
     def glyphs(self):
-        return self.last_obs["glyphs"]
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["glyphs"]
+        else:
+            return self.last_obs["glyphs"]
 
     @property
     def message(self):
-        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return bytes(self.last_obs["obs"]["message"]).decode("latin-1").rstrip("\x00")
+        else:
+            return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
     @property
     def inv_glyphs(self):
-        return self.last_obs["inv_glyphs"]
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["inv_glyphs"]
+        else:
+            return self.last_obs["inv_glyphs"]
 
     @property
     def inv_letters(self):
-        return self.last_obs["inv_letters"]
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["inv_letters"]
+        else:
+            return self.last_obs["inv_letters"]
 
     @property
     def inv_oclasses(self):
-        return self.last_obs["inv_oclasses"]
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["inv_oclasses"]
+        else:
+            return self.last_obs["inv_oclasses"]
 
     @property
     def cursor(self):
-        return tuple(self.last_obs["tty_cursor"])
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return tuple(self.last_obs["obs"]["cursor"])
+        else:
+            return tuple(self.last_obs["tty_cursor"])
+
+    @property
+    def tty_chars(self):
+        # hack for language wrapper
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["tty_chars"]
+        else:
+            return self.last_obs["tty_chars"]
 
     @property
     def entity(self):
