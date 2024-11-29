@@ -75,7 +75,7 @@ class Bot:
 
         return self.last_obs, self.last_info
 
-    def step(self, action: int, auto_more: bool = True) -> None:
+    def step(self, action: int) -> None:
         """
         Take a step in the environment
 
@@ -94,21 +94,6 @@ class Bot:
             raise BotFinished
 
         self.update()
-
-        if auto_more:
-            self.auto_more()
-
-    def auto_more(self):
-        message = bytes(self.tty_chars[0]).decode("latin-1").rstrip(" ")
-        while "--More--" in message:
-            message = message.replace("--More--", " ")
-            message = message.replace("\n", " ")
-
-            self.step(A.MiscAction.MORE, auto_more=False)
-            add = bytes(self.tty_chars[0]).decode("latin-1").rstrip(" ")
-            message += add
-
-        self.message = message
 
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         """
