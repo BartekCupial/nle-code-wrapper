@@ -82,9 +82,15 @@ class Bot:
         Args:
             action: action to take
         """
-        self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
-            self.env.actions.index(action)
-        )
+        try:
+            self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
+                self.env.actions.index(action)
+            )
+        except ValueError as e:
+            if str(e) == "tuple.index(x): x not in tuple":
+                raise BotPanic("action not allowed")
+            else:
+                raise e
 
         self.steps += 1
         self.reward += reward * self.current_discount
