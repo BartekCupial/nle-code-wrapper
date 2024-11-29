@@ -75,7 +75,7 @@ class Bot:
 
         return self.last_obs, self.last_info
 
-    def step(self, action: int) -> None:
+    def step(self, action: int, auto_more: bool = True) -> None:
         """
         Take a step in the environment
 
@@ -94,6 +94,21 @@ class Bot:
             raise BotFinished
 
         self.update()
+
+        if auto_more:
+            self.auto_more()
+
+    def auto_more(self):
+        message = bytes(self.tty_chars[0]).decode("latin-1").rstrip(" ")
+        while "--More--" in message:
+            message = message.replace("--More--", " ")
+            message = message.replace("\n", " ")
+
+            self.step(A.MiscAction.MORE, auto_more=False)
+            add = bytes(self.tty_chars[0]).decode("latin-1").rstrip(" ")
+            message += add
+
+        self.message = message
 
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         """
@@ -175,6 +190,8 @@ class Bot:
         self.blstats = self.get_blstats()
         self.glyphs = self.get_glyphs()
         self.message = self.get_message()
+        self.tty_chars = self.get_tty_chars()
+        self.tty_colors = self.get_tty_colors()
         self.cursor = self.get_cursor()
         self.inventory = self.get_inventory()
         self.entity = self.get_entity()
@@ -200,6 +217,12 @@ class Bot:
             str with the message
         """
         return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
+
+    def get_tty_chars(self):
+        return self.last_obs["tty_chars"]
+
+    def get_tty_colors(self):
+        return self.last_obs["tty_colors"]
 
     def get_cursor(self):
         return tuple(self.last_obs["tty_cursor"])
