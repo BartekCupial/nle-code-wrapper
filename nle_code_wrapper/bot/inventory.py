@@ -1,3 +1,5 @@
+from typing import Dict, List
+
 import numpy as np
 from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemShopStatus
 
@@ -76,7 +78,7 @@ class Inventory:
             item = Item(letter, name, oclass, glyph)
             self.items.append(item)
 
-        self.inventory = {}
+        self.inventory: Dict[str, List[Item]] = {}
         inventory_classes = {
             "coins": [ItemClasses.COINS],
             "amulets": [ItemClasses.AMULETS],
@@ -100,8 +102,8 @@ class Inventory:
         for key, classes in inventory_classes.items():
             self.inventory[key] = [item for item in self.items if item.item_class in classes]
 
-    def __getitem__(self, key):
-        return self.items[key]
+    def __getitem__(self, key) -> List[Item]:
+        return self.inventory[key]
 
     def __len__(self):
         return len(self.items)
