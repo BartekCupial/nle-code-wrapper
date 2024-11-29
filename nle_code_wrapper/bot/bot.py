@@ -60,6 +60,7 @@ class Bot:
         self.current_strategy = None
         self.current_args = None
         self.strategy_steps = 0
+        self.current_discount = 1.0
 
         self.last_obs, self.last_info = self.env.reset(**kwargs)
 
