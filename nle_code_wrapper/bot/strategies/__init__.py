@@ -44,7 +44,6 @@ from nle_code_wrapper.bot.strategies.explore import (
 from nle_code_wrapper.bot.strategies.explore_items import explore_items
 from nle_code_wrapper.bot.strategies.fight_monster import fight_all_monsters, fight_closest_monster
 from nle_code_wrapper.bot.strategies.goto import (
-    goto,
     goto_closest_corridor,
     goto_closest_corridor_east,
     goto_closest_corridor_north,
@@ -115,7 +114,6 @@ __all__ = [
     explore_items,
     fight_all_monsters,
     fight_closest_monster,
-    goto,
     goto_closest_corridor,
     goto_closest_corridor_east,
     goto_closest_corridor_north,
