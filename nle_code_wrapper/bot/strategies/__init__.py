@@ -1,3 +1,15 @@
+from nle_code_wrapper.bot.strategies.direction import (
+    down,
+    east,
+    north,
+    north_east,
+    north_west,
+    south,
+    south_east,
+    south_west,
+    up,
+    west,
+)
 from nle_code_wrapper.bot.strategies.explore import (
     explore_corridor,
     explore_corridor_east,
@@ -19,7 +31,6 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_systematically_south,
     explore_room_systematically_west,
     explore_room_west,
-    general_explore,
 )
 from nle_code_wrapper.bot.strategies.explore_items import explore_items
 from nle_code_wrapper.bot.strategies.fight_monster import fight_all_monsters, fight_closest_monster
@@ -47,13 +58,23 @@ from nle_code_wrapper.bot.strategies.quaff import quaff_potion_from_inv
 from nle_code_wrapper.bot.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategies.run_away import run_away
 from nle_code_wrapper.bot.strategies.search import (
-    general_search,
     search_corridor_for_hidden_doors,
     search_for_traps,
     search_room_for_hidden_doors,
 )
+from nle_code_wrapper.bot.strategies.zap import zap
 
 __all__ = [
+    down,
+    east,
+    north,
+    north_east,
+    north_west,
+    south,
+    south_east,
+    south_west,
+    up,
+    west,
     explore_corridor,
     explore_corridor_east,
     explore_corridor_north,
@@ -74,7 +95,6 @@ __all__ = [
     explore_room_systematically_south,
     explore_room_systematically_west,
     explore_room_west,
-    general_explore,
     explore_items,
     fight_all_monsters,
     fight_closest_monster,
@@ -101,8 +121,8 @@ __all__ = [
     quaff_potion_from_inv,
     random_move,
     run_away,
-    general_search,
     search_corridor_for_hidden_doors,
     search_for_traps,
     search_room_for_hidden_doors,
+    zap,
 ]
