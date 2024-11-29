@@ -13,16 +13,26 @@ from nle_code_wrapper.bot import Bot
 
 def letter_strategy(bot: Bot, letter: str) -> bool:
     # Note: we purposely don't use strategy decorator here, we don't want to count strategy steps
-    bot.step(ord(letter))
-    return True
+
+    # only use the letter strategy if the bot is asking for a letter
+    if bot.cursor[0] == [0]:
+        bot.step(ord(letter))
+        return True
+    else:
+        return False
 
 
 def direction_strategy(
     bot: "Bot", direction: Union[CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection]
 ) -> bool:
     # Note: we purposely don't use strategy decorator here, we don't want to count strategy steps
-    bot.step(direction)
-    return True
+
+    # only use the direction strategy if the bot is asking for a direction
+    if "In what direction?" in bot.message:
+        bot.step(direction)
+        return True
+    else:
+        return False
 
 
 class NLECodeWrapper(gym.Wrapper):
