@@ -15,7 +15,7 @@ class Item:
         value: int = None,
         weight: int = None,
     ):
-        self.letter = chr(letter)
+        self.letter = letter
         self.name = "".join(map(chr, name)).rstrip("\x00")
         self.item_class = ItemClasses(oclass)
         self.glyph = glyph
@@ -60,7 +60,7 @@ class Item:
         return ItemEnchantment(ench)
 
     def __str__(self):
-        return f"{self.letter}) {self.name}"
+        return f"{chr(self.letter)}) {self.name}"
 
 
 class Inventory:

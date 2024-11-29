@@ -55,16 +55,13 @@ def goto(bot: "Bot", where, action):
 
 
 def try_current_items(bot, command):
-    inv_glyphs = bot.inv_glyphs
-    inv_letters = bot.inv_letters
-
     item_class = command_item_map[command]
 
     # find item in the inventory
     item_char = None
-    for char, glyph in zip(inv_letters, inv_glyphs):
-        if glyph in item_class:
-            item_char = char
+    for item in bot.inventory.items:
+        if item.glyph in item_class:
+            item_char = item.letter
 
             bot.step(command)
             bot.step(item_char)
