@@ -22,6 +22,7 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         cfg.strategies = [obj for name, obj in inspect.getmembers(strategy_module, inspect.isfunction)]
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, cfg.strategies, max_strategy_steps=cfg.max_strategy_steps, gamma=cfg.gamma)
+        gamma = cfg.gamma if hasattr(cfg, "gamma") else 1.0
+        env = NLECodeWrapper(env, cfg.strategies, max_strategy_steps=cfg.max_strategy_steps, gamma=gamma)
 
     return env
