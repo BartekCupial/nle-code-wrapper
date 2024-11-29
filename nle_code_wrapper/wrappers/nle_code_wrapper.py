@@ -1,11 +1,28 @@
+from functools import partial
+from string import ascii_lowercase, ascii_uppercase
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 import gymnasium as gym
 import numpy as np
+from nle.nethack.actions import CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
 from nle_code_wrapper.bot import Bot
+
+
+def letter_strategy(bot: Bot, letter: str) -> bool:
+    # Note: we purposely don't use strategy decorator here, we don't want to count strategy steps
+    bot.step(ord(letter))
+    return True
+
+
+def direction_strategy(
+    bot: "Bot", direction: Union[CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection]
+) -> bool:
+    # Note: we purposely don't use strategy decorator here, we don't want to count strategy steps
+    bot.step(direction)
+    return True
 
 
 class NLECodeWrapper(gym.Wrapper):
@@ -17,6 +34,33 @@ class NLECodeWrapper(gym.Wrapper):
 
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)
+
+        # add letter strategies to action space
+        for char in ascii_lowercase + ascii_uppercase:
+            strategy_func = partial(letter_strategy, letter=char)
+            strategy_func.__name__ = char
+            self.bot.strategy(strategy_func)
+
+        directions = {
+            "north": CompassCardinalDirection.N,
+            "south": CompassCardinalDirection.S,
+            "east": CompassCardinalDirection.E,
+            "west": CompassCardinalDirection.W,
+            "north_east": CompassIntercardinalDirection.NE,
+            "north_west": CompassIntercardinalDirection.NW,
+            "south_east": CompassIntercardinalDirection.SE,
+            "south_west": CompassIntercardinalDirection.SW,
+            "up": MiscDirection.UP,
+            "down": MiscDirection.DOWN,
+            "wait": MiscDirection.WAIT,
+        }
+
+        # add direction strategies to action space
+        for direction, action in directions.items():
+            strategy_func = partial(direction_strategy, direction=action)
+            strategy_func.__name__ = direction
+            self.bot.strategy(strategy_func)
+
         self.action_space = gym.spaces.Discrete(len(strategies))
         self.observation_space = gym.spaces.Dict(
             {"env_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}

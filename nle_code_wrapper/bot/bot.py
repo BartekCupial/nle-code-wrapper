@@ -6,10 +6,9 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 
 from nle.env.base import NLE
 from nle.nethack import actions as A
-from nle.nethack.actions import Command, CompassDirection
 from nle_utils.blstats import BLStats
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
-from numpy import int64, ndarray, uint8
+from numpy import int64, ndarray
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
@@ -180,6 +179,7 @@ class Bot:
         self.inventory = self.get_inventory()
         self.entity = self.get_entity()
         self.entities = self.get_entities()
+        self.current_level = self.get_current_level()
 
         self.current_level.update(self.glyphs, self.blstats)
 
@@ -227,8 +227,7 @@ class Bot:
         """
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
-    @property
-    def current_level(self) -> Level:
+    def get_current_level(self) -> Level:
         """
         :return: Level object of the current level
         """
