@@ -34,7 +34,6 @@ def main():
     cfg = parse_minihack_args()
 
     if cfg.code_wrapper:
-        setup_autocomplete(partial(completer, commands=cfg.strategies))
         play(cfg, get_action=play_using_strategies_autocomplete)
     else:
         play(cfg, get_action=play_using_nethack)

@@ -3,6 +3,7 @@ import readline
 import sys
 import termios
 import tty
+from functools import partial
 
 
 def play_using_strategies(env, action_mode="human", obs=None):
@@ -51,6 +52,7 @@ def play_using_strategies_autocomplete(env, action_mode="human", obs=None):
         action = env.action_space.sample()
     elif action_mode == "human":
         names = [strategy.__name__ for strategy in env.bot.strategies]
+        setup_autocomplete(partial(completer, commands=names))
 
         while True:
             command = input("> ")
