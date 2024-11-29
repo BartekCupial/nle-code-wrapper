@@ -51,16 +51,11 @@ def goto(bot: "Bot", where):
 
 
 def put_on_ring_from_inv(bot: "Bot"):
-    inv_letters = bot.inv_letters
-    inv_oclasses = bot.inv_oclasses
-
-    ring_letters = inv_letters[inv_oclasses == nethack.RING_CLASS]
-
     # find the ring of levitation
     levitation = False
-    for ring_char in ring_letters:
+    for ring in bot.inventory["rings"]:
         bot.step(A.Command.PUTON)
-        bot.step(ring_char)
+        bot.step(ring.letter)
         bot.type_text("l")  # indicates left ring finger - not sure if this matters
 
         if bot.blstats.prop_mask & nethack.BL_MASK_LEV:

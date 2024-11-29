@@ -16,18 +16,13 @@ def quaff_potion_from_inv(bot: "Bot") -> bool:
     Returns:
         bool: True if a potion was quaffed, False otherwise.
     """
-    inv_glyphs = bot.inv_glyphs
-    inv_letters = bot.inv_letters
+    potions = bot.inventory["potions"]
 
-    # find the last potion in the inventory
-    potion_char = None
-    for char, glyph in zip(inv_letters, inv_glyphs):
-        if glyph in G.POTION_CLASS:
-            potion_char = char
-
-    if potion_char is None:
-        return False
-    else:
+    if potions:
+        # find the last potion in the inventory
+        potion_char = potions[-1].letter
         bot.step(A.Command.QUAFF)
         bot.step(potion_char)
         return True
+    else:
+        return False
