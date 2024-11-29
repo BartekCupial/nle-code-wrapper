@@ -54,7 +54,7 @@ class TestMazewalkMapped(object):
                     pass
 
         cfg.strategies = [solve]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -89,5 +89,5 @@ class TestMazewalkMapped(object):
                         pass
 
         cfg.strategies = [general_solve]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

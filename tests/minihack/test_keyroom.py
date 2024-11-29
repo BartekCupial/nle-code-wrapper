@@ -94,5 +94,5 @@ class TestMazewalkMapped(object):
         # TODO: this is quite weak strategy for general exploration of the levels
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         cfg.strategies = [solve]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

@@ -126,7 +126,7 @@ class TestMazewalkMapped(object):
                     pass
 
         cfg.strategies = [solve]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -150,7 +150,7 @@ class TestMazewalkMapped(object):
     def test_mini(self, env, where, action, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         cfg.strategies = [partial(general_mini, where=where, action=action)]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -174,5 +174,5 @@ class TestMazewalkMapped(object):
     def test_mini_distract(self, env, where, action, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
         cfg.strategies = [partial(general_mini, where=where, action=action)]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

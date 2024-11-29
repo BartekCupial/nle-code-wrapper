@@ -39,7 +39,7 @@ class TestMazewalkMapped(object):
                     pass
 
         cfg.strategies = [solve]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -66,7 +66,7 @@ class TestMazewalkMapped(object):
                     pass
 
         cfg.strategies = [general_fight]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -90,7 +90,7 @@ class TestMazewalkMapped(object):
                     pass
 
         cfg.strategies = [general_traps]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -118,5 +118,5 @@ class TestMazewalkMapped(object):
                     pass
 
         cfg.strategies = [general_smart_fight]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
