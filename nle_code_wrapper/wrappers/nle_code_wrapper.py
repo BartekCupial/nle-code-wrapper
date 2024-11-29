@@ -9,27 +9,30 @@ from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
 
 
+@strategy
 def letter_strategy(bot: Bot, letter: str) -> bool:
-    # Note: we purposely don't use strategy decorator here, we don't want to count strategy steps
-
     # only use the letter strategy if the bot is asking for a letter
     if bot.cursor[0] == [0]:
         bot.step(ord(letter))
+        # Note:we don't want to count strategy steps when we are typing a letter
+        bot.strategy_steps -= 1
         return True
     else:
         return False
 
 
+@strategy
 def direction_strategy(
     bot: "Bot", direction: Union[CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection]
 ) -> bool:
-    # Note: we purposely don't use strategy decorator here, we don't want to count strategy steps
-
     # only use the direction strategy if the bot is asking for a direction
     if "In what direction?" in bot.message:
         bot.step(direction)
+        # Note:we don't want to count strategy steps when we are typing a letter
+        bot.strategy_steps -= 1
         return True
     else:
         return False
@@ -71,7 +74,7 @@ class NLECodeWrapper(gym.Wrapper):
             strategy_func.__name__ = direction
             self.bot.strategy(strategy_func)
 
-        self.action_space = gym.spaces.Discrete(len(strategies))
+        self.action_space = gym.spaces.Discrete(len(self.bot.strategies))
         self.observation_space = gym.spaces.Dict(
             {"env_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
         )
