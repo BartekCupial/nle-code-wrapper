@@ -13,6 +13,7 @@ from numpy import int64, ndarray, uint8
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
+from nle_code_wrapper.bot.inventory import Inventory
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
@@ -42,60 +43,6 @@ class Bot:
             func: function to add as a strategy
         """
         self.strategies.append(func)
-
-    @property
-    def blstats(self) -> BLStats:
-        return BLStats(*self.last_obs["blstats"])
-
-    @property
-    def glyphs(self) -> ndarray:
-        """
-
-        Returns:
-            2D numpy array with the glyphs
-        """
-        return self.last_obs["glyphs"]
-
-    @property
-    def message(self) -> str:
-        """
-        Returns:
-            str with the message
-        """
-        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
-
-    @property
-    def inv_glyphs(self) -> ndarray:
-        return self.last_obs["inv_glyphs"]
-
-    @property
-    def inv_letters(self) -> ndarray:
-        return self.last_obs["inv_letters"]
-
-    @property
-    def inv_oclasses(self) -> ndarray:
-        return self.last_obs["inv_oclasses"]
-
-    @property
-    def cursor(self):
-        return tuple(self.last_obs["tty_cursor"])
-
-    @property
-    def entity(self) -> Entity:
-        """
-        Returns:
-            Entity object with the player
-        """
-        position = (self.blstats.y, self.blstats.x)
-        return Entity(position, self.glyphs[position])
-
-    @property
-    def entities(self) -> List[Union[Any, Entity]]:
-        """
-        Returns:
-            List of Entity objects with the monsters
-        """
-        return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
     def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Dict[str, Any]]]:
         """
@@ -225,7 +172,59 @@ class Bot:
             self.step(ord(char))
 
     def update(self) -> None:
+        self.blstats = self.get_blstats()
+        self.glyphs = self.get_glyphs()
+        self.message = self.get_message()
+        self.cursor = self.get_cursor()
+        self.inventory = self.get_inventory()
+        self.entity = self.get_entity()
+        self.entities = self.get_entities()
+
         self.current_level.update(self.glyphs, self.blstats)
+
+    def get_blstats(self) -> BLStats:
+        return BLStats(*self.last_obs["blstats"])
+
+    def get_glyphs(self) -> ndarray:
+        """
+
+        Returns:
+            2D numpy array with the glyphs
+        """
+        return self.last_obs["glyphs"]
+
+    def get_message(self) -> str:
+        """
+        Returns:
+            str with the message
+        """
+        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
+
+    def get_cursor(self):
+        return tuple(self.last_obs["tty_cursor"])
+
+    def get_inventory(self) -> Inventory:
+        return Inventory(
+            self.last_obs["inv_strs"],
+            self.last_obs["inv_letters"],
+            self.last_obs["inv_oclasses"],
+            self.last_obs["inv_glyphs"],
+        )
+
+    def get_entity(self) -> Entity:
+        """
+        Returns:
+            Entity object with the player
+        """
+        position = (self.blstats.y, self.blstats.x)
+        return Entity(position, self.glyphs[position])
+
+    def get_entities(self) -> List[Union[Any, Entity]]:
+        """
+        Returns:
+            List of Entity objects with the monsters
+        """
+        return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
     @property
     def current_level(self) -> Level:
