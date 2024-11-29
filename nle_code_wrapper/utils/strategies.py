@@ -72,7 +72,7 @@ def label_dungeon_features(bot: "Bot"):
     """
     level = bot.current_level
     position = bot.entity.position
-    structure = ndimage.generate_binary_structure(2, 2)
+    structure = ndimage.generate_binary_structure(2, 1)
 
     # rooms
     room_floor = frozenset({SS.S_room, SS.S_darkroom})
