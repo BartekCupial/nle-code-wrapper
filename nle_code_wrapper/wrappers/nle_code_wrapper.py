@@ -4,12 +4,19 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 
 import gymnasium as gym
 import numpy as np
-from nle.nethack.actions import CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection
+from nle.nethack import actions as A
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
+
+
+@strategy
+def more(bot: Bot) -> bool:
+    bot.step(A.MiscAction.MORE)
+    bot.strategy_steps -= 1
+    return True
 
 
 @strategy
@@ -26,7 +33,7 @@ def letter_strategy(bot: Bot, letter: str) -> bool:
 
 @strategy
 def direction_strategy(
-    bot: "Bot", direction: Union[CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection]
+    bot: "Bot", direction: Union[A.CompassCardinalDirection, A.CompassIntercardinalDirection, A.MiscDirection]
 ) -> bool:
     if "In what direction?" in bot.message:
         # Note:we don't want to count strategy steps when we are typing a letter
@@ -53,17 +60,17 @@ class NLECodeWrapper(gym.Wrapper):
             self.bot.strategy(strategy_func)
 
         directions = {
-            "north": CompassCardinalDirection.N,
-            "south": CompassCardinalDirection.S,
-            "east": CompassCardinalDirection.E,
-            "west": CompassCardinalDirection.W,
-            "north_east": CompassIntercardinalDirection.NE,
-            "north_west": CompassIntercardinalDirection.NW,
-            "south_east": CompassIntercardinalDirection.SE,
-            "south_west": CompassIntercardinalDirection.SW,
-            "up": MiscDirection.UP,
-            "down": MiscDirection.DOWN,
-            "wait": MiscDirection.WAIT,
+            "north": A.CompassCardinalDirection.N,
+            "south": A.CompassCardinalDirection.S,
+            "east": A.CompassCardinalDirection.E,
+            "west": A.CompassCardinalDirection.W,
+            "north_east": A.CompassIntercardinalDirection.NE,
+            "north_west": A.CompassIntercardinalDirection.NW,
+            "south_east": A.CompassIntercardinalDirection.SE,
+            "south_west": A.CompassIntercardinalDirection.SW,
+            "up": A.MiscDirection.UP,
+            "down": A.MiscDirection.DOWN,
+            "wait": A.MiscDirection.WAIT,
         }
 
         # add direction strategies to action space
@@ -71,6 +78,9 @@ class NLECodeWrapper(gym.Wrapper):
             strategy_func = partial(direction_strategy, direction=action)
             strategy_func.__name__ = direction
             self.bot.strategy(strategy_func)
+
+        # add more strategy
+        self.bot.strategy(more)
 
         self.action_space = gym.spaces.Discrete(len(self.bot.strategies))
         self.observation_space = gym.spaces.Dict(
