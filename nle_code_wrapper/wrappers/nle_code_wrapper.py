@@ -28,14 +28,12 @@ def letter_strategy(bot: Bot, letter: str) -> bool:
 def direction_strategy(
     bot: "Bot", direction: Union[CompassCardinalDirection, CompassIntercardinalDirection, MiscDirection]
 ) -> bool:
-    # only use the direction strategy if the bot is asking for a direction
     if "In what direction?" in bot.message:
-        bot.step(direction)
         # Note:we don't want to count strategy steps when we are typing a letter
         bot.strategy_steps -= 1
-        return True
-    else:
-        return False
+
+    bot.step(direction)
+    return True
 
 
 class NLECodeWrapper(gym.Wrapper):
