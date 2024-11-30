@@ -1,12 +1,18 @@
 import inspect
+import itertools
+from argparse import Namespace
 from functools import partial
-from typing import Callable
+from typing import Any, Callable, Dict, List, Tuple, Union
 
+from nle.env.base import NLE
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
+from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
+from numpy import int64, ndarray
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
+from nle_code_wrapper.bot.inventory import Inventory
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
@@ -14,13 +20,27 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
-    def __init__(self, env):
+    def __init__(
+        self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 100, gamma: float = 0.99
+    ) -> None:
+        """
+        Gym environment or Namespace with the same attributes as the gym environment
+        """
+
         self.env = env
+        self.gamma = gamma
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
+        self.max_strategy_steps = max_strategy_steps
 
-    def strategy(self, func):
+    def strategy(self, func: Union[partial, Callable]) -> None:
+        """
+        Decorator to add a strategy to the bot
+
+        Args:
+            func: function to add as a strategy
+        """
         self.strategies.append(func)
 
     @property
@@ -104,20 +124,29 @@ class Bot:
     def entities(self):
         return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
 
-    def reset(self, **kwargs):
+    def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Dict[str, Any]]]:
+        """
+        Reset the environment and the bot. It also updates the last_obs and last_info.
+
+        Args:
+            **kwargs -parameters to reset the environment
+        Returns:
+            observation and info
+        """
+
         self.levels = {}
         self.steps = 0
         self.reward = 0.0
         self.current_strategy = None
         self.current_args = None
-
-        self.done = False
+        self.strategy_steps = 0
+        self.current_discount = 1.0
 
         self.last_obs, self.last_info = self.env.reset(**kwargs)
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
-            "strategy_steps": self.steps,
+            "env_steps": self.steps,
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
@@ -127,23 +156,45 @@ class Bot:
 
         return self.last_obs, self.last_info
 
-    def step(self, action):
-        self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
-            self.env.actions.index(action)
-        )
+    def step(self, action: int) -> None:
+        """
+        Take a step in the environment
+
+        Args:
+            action: action to take
+        """
+        try:
+            self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
+                self.env.actions.index(action)
+            )
+        except ValueError as e:
+            if str(e) == "tuple.index(x): x not in tuple":
+                raise BotPanic("action not allowed")
+            else:
+                raise e
 
         self.steps += 1
-        self.reward += reward
+        self.reward += reward * self.current_discount
+        self.current_discount *= self.gamma
 
         if self.terminated or self.truncated:
-            self.done = True
             raise BotFinished
 
         self.update()
 
-    def strategy_step(self, action):
+    def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
+        """
+        Take a step in the environment using the strategies defined in the bot. If no strategy is chosen, the action
+        will decide the strategy to use. If a strategy is chosen, the action will be passed as an argument to the strategy.
+
+        Args:
+            action: action to take
+        Returns:
+            observation, reward, done, info
+        """
         self.steps = 0
         self.reward = 0
+        self.current_discount = 1.0
         self.terminated = False
         self.truncated = False
         self.last_info = {}
@@ -153,47 +204,128 @@ class Bot:
                 if action < len(self.strategies):
                     self.current_strategy = self.strategies[action]
                     self.current_args = ()
-                # if action is wrong do nothing
-                # TODO: we need to write tests so they sample from correct action space
+                else:
+                    # if action is wrong do nothing, we still should increment strategy_step
+                    # this is only relevant for multiple arguments strategies
+                    self.strategy_steps += 1
             else:
                 self.current_args += (action,)
 
             # we need this if the strategy was not created because out of bounds
             if self.current_strategy is not None:
+                # TODO: support in the future, keep in mind action space will have to be changed
+                assert (
+                    check_strategy_parameters(self.current_strategy) == 1
+                ), f"For now ban on strategies with arguments, {self.current_strategy.__name__}"
+
                 # If the strategy has all the arguments it needs, call it
                 if check_strategy_parameters(self.current_strategy) == len(self.current_args) + 1:  # +1 for self
                     self.current_strategy(self, *self.current_args)
                     self.current_strategy = None
                     self.current_args = None
         except (BotPanic, BotFinished):
-            pass
+            self.current_strategy = None
+            self.current_args = None
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
-            "strategy_steps": self.steps,
+            "env_steps": self.steps,
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
 
+        if "end_status" not in self.last_info:
+            # this will happen when we exceed max_strategy_steps
+            self.last_info["end_status"] = NLE.StepStatus.ABORTED
+
         if self.terminated or self.truncated:
             new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
+            new_extra_stats["strategy_steps"] = self.strategy_steps
 
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
 
-    def search(self):
+    def search(self) -> None:
         self.step(A.Command.SEARCH)
-        self.current_level().search_count[self.blstats.y, self.blstats.x] += 1
 
-    def type_text(self, text):
+        blstats = self.blstats
+        x, y = blstats.x, blstats.y
+        for i, j in itertools.product([-1, 0, 1], repeat=2):
+            self.current_level.search_count[y + i, x + j] += 1
+
+    def type_text(self, text: str) -> None:
         for char in text:
             self.step(ord(char))
 
-    def update(self):
-        self.current_level().update(self.glyphs, self.blstats)
+    def update(self) -> None:
+        self.blstats = self.get_blstats()
+        self.glyphs = self.get_glyphs()
+        self.message = self.get_message()
+        self.tty_chars = self.get_tty_chars()
+        self.tty_colors = self.get_tty_colors()
+        self.cursor = self.get_cursor()
+        self.inventory = self.get_inventory()
+        self.entity = self.get_entity()
+        self.entities = self.get_entities()
+        self.current_level = self.get_current_level()
 
-    def current_level(self) -> Level:
+        self.current_level.update(self.glyphs, self.blstats)
+
+    def get_blstats(self) -> BLStats:
+        return BLStats(*self.last_obs["blstats"])
+
+    def get_glyphs(self) -> ndarray:
+        """
+
+        Returns:
+            2D numpy array with the glyphs
+        """
+        return self.last_obs["glyphs"]
+
+    def get_message(self) -> str:
+        """
+        Returns:
+            str with the message
+        """
+        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
+
+    def get_tty_chars(self):
+        return self.last_obs["tty_chars"]
+
+    def get_tty_colors(self):
+        return self.last_obs["tty_colors"]
+
+    def get_cursor(self):
+        return tuple(self.last_obs["tty_cursor"])
+
+    def get_inventory(self) -> Inventory:
+        return Inventory(
+            self.last_obs["inv_strs"],
+            self.last_obs["inv_letters"],
+            self.last_obs["inv_oclasses"],
+            self.last_obs["inv_glyphs"],
+        )
+
+    def get_entity(self) -> Entity:
+        """
+        Returns:
+            Entity object with the player
+        """
+        position = (self.blstats.y, self.blstats.x)
+        return Entity(position, self.glyphs[position])
+
+    def get_entities(self) -> List[Union[Any, Entity]]:
+        """
+        Returns:
+            List of Entity objects with the monsters
+        """
+        return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
+
+    def get_current_level(self) -> Level:
+        """
+        :return: Level object of the current level
+        """
         key = (self.blstats.dungeon_number, self.blstats.level_number)
         if key not in self.levels:
             self.levels[key] = Level(*key)

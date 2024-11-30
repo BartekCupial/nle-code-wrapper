@@ -3,8 +3,13 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore, fight_closest_monster, goto_stairs, run_away
+from nle_code_wrapper.bot.strategies import explore_room, fight_closest_monster, goto_closest_staircase_down, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
+
+
+def multiple_monsters_adjacent(bot: "Bot") -> bool:
+    if len([e for e in bot.entities if bot.pathfinder.distance(e.position, bot.entity.position) == 1]) > 1:
+        run_away(bot)
 
 
 @pytest.mark.usefixtures("register_components")
@@ -23,18 +28,18 @@ class TestMazewalkMapped(object):
     def test_solve_room_explore(self, env):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
 
-        def general_explore(bot: "Bot"):
+        def solve(bot: "Bot"):
             while True:
                 try:
-                    if goto_stairs(bot):
+                    if goto_closest_staircase_down(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
-        cfg.strategies = [general_explore]
-        status = play(cfg)
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -53,15 +58,15 @@ class TestMazewalkMapped(object):
                 try:
                     if fight_closest_monster(bot):
                         pass
-                    elif goto_stairs(bot):
+                    elif goto_closest_staircase_down(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
         cfg.strategies = [general_fight]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -77,15 +82,15 @@ class TestMazewalkMapped(object):
         def general_traps(bot: "Bot"):
             while True:
                 try:
-                    if goto_stairs(bot):
+                    if goto_closest_staircase_down(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
         cfg.strategies = [general_traps]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -101,17 +106,17 @@ class TestMazewalkMapped(object):
         def general_smart_fight(bot: "Bot"):
             while True:
                 try:
-                    if run_away(bot):
+                    if multiple_monsters_adjacent(bot):
                         pass
                     elif fight_closest_monster(bot):
                         pass
-                    elif goto_stairs(bot):
+                    elif goto_closest_staircase_down(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
         cfg.strategies = [general_smart_fight]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

@@ -7,12 +7,12 @@ from nle_utils.glyph import G
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategies import goto_stairs, quaff_potion_from_inv
+from nle_code_wrapper.bot.strategies import goto_closest_staircase_down, quaff_potion_from_inv
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
 
-def lava_strategy(bot: "Bot"):
+def solve(bot: "Bot"):
     while True:
         goto(bot, G.RING_CLASS)
         goto(bot, G.POTION_CLASS)
@@ -21,7 +21,7 @@ def lava_strategy(bot: "Bot"):
             pass
         else:
             put_on_ring_from_inv(bot)
-        goto_stairs(bot)
+        goto_closest_staircase_down(bot)
 
 
 def pickup(bot: "Bot"):
@@ -51,16 +51,11 @@ def goto(bot: "Bot", where):
 
 
 def put_on_ring_from_inv(bot: "Bot"):
-    inv_letters = bot.inv_letters
-    inv_oclasses = bot.inv_oclasses
-
-    ring_letters = inv_letters[inv_oclasses == nethack.RING_CLASS]
-
     # find the ring of levitation
     levitation = False
-    for ring_char in ring_letters:
+    for ring in bot.inventory["rings"]:
         bot.step(A.Command.PUTON)
-        bot.step(ring_char)
+        bot.step(ring.letter)
         bot.type_text("l")  # indicates left ring finger - not sure if this matters
 
         if bot.blstats.prop_mask & nethack.BL_MASK_LEV:
@@ -83,10 +78,10 @@ class TestMazewalkMapped(object):
             "MiniHack-LavaCross-Levitate-Ring-Pickup-Full-v0",
         ],
     )
-    @pytest.mark.parametrize("seed", [0, 1, 2, 3, 4])
+    @pytest.mark.parametrize("seed", list(range(5)))
     def test_lava(self, env, seed):
         # TODO: for some of the variants there are monsters which have to be dealt with
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        cfg.strategies = [lava_strategy]
-        status = play(cfg)
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

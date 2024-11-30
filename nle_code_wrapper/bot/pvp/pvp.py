@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from nle_utils.glyph import G
+from numpy import ndarray
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.utils import utils
@@ -10,15 +11,15 @@ if TYPE_CHECKING:
 
 
 class Pvp:
-    def __init__(self, bot: "Bot"):
+    def __init__(self, bot: "Bot") -> None:
         self.bot = bot
 
-    def get_monster_mask(self):
+    def get_monster_mask(self) -> ndarray:
         monster_mask = utils.isin(self.bot.glyphs, G.MONS, G.INVISIBLE_MON)
         monster_mask[self.bot.blstats.y, self.bot.blstats.x] = 0
         return monster_mask
 
-    def attack(self, entity: Entity):
+    def attack(self, entity: Entity) -> None:
         path = self.bot.pathfinder.get_path_to(entity.position)
         orig_path = list(path)
         path = orig_path[1:]
