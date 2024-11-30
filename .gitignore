@@ -1,4 +1,5 @@
 local/
+results/
 slurm_output/
 
 # Byte-compiled / optimized / DLL files
