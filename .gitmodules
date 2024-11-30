@@ -1,5 +1,5 @@
-[submodule "external/nle-utils"]
-	path = external/nle-utils
+[submodule "external/nle_utils"]
+	path = external/nle_utils
 	url = git@github.com:BartekCupial/nle-utils.git
 [submodule "external/sample_factory"]
 	path = external/sample_factory
