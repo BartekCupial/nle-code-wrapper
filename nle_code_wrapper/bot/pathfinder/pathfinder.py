@@ -1,7 +1,8 @@
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Tuple, Union
 
 import numpy as np
 from nle.nethack import actions as A
+from numpy import int64
 
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.pathfinder.chebyshev_search import ChebyshevSearch
@@ -12,7 +13,7 @@ if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
 
 
-def calc_direction(from_y, from_x, to_y, to_x):
+def calc_direction(from_y: int64, from_x: int64, to_y: int64, to_x: int64) -> str:
     assert abs(from_y - to_y) <= 1 and abs(from_x - to_x) <= 1, ((from_y, from_x), (to_y, to_x))
 
     ret = ""
@@ -31,26 +32,56 @@ def calc_direction(from_y, from_x, to_y, to_x):
 
 
 class Pathfinder:
-    def __init__(self, bot: "Bot"):
+    """
+    Pathfinder class to handle pathfinding and movement.
+    """
+
+    def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
         self.movements: Movements = Movements(bot)
         self.search = ChebyshevSearch(self.movements)
 
-    def astar(self, start, goal):
+    def astar(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
+    ) -> Union[Iterable[Tuple[int64, int64]], None]:
         return self.search.astar(start, goal)
 
-    def distances(self, start):
+    def distances(self, start: Tuple[int64, int64]) -> Dict[Tuple[int64, int64], float]:
         return self.search.distances(start)
 
-    def get_path_to(self, goal):
+    def get_path_to(self, goal: Tuple[int64, int64]) -> Union[List[Tuple[int64, int64]], None]:
+        """
+        Get path to goal using the A* algorithm.
+
+        Args:
+            goal (Tuple[int64, int64]): Goal position.
+        Returns:
+            Union[List[Tuple[int64, int64]], None]: Path to goal if exists, otherwise None.
+        """
+
         result = self.get_path_from_to(self.bot.entity.position, goal)
         return result
 
-    def get_path_from_to(self, start, goal):
+    def get_path_from_to(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
+    ) -> Union[List[Tuple[int64, int64]], None]:
+        """
+        Get path from start to goal using the A* algorithm.
+
+        Args:
+            start (Tuple[int64, int64]): Start position.
+            goal (Tuple[int64, int64]): Goal position.
+
+        Returns:
+            List[Tuple[int64, int64]]: Path from start
+        """
         result = self.search.astar(start, goal)
         return result
 
-    def random_move(self):
+    def random_move(self) -> None:
+        """
+        Randomly move the bot in any direction.
+        """
         movements = [
             A.CompassDirection.N,
             A.CompassDirection.S,
@@ -64,7 +95,13 @@ class Pathfinder:
         action = movements[np.random.choice(len(movements))]
         self.bot.step(action)
 
-    def direction(self, pos):
+    def direction(self, pos: Tuple[int64, int64]) -> None:
+        """
+        Move the bot in the direction of the given position.
+
+        Args:
+            pos (Tuple[int64, int64]): Position to move
+        """
         bot_pos = self.bot.entity.position
         dir = calc_direction(bot_pos[0], bot_pos[1], pos[0], pos[1])
 
@@ -84,7 +121,14 @@ class Pathfinder:
 
         self.bot.step(action)
 
-    def move(self, dir):
+    def move(self, dir: Tuple[int64, int64]) -> None:
+        """
+        Move the bot once to a square in the neighbourhood. Raises BotPanic
+        if the bot position does not match the given position.
+
+        Args:
+            dir (Tuple[int64, int64]): Position to move
+        """
         self.direction(dir)
 
         if self.bot.entity.position != dir:
@@ -93,7 +137,16 @@ class Pathfinder:
                 f"expected ({dir[0]}, {dir[1]}), got ({self.bot.entity.position[0]}, {self.bot.entity.position[1]})"
             )
 
-    def goto(self, goal, fast=False):
+    def goto(self, goal: Tuple[int64, int64], fast: bool = False) -> bool:
+        """
+        Move the bot to the given goal position. If the goal is not reachable, raise BotPanic.
+
+        Args:
+            goal (Tuple[int64, int64]): Goal position.
+            fast (bool): Whether to use fast_goto or not.
+        Returns:
+            bool: True if the bot successfully reaches the goal, False otherwise.
+        """
         cont = True
         while cont and self.bot.entity.position != goal:
             path = self.get_path_to(goal)
@@ -109,7 +162,7 @@ class Pathfinder:
 
             for point in path:
                 # TODO: check if there is peaceful monster
-                if not self.bot.current_level().walkable[point]:
+                if not self.bot.current_level.walkable[point]:
                     cont = True
                     break
                 self.move(point)
@@ -118,13 +171,25 @@ class Pathfinder:
 
         return True
 
-    def distance(self, n1, n2):
+    def distance(self, n1: Tuple[int64, int64], n2: Tuple[int64, int64]) -> int64:
         return chebyshev_distance(n1, n2)
 
-    def neighbors(self, pos):
-        return self.movements.neighbors(pos)
+    def neighbors(self, pos: Tuple[int64, int64], cardinal_only: bool = False) -> List[Union[Any, Tuple[int64, int64]]]:
+        return self.movements.neighbors(pos, cardinal_only=cardinal_only)
 
-    def reachable_adjacent(self, start, goal):
+    def reachable_adjacent(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
+    ) -> Union[Tuple[int64, int64], bool]:
+        """
+        Check if the goal is reachable from the start position.
+
+        Args:
+            start (Tuple[int64, int64]): Start position.
+            goal (Tuple[int64, int64]): Goal position.
+        Returns:
+            Union[Tuple[int64, int64], bool]: Return the position of the reachable adjacent node or False if not reachable.
+        """
+
         distances = self.distances(start)
         neighbors = self.neighbors(goal)
 

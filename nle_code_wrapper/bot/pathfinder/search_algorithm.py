@@ -3,9 +3,10 @@
 
 from abc import ABC, abstractmethod
 from math import inf as infinity
-from typing import Callable, Dict, Generic, Iterable, TypeVar, Union
+from typing import Callable, Dict, Generic, Iterable, Optional, Tuple, TypeVar, Union
 
 import sortedcontainers  # type: ignore
+from numpy import int64
 
 # introduce generic type
 T = TypeVar("T")
@@ -34,7 +35,7 @@ class SearchNode(Generic[T]):
 class SearchNodeDict(Dict[T, SearchNode[T]]):
     """A dict that returns a new SearchNode when a key is missing"""
 
-    def __missing__(self, k) -> SearchNode[T]:
+    def __missing__(self, k: Tuple[int64, int64]) -> SearchNode[T]:
         v = SearchNode(k)
         self.__setitem__(k, v)
         return v
@@ -158,7 +159,7 @@ class SearchAlgorithm(ABC, Generic[T]):
     def reconstruct_distances(self, nodeSet: OpenSet[SearchNode[T]]) -> Iterable[T]:
         return {node.data: node.fscore for node in nodeSet.sortedlist}
 
-    def distances(self, start: T):
+    def distances(self, start: T) -> Dict[Tuple[int64, int64], float]:
         openSet: OpenSet[SearchNode[T]] = OpenSet()
         nodeSet: OpenSet[SearchNode[T]] = OpenSet()
         searchNodes: SearchNodeDict[T] = SearchNodeDict()

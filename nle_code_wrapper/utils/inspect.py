@@ -1,8 +1,9 @@
 import inspect
 from functools import partial
+from typing import Callable, Union
 
 
-def check_strategy_parameters(strategy):
+def check_strategy_parameters(strategy: Union[Callable, partial]) -> int:
     if isinstance(strategy, partial):
         # Get the original function's signature
         original_sig = inspect.signature(strategy.func)

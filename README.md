@@ -18,3 +18,15 @@ pip install -e .[dev,mrunner,minihack]
 ```bash
 pre-commit install
 ```
+
+### How to play nethack/minihack with skills?
+
+NetHack
+```bash
+python -m nle_code_wrapper.envs.nethack.play_nethack --env NetHackChallenge-v0 --code_wrapper True
+```
+
+MiniHack
+```bash
+python -m nle_code_wrapper.envs.minihack.play_minihack --env MiniHack-Corridor-R3-v0 --code_wrapper True
+```
