@@ -50,8 +50,8 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
     cd /dungeons/
     export MINOR=$(python3 -c 'import sys; print(f"cp{sys.version_info.major}{sys.version_info.minor}")')
     pip install "https://github.com/BartekCupial/nle/releases/download/fair/nle-0.9.0-${MINOR}-${MINOR}-manylinux_2_17_$(uname -m).manylinux2014_$(uname -m).whl"
-    # pip install -e external/nle_utils
-    # pip install -e external/sample_factory
+    pip install -e external/nle_utils
+    pip install -e external/sample_factory
     pip install -e .[dev,mrunner,minihack]
 
     chmod a+rw -R /opt/conda/bin/python
