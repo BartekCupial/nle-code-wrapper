@@ -1,6 +1,3 @@
-[submodule "external/BALROG"]
-	path = external/BALROG
-	url = git@github.com:DavidePaglieri/BALROG.git
 [submodule "external/nle-utils"]
 	path = external/nle-utils
 	url = git@github.com:BartekCupial/nle-utils.git
@@ -8,3 +5,6 @@
 	path = external/sample_factory
 	url = https://github.com/BartekCupial/sample-factory
 	branch = nle-code-wrapper
+[submodule "external/balrog"]
+	path = external/balrog
+	url = git@github.com:jens321/BALROG.git
