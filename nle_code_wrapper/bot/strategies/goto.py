@@ -79,6 +79,10 @@ def goto_closest_staircase_up(bot: "Bot") -> bool:
 def get_other_features(bot: "Bot", feature_detection):
     labeled_features, num_labels = feature_detection(bot)
 
+    # if there is only one feature (background), return empty array
+    if (labeled_features == labeled_features[0][0]).all():
+        return np.array([])
+
     my_position = bot.entity.position
     level = bot.current_level
     unvisited_features = []
