@@ -244,8 +244,9 @@ class Bot:
             List of Entity objects with the monsters
         """
         glyphs = self.get_glyphs(last_obs)
-        monster_mask = utils.isin(self.glyphs, G.MONS, G.INVISIBLE_MON)
-        monster_mask[self.blstats.y, self.blstats.x] = 0
+        blstats = self.get_blstats(last_obs)
+        monster_mask = utils.isin(glyphs, G.MONS, G.INVISIBLE_MON)
+        monster_mask[blstats.y, blstats.x] = 0
 
         return [Entity(position, glyphs[position]) for position in list(zip(*np.where(monster_mask)))]
 
