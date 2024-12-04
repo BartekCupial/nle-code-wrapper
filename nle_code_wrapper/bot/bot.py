@@ -4,9 +4,11 @@ from argparse import Namespace
 from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
 
+import numpy as np
 from nle.env.base import NLE
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
+from nle_utils.glyph import G
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
@@ -15,7 +17,7 @@ from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.inventory import Inventory
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Pathfinder
-from nle_code_wrapper.bot.pvp import Pvp
+from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
@@ -30,7 +32,6 @@ class Bot:
         self.env = env
         self.gamma = gamma
         self.pathfinder: Pathfinder = Pathfinder(self)
-        self.pvp: Pvp = Pvp(self)
         self.strategies: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
 
@@ -178,74 +179,80 @@ class Bot:
             self.step(ord(char))
 
     def update(self) -> None:
-        self.blstats = self.get_blstats()
-        self.glyphs = self.get_glyphs()
-        self.message = self.get_message()
-        self.tty_chars = self.get_tty_chars()
-        self.tty_colors = self.get_tty_colors()
-        self.cursor = self.get_cursor()
-        self.inventory = self.get_inventory()
-        self.entity = self.get_entity()
-        self.entities = self.get_entities()
-        self.current_level = self.get_current_level()
+        self.blstats = self.get_blstats(self.last_obs)
+        self.glyphs = self.get_glyphs(self.last_obs)
+        self.message = self.get_message(self.last_obs)
+        self.tty_chars = self.get_tty_chars(self.last_obs)
+        self.tty_colors = self.get_tty_colors(self.last_obs)
+        self.cursor = self.get_cursor(self.last_obs)
+        self.inventory = self.get_inventory(self.last_obs)
+        self.entity = self.get_entity(self.last_obs)
+        self.entities = self.get_entities(self.last_obs)
+        self.current_level = self.get_current_level(self.last_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
 
-    def get_blstats(self) -> BLStats:
-        return BLStats(*self.last_obs["blstats"])
+    def get_blstats(self, last_obs) -> BLStats:
+        return BLStats(*last_obs["blstats"])
 
-    def get_glyphs(self) -> ndarray:
+    def get_glyphs(self, last_obs) -> ndarray:
         """
 
         Returns:
             2D numpy array with the glyphs
         """
-        return self.last_obs["glyphs"]
+        return last_obs["glyphs"]
 
-    def get_message(self) -> str:
+    def get_message(self, last_obs) -> str:
         """
         Returns:
             str with the message
         """
-        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
+        return bytes(last_obs["message"]).decode("latin-1").rstrip("\x00")
 
-    def get_tty_chars(self):
-        return self.last_obs["tty_chars"]
+    def get_tty_chars(self, last_obs):
+        return last_obs["tty_chars"]
 
-    def get_tty_colors(self):
-        return self.last_obs["tty_colors"]
+    def get_tty_colors(self, last_obs):
+        return last_obs["tty_colors"]
 
-    def get_cursor(self):
-        return tuple(self.last_obs["tty_cursor"])
+    def get_cursor(self, last_obs):
+        return tuple(last_obs["tty_cursor"])
 
-    def get_inventory(self) -> Inventory:
+    def get_inventory(self, last_obs) -> Inventory:
         return Inventory(
-            self.last_obs["inv_strs"],
-            self.last_obs["inv_letters"],
-            self.last_obs["inv_oclasses"],
-            self.last_obs["inv_glyphs"],
+            last_obs["inv_strs"],
+            last_obs["inv_letters"],
+            last_obs["inv_oclasses"],
+            last_obs["inv_glyphs"],
         )
 
-    def get_entity(self) -> Entity:
+    def get_entity(self, last_obs) -> Entity:
         """
         Returns:
             Entity object with the player
         """
-        position = (self.blstats.y, self.blstats.x)
-        return Entity(position, self.glyphs[position])
+        blstats = self.get_blstats(last_obs)
+        position = (blstats.y, blstats.x)
+        return Entity(position, self.get_glyphs(last_obs)[position])
 
-    def get_entities(self) -> List[Union[Any, Entity]]:
+    def get_entities(self, last_obs) -> List[Union[Any, Entity]]:
         """
         Returns:
             List of Entity objects with the monsters
         """
-        return [Entity(position, self.glyphs[position]) for position in zip(*self.pvp.get_monster_mask().nonzero())]
+        glyphs = self.get_glyphs(last_obs)
+        monster_mask = utils.isin(self.glyphs, G.MONS, G.INVISIBLE_MON)
+        monster_mask[self.blstats.y, self.blstats.x] = 0
 
-    def get_current_level(self) -> Level:
+        return [Entity(position, glyphs[position]) for position in list(zip(*np.where(monster_mask)))]
+
+    def get_current_level(self, last_obs) -> Level:
         """
         :return: Level object of the current level
         """
-        key = (self.blstats.dungeon_number, self.blstats.level_number)
+        blstats = self.get_blstats(last_obs)
+        key = (blstats.dungeon_number, blstats.level_number)
         if key not in self.levels:
             self.levels[key] = Level(*key)
         return self.levels[key]
