@@ -38,8 +38,11 @@ class Pathfinder:
 
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
-        self.movements: Movements = Movements(bot)
+        self.movements = bot.movements
         self.search = ChebyshevSearch(self.movements)
+
+    def set_movements(self, movements: Movements):
+        self.movements = movements
 
     def astar(
         self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
@@ -76,7 +79,10 @@ class Pathfinder:
             List[Tuple[int64, int64]]: Path from start
         """
         result = self.search.astar(start, goal)
-        return result
+        if result is None:
+            return None
+        else:
+            return list(result)
 
     def random_move(self) -> None:
         """
@@ -152,8 +158,7 @@ class Pathfinder:
             path = self.get_path_to(goal)
             if path is None:
                 raise BotPanic("end point is no longer accessible")
-            orig_path = list(path)
-            path = orig_path[1:]
+            path = path[1:]
 
             # TODO: implement fast_goto
             # if fast and len(path) > 2:
