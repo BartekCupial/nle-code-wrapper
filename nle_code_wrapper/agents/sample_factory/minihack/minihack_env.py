@@ -15,6 +15,11 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         strategy_func = get_function_by_name(cfg.strategies_loc, strategy_name)
         strategies.append(strategy_func)
 
+    panics = []
+    for panic_name in cfg.panics:
+        panic_func = get_function_by_name(cfg.panics_loc, panic_name)
+        panics.append(panic_func)
+
     if cfg.code_wrapper:
         env = NLECodeWrapper(env, strategies, max_strategy_steps=cfg.max_strategy_steps, gamma=cfg.gamma)
 

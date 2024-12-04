@@ -64,7 +64,14 @@ def make_custom_env(env_name, cfg, env_config, render_mode: Optional[str] = None
             strategies.append(strategy_func)
         cfg.strategies = strategies
 
+    if len(cfg.panics) > 0 and isinstance(cfg.panics[0], str):
+        panics = []
+        for panic_name in cfg.panics:
+            panic_func = get_function_by_name(cfg.panics_loc, panic_name)
+            panics.append(panic_func)
+        cfg.panics = panics
+
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, cfg.strategies, max_strategy_steps=cfg.max_strategy_steps)
+        env = NLECodeWrapper(env, cfg.strategies, cfg.panics, max_strategy_steps=cfg.max_strategy_steps)
 
     return env

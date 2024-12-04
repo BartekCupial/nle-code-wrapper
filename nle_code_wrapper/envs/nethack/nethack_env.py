@@ -21,8 +21,18 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     else:
         cfg.strategies = [obj for name, obj in inspect.getmembers(strategy_module, inspect.isfunction)]
 
+    if len(cfg.panics) > 0:
+        if isinstance(cfg.panics[0], str):
+            panics = []
+            for panic_name in cfg.panics:
+                panic_func = get_function_by_name(cfg.panics_loc, panic_name)
+                panics.append(panic_func)
+            cfg.panics = panics
+    else:
+        cfg.panics = [obj for name, obj in inspect.getmembers(strategy_module, inspect.isfunction)]
+
     if cfg.code_wrapper:
         gamma = cfg.gamma if hasattr(cfg, "gamma") else 1.0
-        env = NLECodeWrapper(env, cfg.strategies, max_strategy_steps=cfg.max_strategy_steps, gamma=gamma)
+        env = NLECodeWrapper(env, cfg.strategies, cfg.panics, max_strategy_steps=cfg.max_strategy_steps, gamma=gamma)
 
     return env
