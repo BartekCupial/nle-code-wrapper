@@ -5,7 +5,7 @@ from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategies.goto import goto_closest
-from nle_code_wrapper.bot.strategy import strategy
+from nle_code_wrapper.bot.strategy import repeat, strategy
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
 
 
@@ -44,6 +44,8 @@ def get_unvisited_positions(bot: "Bot", labeled_features):
     return unexplored_positions
 
 
+@strategy
+@repeat
 def explore(bot: "Bot", feature_detection: Callable, get_positions: Callable, direction: str):
     """
     Explores the current feature by directing the bot to positions to explore.
@@ -84,107 +86,86 @@ def explore(bot: "Bot", feature_detection: Callable, get_positions: Callable, di
     return False
 
 
-@strategy
 def explore_room(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_revelable_positions, "all")
 
 
-@strategy
 def explore_room_west(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_revelable_positions, "west")
 
 
-@strategy
 def explore_room_east(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_revelable_positions, "east")
 
 
-@strategy
 def explore_room_north(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_revelable_positions, "north")
 
 
-@strategy
 def explore_room_south(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_revelable_positions, "south")
 
 
-@strategy
 def explore_corridor(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_revelable_positions, "all")
 
 
-@strategy
 def explore_corridor_west(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_revelable_positions, "west")
 
 
-@strategy
 def explore_corridor_east(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_revelable_positions, "east")
 
 
-@strategy
 def explore_corridor_north(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_revelable_positions, "north")
 
 
-@strategy
 def explore_corridor_south(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_revelable_positions, "south")
 
 
-@strategy
 def explore_room_systematically(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_unvisited_positions, "all")
 
 
-@strategy
 def explore_room_systematically_west(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_unvisited_positions, "west")
 
 
-@strategy
 def explore_room_systematically_east(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_unvisited_positions, "east")
 
 
-@strategy
 def explore_room_systematically_north(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_unvisited_positions, "north")
 
 
-@strategy
 def explore_room_systematically_south(bot: "Bot") -> bool:
     return explore(bot, room_detection, get_unvisited_positions, "south")
 
 
-@strategy
 def explore_corridor_systematically(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_unvisited_positions, "all")
 
 
-@strategy
 def explore_corridor_systematically_west(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_unvisited_positions, "west")
 
 
-@strategy
 def explore_corridor_systematically_east(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_unvisited_positions, "east")
 
 
-@strategy
 def explore_corridor_systematically_north(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_unvisited_positions, "north")
 
 
-@strategy
 def explore_corridor_systematically_south(bot: "Bot") -> bool:
     return explore(bot, corridor_detection, get_unvisited_positions, "south")
 
 
-@strategy
 def general_explore(bot: "Bot") -> bool:
     """
     Explore the current level using the bot.

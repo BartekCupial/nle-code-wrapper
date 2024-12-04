@@ -8,5 +8,13 @@ class BotPanic(BaseException):
     pass
 
 
+class EnemyAppeared(BotPanic):
+    pass
+
+
+class LostHP(BotPanic):
+    pass
+
+
 class BotChangeStrategy(BaseException):
     pass

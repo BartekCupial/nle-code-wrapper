@@ -1,7 +1,7 @@
 from functools import wraps
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.exceptions import BotFinished
+from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 
 
 def strategy(func):
@@ -24,5 +24,25 @@ def strategy(func):
             raise BotFinished
 
         return func(bot, *args, **kwargs)
+
+    return wrapper
+
+
+def repeat(func):
+    """
+    A decorator that repeatedly executes the given function until a BotFinished exception is raised.
+    Args:
+        func (callable): The function to be repeatedly executed. It should accept a "Bot" instance as its first argument.
+    Returns:
+        callable: A wrapper function that executes the given function in a loop until a BotFinished exception is encountered.
+    """
+
+    @wraps(func)
+    def wrapper(bot: "Bot", *args, **kwargs):
+        try:
+            while func(bot, *args, **kwargs):
+                pass
+        except BotPanic:
+            pass
 
     return wrapper

@@ -1,3 +1,4 @@
+import copy
 import inspect
 import itertools
 from argparse import Namespace
@@ -33,9 +34,10 @@ class Bot:
         self.gamma = gamma
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.strategies: list[Callable] = []
+        self.panics: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
 
-    def strategy(self, func: Union[partial, Callable]) -> None:
+    def strategy(self, func: Callable) -> None:
         """
         Decorator to add a strategy to the bot
 
@@ -43,6 +45,15 @@ class Bot:
             func: function to add as a strategy
         """
         self.strategies.append(func)
+
+    def panic(self, func: Callable) -> None:
+        """
+        Decorator to add a panic to the bot
+
+        Args:
+            func: function to add as a panic
+        """
+        self.panics.append(func)
 
     def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Dict[str, Any]]]:
         """
@@ -61,8 +72,9 @@ class Bot:
         self.current_args = None
         self.strategy_steps = 0
         self.current_discount = 1.0
+        self.last_obs = None
 
-        self.last_obs, self.last_info = self.env.reset(**kwargs)
+        self.current_obs, self.last_info = self.env.reset(**kwargs)
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -74,7 +86,7 @@ class Bot:
 
         self.update()
 
-        return self.last_obs, self.last_info
+        return self.current_obs, self.last_info
 
     def step(self, action: int) -> None:
         """
@@ -83,8 +95,9 @@ class Bot:
         Args:
             action: action to take
         """
+        self.last_obs = copy.deepcopy(self.current_obs)
         try:
-            self.last_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
+            self.current_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
                 self.env.actions.index(action)
             )
         except ValueError as e:
@@ -103,6 +116,7 @@ class Bot:
             raise BotFinished
 
         self.update()
+        self.check_panics()
 
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         """
@@ -166,7 +180,7 @@ class Bot:
 
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
-        return self.last_obs, self.reward, self.terminated, self.truncated, self.last_info
+        return self.current_obs, self.reward, self.terminated, self.truncated, self.last_info
 
     def search(self) -> None:
         self.step(A.Command.SEARCH)
@@ -180,17 +194,21 @@ class Bot:
         for char in text:
             self.step(ord(char))
 
+    def check_panics(self):
+        for panic in self.panics:
+            panic(self)
+
     def update(self) -> None:
-        self.blstats = self.get_blstats(self.last_obs)
-        self.glyphs = self.get_glyphs(self.last_obs)
-        self.message = self.get_message(self.last_obs)
-        self.tty_chars = self.get_tty_chars(self.last_obs)
-        self.tty_colors = self.get_tty_colors(self.last_obs)
-        self.cursor = self.get_cursor(self.last_obs)
-        self.inventory = self.get_inventory(self.last_obs)
-        self.entity = self.get_entity(self.last_obs)
-        self.entities = self.get_entities(self.last_obs)
-        self.current_level = self.get_current_level(self.last_obs)
+        self.blstats = self.get_blstats(self.current_obs)
+        self.glyphs = self.get_glyphs(self.current_obs)
+        self.message = self.get_message(self.current_obs)
+        self.tty_chars = self.get_tty_chars(self.current_obs)
+        self.tty_colors = self.get_tty_colors(self.current_obs)
+        self.cursor = self.get_cursor(self.current_obs)
+        self.inventory = self.get_inventory(self.current_obs)
+        self.entity = self.get_entity(self.current_obs)
+        self.entities = self.get_entities(self.current_obs)
+        self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
 
