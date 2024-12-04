@@ -17,7 +17,8 @@ from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.inventory import Inventory
 from nle_code_wrapper.bot.level import Level
-from nle_code_wrapper.bot.pathfinder import Pathfinder
+from nle_code_wrapper.bot.pathfinder import Movements, Pathfinder
+from nle_code_wrapper.bot.pvp import Pvp
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
@@ -32,7 +33,12 @@ class Bot:
 
         self.env = env
         self.gamma = gamma
+
+        # plugins # TODO: find a better way for adding plugins
+        self.movements: Movements = Movements(self)
         self.pathfinder: Pathfinder = Pathfinder(self)
+        self.pvp: Pvp = Pvp(self)
+
         self.strategies: list[Callable] = []
         self.panics: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
@@ -211,6 +217,7 @@ class Bot:
         self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
+        self.pvp.update()
 
     def get_blstats(self, last_obs) -> BLStats:
         return BLStats(*last_obs["blstats"])

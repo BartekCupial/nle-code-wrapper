@@ -11,16 +11,20 @@ class Entity:
         """
         self.position = position
         self.glyph = glyph
-        self.name = self.get_monster_name(glyph)
+        self.permonst = self.get_permonst(glyph)
+        self.name = self.permonst.mname if self.permonst else None
+        self.difficulty = self.permonst.difficulty if self.permonst else None
+        self.ac = self.permonst.ac if self.permonst else None
+        self.cnutrit = self.permonst.cnutrit if self.permonst else None
 
-    def get_monster_name(self, glyph: int16) -> str:
+    def get_permonst(self, glyph: int16) -> str:
         """
         Get the monster name from the glyph.
         """
         if nethack.glyph_is_monster(glyph):
             mon_id = nethack.glyph_to_mon(glyph)
             mon = nethack.permonst(mon_id)
-            return mon.mname
+            return mon
         return None
 
     def __eq__(self, other: Any) -> bool:
