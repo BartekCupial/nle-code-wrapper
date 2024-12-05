@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Union
 
 import numpy as np
 from scipy import ndimage
@@ -46,7 +46,9 @@ def get_unvisited_positions(bot: "Bot", labeled_features):
 
 @strategy
 @repeat
-def explore(bot: "Bot", feature_detection: Callable, get_positions: Callable, direction: str):
+def explore(
+    bot: "Bot", feature_detection: Union[corridor_detection, room_detection], get_positions: Callable, direction: str
+):
     """
     Explores the current feature by directing the bot to positions to explore.
 
