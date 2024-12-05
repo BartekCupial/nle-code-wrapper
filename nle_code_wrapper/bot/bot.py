@@ -124,6 +124,10 @@ class Bot:
         self.update()
         self.check_panics()
 
+        # auto more
+        if "--More--" in bytes(self.tty_chars[0]).decode("latin-1"):
+            self.step(A.MiscAction.MORE)
+
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         """
         Take a step in the environment using the strategies defined in the bot. If no strategy is chosen, the action
