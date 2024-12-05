@@ -3,6 +3,7 @@ from typing import Optional
 
 from nle_utils.envs.nethack.nethack_env import make_nethack_env as make_env
 
+import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers.nle_code_wrapper import NLECodeWrapper
@@ -29,7 +30,7 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
                 panics.append(panic_func)
             cfg.panics = panics
     else:
-        cfg.panics = [obj for name, obj in inspect.getmembers(strategy_module, inspect.isfunction)]
+        cfg.panics = [obj for name, obj in inspect.getmembers(panic_module, inspect.isfunction)]
 
     if cfg.code_wrapper:
         gamma = cfg.gamma if hasattr(cfg, "gamma") else 1.0
