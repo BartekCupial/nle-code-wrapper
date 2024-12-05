@@ -5,3 +5,6 @@
 	path = external/sample_factory
 	url = https://github.com/BartekCupial/sample-factory
 	branch = nle-code-wrapper
+[submodule "external/balrog"]
+	path = external/balrog
+	url = git@github.com:jens321/BALROG.git

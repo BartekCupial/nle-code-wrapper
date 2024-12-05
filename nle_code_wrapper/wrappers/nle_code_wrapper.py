@@ -94,6 +94,16 @@ class NLECodeWrapper(gym.Wrapper):
         return obs, info
 
     def step(self, action: Union[int64, int]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
+        # allow for passing of action as string
+        if isinstance(action, str):
+            # preprocess action
+            try:
+                action = [s.__name__ for s in self.bot.strategies].index(action)
+            except:
+                # sample random index with high of len self.bot.strategies
+                print("WARNING: Invalid action passed. Sampling random strategy.")
+                action = np.random.randint(0, len(self.bot.strategies))
+
         obs, reward, terminated, truncated, info = self.bot.strategy_step(action)
         obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
 

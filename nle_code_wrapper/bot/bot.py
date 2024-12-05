@@ -192,7 +192,10 @@ class Bot:
         self.current_level.update(self.glyphs, self.blstats)
 
     def get_blstats(self) -> BLStats:
-        return BLStats(*self.last_obs["blstats"])
+        if "obs" in self.last_obs:
+            return BLStats(*self.last_obs["obs"]["blstats"])
+        else:
+            return BLStats(*self.last_obs["blstats"])
 
     def get_glyphs(self) -> ndarray:
         """
@@ -200,31 +203,54 @@ class Bot:
         Returns:
             2D numpy array with the glyphs
         """
-        return self.last_obs["glyphs"]
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["glyphs"]
+        else:
+            return self.last_obs["glyphs"]
 
     def get_message(self) -> str:
         """
         Returns:
             str with the message
         """
-        return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
+        if "obs" in self.last_obs:
+            return bytes(self.last_obs["obs"]["message"]).decode("latin-1").rstrip("\x00")
+        else:
+            return bytes(self.last_obs["message"]).decode("latin-1").rstrip("\x00")
 
     def get_tty_chars(self):
-        return self.last_obs["tty_chars"]
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["tty_chars"]
+        else:
+            return self.last_obs["tty_chars"]
 
     def get_tty_colors(self):
-        return self.last_obs["tty_colors"]
+        if "obs" in self.last_obs:
+            return self.last_obs["obs"]["tty_colors"]
+        else:
+            return self.last_obs["tty_colors"]
 
     def get_cursor(self):
-        return tuple(self.last_obs["tty_cursor"])
+        if "obs" in self.last_obs:
+            return tuple(self.last_obs["obs"]["tty_cursor"])
+        else:
+            return tuple(self.last_obs["tty_cursor"])
 
     def get_inventory(self) -> Inventory:
-        return Inventory(
-            self.last_obs["inv_strs"],
-            self.last_obs["inv_letters"],
-            self.last_obs["inv_oclasses"],
-            self.last_obs["inv_glyphs"],
-        )
+        if "obs" in self.last_obs:
+            return Inventory(
+                self.last_obs["obs"]["inv_strs"],
+                self.last_obs["obs"]["inv_letters"],
+                self.last_obs["obs"]["inv_oclasses"],
+                self.last_obs["obs"]["inv_glyphs"],
+            )
+        else:
+            return Inventory(
+                self.last_obs["inv_strs"],
+                self.last_obs["inv_letters"],
+                self.last_obs["inv_oclasses"],
+                self.last_obs["inv_glyphs"],
+            )
 
     def get_entity(self) -> Entity:
         """

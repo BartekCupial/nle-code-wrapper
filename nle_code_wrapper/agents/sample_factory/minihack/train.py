@@ -5,6 +5,7 @@ from nle_utils.envs.minihack.minihack_params import add_extra_params_minihack_en
 from sample_factory.algo.utils.context import global_model_factory
 from sample_factory.cfg.arguments import parse_full_cfg, parse_sf_args
 from sample_factory.envs.env_utils import register_env
+from sample_factory.model.actor_critic import LMActorCriticSeparateWeights
 from sample_factory.model.encoder import Encoder
 from sample_factory.train import run_rl
 from sample_factory.utils.typing import Config, ObsSpace
@@ -34,9 +35,12 @@ def make_minihack_encoder(cfg: Config, obs_space: ObsSpace) -> Encoder:
     return model_cls(cfg, obs_space)
 
 
-def register_minihack_components():
+def register_minihack_components(cfg):
     register_minihack_envs()
     global_model_factory().register_encoder_factory(make_minihack_encoder)
+
+    if cfg.use_lm:
+        global_model_factory().register_actor_critic_factory(LMActorCriticSeparateWeights)
 
 
 def parse_minihack_args(argv=None, evaluation=False):
@@ -53,8 +57,8 @@ def parse_minihack_args(argv=None, evaluation=False):
 
 def main():  # pragma: no cover
     """Script entry point."""
-    register_minihack_components()
     cfg = parse_minihack_args()
+    register_minihack_components(cfg)
     status = run_rl(cfg)
     return status
 

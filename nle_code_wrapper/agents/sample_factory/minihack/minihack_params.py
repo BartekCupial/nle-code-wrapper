@@ -23,6 +23,8 @@ def add_extra_params_model(parser):
     p.add_argument("--blstats_hdim", type=int, default=512)
     p.add_argument("--fc_after_cnn_hdim", type=int, default=512)
     p.add_argument("--use_resnet", type=str2bool, default=False)
+    p.add_argument("--lm_model_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct")
+    p.add_argument("--use_lm", type=str2bool, default=False, help="Use language model as a policy.")
 
 
 def add_extra_params_general(parser):
