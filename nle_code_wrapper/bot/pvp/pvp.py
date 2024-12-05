@@ -53,24 +53,24 @@ class Pvp:
             else:
                 self.target = None
 
-    def attack(self, entity: Entity):
-        # Causes the bot to begin attacking an entity until it is killed or told to stop.
+    def attack_melee(self, entity: Entity):
         self.target = entity
+        self.update()
         pathfinder = self.bot.pathfinder
 
         try:
+            # attack an entity until it is killed or told to stop.
             while self.target:
                 if pathfinder.distance(self.bot.entity.position, self.target.position) > self.attack_range:
                     path = pathfinder.get_path_to(self.target.position)
                     if path:
                         pathfinder.move(path[1])
                 else:
-                    self.attempt_attack()
-        # TODO: think if this always help
+                    if self.target:
+                        self.bot.pathfinder.direction(self.target.position)
+
+        # TODO: write separate strategies for single monster and multiple monsters
+        # 1) when we are fighting multiple monsters, we want to keep fighting
+        # 2) when we are fighting one monster and another monster appears, we want to stop fighting
         except EnemyAppeared:
             pass
-
-    def attempt_attack(self):
-        # TODO: implement stuff like wielding weapons if needed
-        if self.target:
-            self.bot.pathfinder.direction(self.target.position)

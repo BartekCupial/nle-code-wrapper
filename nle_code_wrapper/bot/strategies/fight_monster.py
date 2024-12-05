@@ -22,15 +22,7 @@ def fight_closest_monster(bot: "Bot") -> bool:
     )
 
     if entity:
-        bot.pvp.attack(entity)
+        bot.pvp.attack_melee(entity)
         return True
     else:
         return False
-
-
-def fight_all_monsters(bot: "Bot") -> None:
-    # kill all reachable monsters
-    while True:
-        fighting = fight_closest_monster(bot)
-        if not fighting:
-            break
