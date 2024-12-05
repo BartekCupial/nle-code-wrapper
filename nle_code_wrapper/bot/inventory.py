@@ -4,7 +4,7 @@ from typing import Dict, List
 
 import numpy as np
 from nle import nethack
-from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemShopStatus
+from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
 
 OBJECT_NAMES = {
     (nethack.OBJ_NAME(nethack.objclass(index)), nethack.objclass(index).oc_class): nethack.objclass(index)
@@ -40,6 +40,29 @@ def get_object(full_name, obj_class):
     return candidates[0][1]
 
 
+def get_object_name(obj):
+    return nethack.objdescr.from_idx(obj.oc_name_idx).oc_name
+
+
+def get_object_weight(obj):
+    """
+    Calculate the weight of the given object, including recursive calculation
+    of contained objects' weights.
+
+    Args:
+        obj: The object to calculate weight for
+
+    Returns:
+        int: Total weight of the object
+    """
+    # TODO: recursive calculation
+    return obj.oc_weight
+
+
+def arm_bonus(obj, enchantment: int, erosion: int):
+    return obj.a_ac + enchantment - min(erosion, obj.a_ac)
+
+
 class Item:
     def __init__(
         self,
@@ -48,49 +71,20 @@ class Item:
         oclass: int,
         glyph: int,
         shop_status: int = None,
-        value: int = None,
     ):
         self.letter = letter
-        self.full_name = "".join(map(chr, name)).rstrip("\x00")
-        self.item_class = ItemClasses(oclass)
         self.glyph = glyph
+        self.full_name = "".join(map(chr, name)).rstrip("\x00")
+        self.item_class = ItemClasses.from_oclass(oclass)
+        self.beatitude = ItemBeatitude.from_name(self.full_name)
+        self.enchantment = ItemEnchantment.from_name(self.full_name)
+        self.erosion = ItemErosion.from_name(self.full_name)
 
         self.shop_status = ItemShopStatus(shop_status) if shop_status is not None else None
-        self.value = value
 
-    @property
-    def object(self):
-        return get_object(self.full_name, self.item_class)
-
-    @property
-    def name(self):
-        return nethack.objdescr.from_idx(self.object.oc_name_idx).oc_name
-
-    @property
-    def weight(self):
-        """
-        Calculate the weight of the given object, including recursive calculation
-        of contained objects' weights.
-
-        Args:
-            obj: The object to calculate weight for
-
-        Returns:
-            int: Total weight of the object
-        """
-        # TODO: recursive calculation
-        return self.object.oc_weight
-
-    @property
-    def beatitude(self):
-        if "blessed" in self.full_name:
-            return ItemBeatitude.BLESSED
-        elif "uncursed" in self.full_name:
-            return ItemBeatitude.UNCURSED
-        elif "cursed" in self.full_name:
-            return ItemBeatitude.CURSED
-        else:
-            return ItemBeatitude.UNKNOWN
+        self.object = get_object(self.full_name, self.item_class)
+        self.name = get_object_name(self.object)
+        self.weight = get_object_weight(self.object)
 
     @property
     def in_use(self):
@@ -106,31 +100,24 @@ class Item:
         else:
             return 1
 
-    @property
-    def enchantment(self):
-        if "+" in self.full_name:
-            ench = int(self.full_name.split("+")[1].split(" ")[0])
-        elif "-" in self.full_name:
-            ench = int(self.full_name.split("-")[1].split(" ")[0])
-        else:
-            ench = None
-        return ItemEnchantment(ench)
-
     """
     WEAPON
     """
 
+    @property
     def is_weapon(self):
         return self.item_class == ItemClasses.WEAPONS
 
+    @property
     def is_launcher(self):
-        if not self.is_weapon():
+        if not self.is_weapon:
             return False
 
         return self.name in ["bow", "long bow", "elven bow", "orcish bow", "yumi", "crossbow", "sling"]
 
+    @property
     def is_firing_projectile(self, launcher: Item = None):
-        if not self.is_weapon():
+        if not self.is_weapon:
             return False
 
         arrows = ["arrow", "elven arrow", "orcish arrow", "silver arrow", "ya"]
@@ -151,8 +138,9 @@ class Item:
 
         raise ValueError(f"Unknown launcher type: {launcher.name}")
 
+    @property
     def is_thrown_projectile(self):
-        if not self.is_weapon():
+        if not self.is_weapon:
             return False
 
         return self.name in [
@@ -170,6 +158,18 @@ class Item:
             "dart",
             "shuriken",
         ]
+
+    """
+    ARMOR
+    """
+
+    @property
+    def is_armor(self):
+        return self.item_class == ItemClasses.ARMOR
+
+    @property
+    def arm_bonus(self):
+        return arm_bonus(self.object, self.enchantment.value, self.erosion.value)
 
     def __str__(self):
         return f"{chr(self.letter)}) {self.full_name}"
@@ -244,11 +244,4 @@ if __name__ == "__main__":
     inv_strs = obs["inv_strs"]
 
     inventory = Inventory(inv_strs, inv_letters, inv_oclasses, inv_glyphs)
-    for item in inventory.items:
-        item.object
-        item.weight
-        item.beatitude
-        item.in_use
-        item.quantity
-        item.enchantment
     print(inventory)
