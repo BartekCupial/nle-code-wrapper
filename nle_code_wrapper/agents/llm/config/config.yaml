@@ -4,7 +4,6 @@ agent:
   max_history: 16        # Maximum number of previous turns to keep in the dialogue history
   max_image_history: 0   # Maximum number of images to keep in the history
   max_cot_history: 1     # Maximum number of chain-of-thought steps to keep in history (if using 'cot' type of agent)
-  cache_icl: False       # Whether to cache In-Context Learning demonstrations (for 'icl' agents)
 
 eval:
   output_dir: "results"  # Directory where evaluation results will be saved
@@ -13,11 +12,9 @@ eval:
   num_episodes:          # Minimum number of episodes to run for each environment. You can optionally increase this to get more reliable results
     minihack: 1          # Number of episodes for each 'minihack' task
   max_steps_per_episode: null   # Max steps per episode; null uses the environment default
-  save_trajectories: True       # Whether to save agent trajectories
-  icl_episodes: 1               # Number of In-Context Learning episodes to use
-  icl_dataset: demos            # Dataset for ICL demonstrations
-
-  wandb_save: False  
+  save_trajectories: True       # Whether to save agent trajectories (text only)
+  wandb_save: False 
+  save_images: False            # Whether to save images from the environment 
              
 wandb:
   project_name: nle_code_wrapper
@@ -27,13 +24,14 @@ wandb:
 client:
   client_name: openai           # LLM client to use (e.g., 'openai', 'gemini', 'claude')
   model_id: gpt-4o              # Model identifier (e.g., 'gpt-4', 'gpt-3.5-turbo')
-  base_url: http://localhost:8000/v1   # Base URL for the API (if using a local server)
+  base_url: http://localhost:8080/v1   # Base URL for the API (if using a local server)
   generate_kwargs:
     temperature: 0.0            # Sampling temperature; 0.0 makes the output deterministic
     max_tokens: 1024            # Max tokens to generate in the response
   timeout: 60                   # Timeout for API requests in seconds
   max_retries: 5                # Max number of retries for failed API calls
   delay: 2                      # Exponential backoff factor between retries in seconds
+  alternate_roles: False        # Whether the client requires alternating between the agent and the environment
 
 envs:
   names: minihack   # Environments to evaluate, separated by hyphens
@@ -61,9 +59,6 @@ use_language_action: True
 code_wrapper: False # Do we want to wrap the env with code wrapper?
 strategies: # List of strategy names that the agent can use
   - goto_stairs
-  - open_doors_kick
-  - explore
-  - search
 strategies_loc: nle_code_wrapper.bot.strategies # Where to search for strategies implementation.
 
 hydra:
