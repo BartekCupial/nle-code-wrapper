@@ -1,8 +1,9 @@
+import numpy as np
 import pytest
 from nle import nethack
 from nle_utils.item import ItemClasses
 
-from nle_code_wrapper.bot.inventory import OBJECT_NAMES, get_object
+from nle_code_wrapper.bot.inventory import OBJECT_NAMES, Inventory, Item, get_object
 
 
 @pytest.mark.parametrize(
@@ -27,3 +28,48 @@ from nle_code_wrapper.bot.inventory import OBJECT_NAMES, get_object
 )
 def test_get_object(full_name, obj_class):
     get_object(full_name, obj_class)
+
+
+@pytest.mark.parametrize(
+    "full_name",
+    [
+        "arrow",
+        "elven arrow",
+        "runed arrow",
+        "orcish arrow",
+        "crude arrow",
+        "silver arrow",
+        "ya",
+        "bamboo arrow",
+        "crossbow bolt",
+    ],
+)
+def test_item_firing_projectiles(full_name):
+    item = Item(ord("a"), np.array([ord(c) for c in full_name]), ItemClasses.WEAPONS.value, 0)
+    assert item.is_firing_projectile()
+
+
+@pytest.mark.parametrize(
+    "full_name",
+    [
+        "boomerang",
+        "dagger",
+        "elven dagger",
+        "runed dagger",
+        "orcish dagger",
+        "crude dagger",
+        "silver dagger",
+        "worm tooth",
+        "crysknife",
+        "knife",
+        "athame",
+        "scalpel",
+        "stiletto",
+        "dart",
+        "shuriken",
+        "throwing star",
+    ],
+)
+def test_item_thrown_projectiles(full_name):
+    item = Item(ord("a"), np.array([ord(c) for c in full_name]), ItemClasses.WEAPONS.value, 0)
+    assert item.is_thrown_projectile()

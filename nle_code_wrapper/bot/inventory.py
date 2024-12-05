@@ -1,3 +1,5 @@
+from __future__ import annotations
+
 from typing import Dict, List
 
 import numpy as np
@@ -23,13 +25,16 @@ def get_object(full_name, obj_class):
         if obj_name in full_name and chr(obj_class.value) == oc_class:
             candidates.append((obj_name, obj))
 
-    if len(candidates) == 0:
-        for (obj_descr, oc_class), obj in OBJECT_DESCRS.items():
-            if obj_descr is None:
-                continue
+    for (obj_descr, oc_class), obj in OBJECT_DESCRS.items():
+        if obj_descr is None:
+            continue
 
-            if obj_descr in full_name and chr(obj_class.value) == oc_class:
-                candidates.append((obj_descr, obj))
+        if obj_descr in full_name and chr(obj_class.value) == oc_class:
+            candidates.append((obj_descr, obj))
+
+    if len(candidates) > 1:
+        # take longest match, example "dark green" will match with green and dark green, take dark green
+        candidates = [sorted(candidates, key=lambda x: len(x[0]), reverse=True)[0]]
 
     assert len(candidates) == 1, f"Multiple candidates found: {candidates}"
     return candidates[0][1]
@@ -56,6 +61,10 @@ class Item:
     @property
     def object(self):
         return get_object(self.full_name, self.item_class)
+
+    @property
+    def name(self):
+        return nethack.objdescr.from_idx(self.object.oc_name_idx).oc_name
 
     @property
     def weight(self):
@@ -106,6 +115,61 @@ class Item:
         else:
             ench = None
         return ItemEnchantment(ench)
+
+    """
+    WEAPON
+    """
+
+    def is_weapon(self):
+        return self.item_class == ItemClasses.WEAPONS
+
+    def is_launcher(self):
+        if not self.is_weapon():
+            return False
+
+        return self.name in ["bow", "long bow", "elven bow", "orcish bow", "yumi", "crossbow", "sling"]
+
+    def is_firing_projectile(self, launcher: Item = None):
+        if not self.is_weapon():
+            return False
+
+        arrows = ["arrow", "elven arrow", "orcish arrow", "silver arrow", "ya"]
+
+        if launcher is None:
+            return arrows + ["crossbow bolt"]  # TODO: sling ammo
+
+        if launcher.name == "crossbow":
+            return self.name == "crossbow bolt"
+
+        if launcher.name == "sling":
+            # TODO: implement sling ammo validation
+            return False
+
+        bows = ["bow", "long bow", "elven bow", "orcish bow", "yumi"]
+        if launcher.name in bows:
+            return self.name in arrows
+
+        raise ValueError(f"Unknown launcher type: {launcher.name}")
+
+    def is_thrown_projectile(self):
+        if not self.is_weapon():
+            return False
+
+        return self.name in [
+            "boomerang",
+            "dagger",
+            "elven dagger",
+            "orcish dagger",
+            "silver dagger",
+            "worm tooth",
+            "crysknife",
+            "knife",
+            "athame",
+            "scalpel",
+            "stiletto",
+            "dart",
+            "shuriken",
+        ]
 
     def __str__(self):
         return f"{chr(self.letter)}) {self.full_name}"
