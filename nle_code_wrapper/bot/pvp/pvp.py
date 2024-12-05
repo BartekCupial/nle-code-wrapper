@@ -47,7 +47,7 @@ class Pvp:
             if closest_entity:
                 self.target = (
                     closest_entity
-                    if pathfinder.distance(self.target.position, closest_entity.position) <= self.view_distance
+                    if pathfinder.distance(self.bot.entity.position, self.target.position) <= self.view_distance
                     else None
                 )
             else:
