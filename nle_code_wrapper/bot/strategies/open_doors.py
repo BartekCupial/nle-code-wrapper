@@ -108,6 +108,7 @@ def open_doors_key(bot: "Bot") -> bool:
     )
 
     if reachable_door:
+        old_opened_doors = utils.isin(bot.glyphs, G.DOOR_OPENED)
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
         bot.step(A.Command.APPLY)
@@ -124,6 +125,8 @@ def open_doors_key(bot: "Bot") -> bool:
                     bot.type_text("y")
                     bot.pathfinder.direction(reachable_door)
 
-        return True
+        # return True if we opened the door
+        opened_doors = utils.isin(bot.glyphs, G.DOOR_OPENED)
+        return not (old_opened_doors == opened_doors).all()
     else:
         return False
