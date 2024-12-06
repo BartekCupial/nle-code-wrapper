@@ -60,13 +60,18 @@ class Pvp:
         try:
             # attack an entity until it is killed or told to stop.
             while self.target:
-                if pathfinder.distance(self.bot.entity.position, self.target.position) > self.attack_range:
-                    path = pathfinder.get_path_to(self.target.position)
-                    if path:
-                        pathfinder.move(path[1])
+                path = pathfinder.get_path_from_to(self.bot.entity.position, self.target.position)
+                if path:
+                    if len(path) - 1 > self.attack_range:
+                        path = pathfinder.get_path_to(self.target.position)
+                        if path:
+                            pathfinder.move(path[1])
+                    else:
+                        if self.target:
+                            self.bot.pathfinder.direction(self.target.position)
                 else:
-                    if self.target:
-                        self.bot.pathfinder.direction(self.target.position)
+                    # there is no path to the target
+                    self.target = None
 
         # TODO: write separate strategies for single monster and multiple monsters
         # 1) when we are fighting multiple monsters, we want to keep fighting
