@@ -19,6 +19,7 @@ from nle_code_wrapper.bot.strategies.basic_items import (
     wield,
     zap,
 )
+from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.explore import (
     explore_corridor,
     explore_corridor_east,
@@ -91,6 +92,7 @@ __all__ = [
     wear,
     wield,
     zap,
+    engrave_elbereth,
     explore_corridor,
     explore_corridor_east,
     explore_corridor_north,
