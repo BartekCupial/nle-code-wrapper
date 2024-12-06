@@ -1,8 +1,10 @@
+import numpy as np
 from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
+from nle_code_wrapper.utils import utils
 
 
 @strategy
@@ -19,11 +21,10 @@ def open_doors(bot: "Bot") -> bool:
               False if no reachable closed doors were found.
     """
 
-    level = bot.current_level
-    closed_doors = level.object_coords(G.DOOR_CLOSED)
+    closed_doors = np.argwhere(utils.isin(bot.glyphs, G.DOOR_CLOSED))
 
     reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
+        (tuple(door) for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, tuple(door))),
         key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
         default=None,
     )
@@ -31,7 +32,16 @@ def open_doors(bot: "Bot") -> bool:
     if reachable_door:
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
-        bot.pathfinder.direction(reachable_door)
+
+        # open the door multiple times
+        doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+        for _ in range(5):
+            # break when we open the doors
+            # break if doors are closed
+            new_doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+            if not (doors == new_doors).all() or "door is locked" in bot.message:
+                break
+            bot.pathfinder.direction(reachable_door)
 
         return True
     else:
@@ -51,11 +61,10 @@ def open_doors_kick(bot: "Bot") -> bool:
         bool: True if a reachable closed door was found and kicked, False otherwise.
     """
 
-    level = bot.current_level
-    closed_doors = level.object_coords(G.DOOR_CLOSED)
+    closed_doors = np.argwhere(utils.isin(bot.glyphs, G.DOOR_CLOSED))
 
     reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
+        (tuple(door) for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, tuple(door))),
         key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
         default=None,
     )
@@ -63,8 +72,17 @@ def open_doors_kick(bot: "Bot") -> bool:
     if reachable_door:
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
-        bot.step(A.Command.KICK)
-        bot.pathfinder.direction(reachable_door)
+
+        # kick the door multiple times
+        doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+        for _ in range(5):
+            # break when we break the doors
+            # break when we injure our leg
+            new_doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+            if not (doors == new_doors).all() or "no shape for kicking" in bot.message:
+                break
+            bot.step(A.Command.KICK)
+            bot.pathfinder.direction(reachable_door)
 
         return True
     else:
