@@ -124,8 +124,9 @@ class Bot:
         self.update()
         self.check_panics()
 
-        # auto more
-        if "--More--" in bytes(self.tty_chars[0]).decode("latin-1"):
+        # auto more, we need to look through all tty_chars
+        # you can have more in first row but also when you step on item pile
+        if "--More--" in bytes(self.tty_chars).decode("latin-1"):
             self.step(A.MiscAction.MORE)
 
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
