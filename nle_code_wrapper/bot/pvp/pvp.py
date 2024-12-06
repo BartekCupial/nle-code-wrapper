@@ -55,7 +55,6 @@ class Pvp:
 
     def attack_melee(self, entity: Entity):
         self.target = entity
-        self.update()
         pathfinder = self.bot.pathfinder
 
         try:
@@ -74,3 +73,6 @@ class Pvp:
         # 2) when we are fighting one monster and another monster appears, we want to stop fighting
         except EnemyAppeared:
             pass
+        except Exception as e:
+            self.target = None
+            raise e
