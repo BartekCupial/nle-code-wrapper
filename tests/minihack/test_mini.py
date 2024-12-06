@@ -10,7 +10,7 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_room,
-    fight_all_monsters,
+    fight_closest_monster,
     goto_closest_staircase_down,
     goto_closest_unexplored_corridor,
     goto_closest_unexplored_room,
@@ -24,7 +24,7 @@ from nle_code_wrapper.utils import utils
 
 def general_mini(bot: "Bot", where, action):
     while True:
-        fight_all_monsters(bot)
+        fight_closest_monster(bot)
         explore_room(bot)
         goto(bot, where, action)
 
