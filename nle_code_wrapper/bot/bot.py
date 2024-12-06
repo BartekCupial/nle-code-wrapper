@@ -110,7 +110,7 @@ class Bot:
             # Handle the case where the action is not in the list of allowed actions,
             # many minihack environments only allow subset of possible actions
             if str(e) == "tuple.index(x): x not in tuple":
-                raise BotPanic("action not allowed")
+                raise BotPanic(f"action not allowed, err: {e}")
             else:
                 raise e
 
