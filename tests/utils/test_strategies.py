@@ -1,6 +1,11 @@
 import pytest
 
-from nle_code_wrapper.bot.strategies import explore_corridor_systematically, goto_closest_corridor, goto_closest_room
+from nle_code_wrapper.bot.strategies import (
+    explore_corridor_systematically,
+    goto_closest_corridor,
+    goto_closest_room,
+    open_doors,
+)
 from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import corridor_detection
@@ -15,7 +20,14 @@ class TestFeatures(object):
         """
         check if corridors are detected correctly:
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_custom_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--code_wrapper=False",
+                "--no-render",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -37,6 +49,7 @@ class TestFeatures(object):
         assert labeled_corridors[room_position] == 0
 
         # - when we are in room
+        open_doors(bot)
         goto_closest_room(bot)
         labeled_corridors, num_corridors = corridor_detection(bot)
         assert labeled_corridors[door_position] != 0
