@@ -106,9 +106,7 @@ class TestMazewalkMapped(object):
         def general_smart_fight(bot: "Bot"):
             while True:
                 try:
-                    if multiple_monsters_adjacent(bot):
-                        pass
-                    elif fight_closest_monster(bot):
+                    if fight_closest_monster(bot):
                         pass
                     elif goto_closest_staircase_down(bot):
                         pass
