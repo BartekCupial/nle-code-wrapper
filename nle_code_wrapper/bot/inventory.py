@@ -86,6 +86,9 @@ class Item:
         self.name = get_object_name(self.object)
         self.weight = get_object_weight(self.object)
 
+    def __str__(self):
+        return f"{chr(self.letter)}) {self.full_name}"
+
     @property
     def in_use(self):
         if "(" in self.full_name:
@@ -171,8 +174,13 @@ class Item:
     def arm_bonus(self):
         return arm_bonus(self.object, self.enchantment.value, self.erosion.value)
 
-    def __str__(self):
-        return f"{chr(self.letter)}) {self.full_name}"
+    """
+    TOOLS
+    """
+
+    @property
+    def is_key(self):
+        return self.item_class == ItemClasses.TOOLS and self.name in ["skeleton key", "lock pick", "credit card"]
 
 
 class Inventory:

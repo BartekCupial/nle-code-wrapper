@@ -99,11 +99,10 @@ def open_doors_key(bot: "Bot") -> bool:
     Returns:
         bool: True if a reachable closed door was found and attempted to be opened with a key, False otherwise.
     """
-    level = bot.current_level
-    closed_doors = level.object_coords(G.DOOR_CLOSED)
+    closed_doors = np.argwhere(utils.isin(bot.glyphs, G.DOOR_CLOSED))
 
     reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
+        (tuple(door) for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, tuple(door))),
         key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
         default=None,
     )
@@ -112,6 +111,18 @@ def open_doors_key(bot: "Bot") -> bool:
         adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
         bot.pathfinder.goto(adjacent)
         bot.step(A.Command.APPLY)
+        if "What do you want to use or apply?" in bot.message:
+            for tool in bot.inventory["tools"]:
+                if tool.is_key:
+                    bot.step(tool.letter)
+                    break
+
+            if "In what direction?" in bot.message:
+                bot.pathfinder.direction(reachable_door)
+
+                if "Unlock it?" in bot.message:
+                    bot.type_text("y")
+                    bot.pathfinder.direction(reachable_door)
 
         return True
     else:
