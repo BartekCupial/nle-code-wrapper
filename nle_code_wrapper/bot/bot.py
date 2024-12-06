@@ -78,9 +78,9 @@ class Bot:
         self.current_args = None
         self.strategy_steps = 0
         self.current_discount = 1.0
-        self.last_obs = None
 
         self.current_obs, self.last_info = self.env.reset(**kwargs)
+        self.last_obs = self.current_obs
 
         extra_stats = self.last_info.get("episode_extra_stats", {})
         new_extra_stats = {
