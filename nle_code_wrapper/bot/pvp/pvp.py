@@ -16,10 +16,6 @@ class Pvp:
 
         self.movements = bot.movements
 
-        # How far away the target entity must be to lose the target.
-        # Target entities further than this distance from the bot will be considered defeated.
-        self.view_distance = 10
-
         # How close the bot must be to the target entity to attack it.
         self.attack_range = 1
 
@@ -45,11 +41,7 @@ class Pvp:
                 default=None,
             )
             if closest_entity:
-                self.target = (
-                    closest_entity
-                    if pathfinder.distance(self.bot.entity.position, self.target.position) <= self.view_distance
-                    else None
-                )
+                self.target = closest_entity
             else:
                 self.target = None
 
