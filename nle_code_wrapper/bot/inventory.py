@@ -6,31 +6,30 @@ import numpy as np
 from nle import nethack
 from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
 
-OBJECT_NAMES = {
-    (nethack.OBJ_NAME(nethack.objclass(index)), nethack.objclass(index).oc_class): nethack.objclass(index)
-    for index in range(nethack.NUM_OBJECTS)
-}
-OBJECT_DESCRS = {
-    (nethack.OBJ_DESCR(nethack.objclass(index)), nethack.objclass(index).oc_class): nethack.objclass(index)
-    for index in range(nethack.NUM_OBJECTS)
-}
+GLYPH_TO_OBJECT = {}
+for glyph in range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS):
+    obj = nethack.objclass(nethack.glyph_to_obj(glyph))
+    GLYPH_TO_OBJECT[glyph] = dict(
+        obj=obj, obj_class=obj.oc_class, obj_name=nethack.OBJ_NAME(obj), obj_description=nethack.OBJ_DESCR(obj)
+    )
 
 
 def get_object(full_name, obj_class):
     candidates = []
-    for (obj_name, oc_class), obj in OBJECT_NAMES.items():
-        if obj_name is None:
+
+    for glyph, obj in GLYPH_TO_OBJECT.items():
+        if obj["obj_name"] is None:
             continue
 
-        if obj_name in full_name and chr(obj_class.value) == oc_class:
-            candidates.append((obj_name, obj))
+        if obj["obj_name"] in full_name and obj["obj_class"] == chr(obj_class.value):
+            candidates.append((obj["obj_name"], obj["obj"]))
 
-    for (obj_descr, oc_class), obj in OBJECT_DESCRS.items():
-        if obj_descr is None:
+    for glyph, obj in GLYPH_TO_OBJECT.items():
+        if obj["obj_description"] is None:
             continue
 
-        if obj_descr in full_name and chr(obj_class.value) == oc_class:
-            candidates.append((obj_descr, obj))
+        if obj["obj_description"] in full_name and obj["obj_class"] == chr(obj_class.value):
+            candidates.append((obj["obj_description"], obj["obj"]))
 
     if len(candidates) > 1:
         # take longest match, example "dark green" will match with green and dark green, take dark green
@@ -66,25 +65,70 @@ def arm_bonus(obj, enchantment: int, erosion: int):
 class Item:
     def __init__(
         self,
-        letter: int,
-        name: np.ndarray,
-        oclass: int,
-        glyph: int,
-        shop_status: int = None,
+        letter=None,
+        glyph=None,
+        full_name=None,
+        item_class=None,
+        beatitude=None,
+        enchantment=None,
+        erosion=None,
+        shop_status=None,  # TODO:
+        object=None,
+        name=None,
+        weight=None,
     ):
         self.letter = letter
         self.glyph = glyph
-        self.full_name = "".join(map(chr, name)).rstrip("\x00")
-        self.item_class = ItemClasses.from_oclass(oclass)
-        self.beatitude = ItemBeatitude.from_name(self.full_name)
-        self.enchantment = ItemEnchantment.from_name(self.full_name)
-        self.erosion = ItemErosion.from_name(self.full_name)
+        self.full_name = full_name
+        self.item_class = item_class
+        self.beatitude = beatitude
+        self.enchantment = enchantment
+        self.erosion = erosion
+        self.shop_status = shop_status
+        self.object = object
+        self.name = name
+        self.weight = weight
 
-        self.shop_status = ItemShopStatus(shop_status) if shop_status is not None else None
+    @staticmethod
+    def from_inv(inv_letter, inv_str, inv_oclass, inv_glyph):
+        full_name = "".join(map(chr, inv_str)).rstrip("\x00")
+        item_class = ItemClasses.from_oclass(inv_oclass)
+        beatitude = ItemBeatitude.from_name(full_name)
+        enchantment = ItemEnchantment.from_name(full_name)
+        erosion = ItemErosion.from_name(full_name)
+        object = get_object(full_name, item_class)
+        name = get_object_name(object)
+        weight = get_object_weight(object)
 
-        self.object = get_object(self.full_name, self.item_class)
-        self.name = get_object_name(self.object)
-        self.weight = get_object_weight(self.object)
+        return Item(
+            letter=inv_letter,
+            glyph=inv_glyph,
+            full_name=full_name,
+            item_class=item_class,
+            beatitude=beatitude,
+            enchantment=enchantment,
+            erosion=erosion,
+            object=object,
+            name=name,
+            weight=weight,
+        )
+
+    @staticmethod
+    def from_obj(obj):
+        object = obj
+        name = get_object_name(object)
+        weight = get_object_weight(object)
+
+        item_class = ItemClasses.from_oclass(obj.oc_class)
+        inv_glyph = [glyph for glyph, o in GLYPH_TO_OBJECT.items() if o["obj"] == obj][0]
+
+        return Item(
+            glyph=inv_glyph,
+            item_class=item_class,
+            object=object,
+            name=name,
+            weight=weight,
+        )
 
     def __str__(self):
         return f"{chr(self.letter)}) {self.full_name}"
@@ -195,7 +239,7 @@ class Inventory:
             if letter == 0:
                 break
 
-            item = Item(letter, name, oclass, glyph)
+            item = Item.from_inv(letter, name, oclass, glyph)
             self.items.append(item)
 
         self.inventory: Dict[str, List[Item]] = {}

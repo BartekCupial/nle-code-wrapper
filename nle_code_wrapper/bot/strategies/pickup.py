@@ -1,14 +1,11 @@
-import numpy as np
 from nle.nethack import actions as A
-from nle_utils.glyph import SS, G
-from scipy import ndimage
+from nle_utils.glyph import G
+from nle_utils.item import ItemClasses
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.inventory import GLYPH_TO_OBJECT
 from nle_code_wrapper.bot.strategies.goto import goto_closest_glyph
 from nle_code_wrapper.bot.strategy import strategy
-from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
-from nle_code_wrapper.utils.utils import coords
 
 
 @strategy
@@ -29,12 +26,21 @@ def pickup_closest_ring(bot: "Bot"):
 
 
 def pickup_closest_boots(bot: "Bot"):
-    # TODO: we should distinguish boots and armor
-    # it should be possile by using correct glyph
-    pickup_closest_item(bot, G.ARMOR_CLASS)
+    # TODO: add new class in G for boots
+    boot_glyphs = [
+        glyph
+        for glyph, obj in GLYPH_TO_OBJECT.items()
+        if obj["obj_class"] == chr(ItemClasses.ARMOR.value) and obj["obj"].oc_armcat == 4
+    ]
+    boot_glyphs = frozenset(boot_glyphs)
+    pickup_closest_item(bot, boot_glyphs)
 
 
 def pickup_closest_horn(bot: "Bot"):
-    # TODO: we should distinguish horn and tools
-    # it should be possile by using correct glyph
-    pickup_closest_item(bot, G.TOOL_CLASS)
+    horn_glyphs = [
+        glyph
+        for glyph, obj in GLYPH_TO_OBJECT.items()
+        if obj["obj_class"] == chr(ItemClasses.TOOLS.value) and obj["obj_description"] == "horn"
+    ]
+    horn_glyphs = frozenset(horn_glyphs)
+    pickup_closest_item(bot, horn_glyphs)
