@@ -3,7 +3,7 @@ import pytest
 from nle import nethack
 from nle_utils.item import ItemClasses, ItemErosion
 
-from nle_code_wrapper.bot.inventory import OBJECT_NAMES, Inventory, Item, arm_bonus, get_object
+from nle_code_wrapper.bot.inventory import Item, arm_bonus, get_object
 
 
 @pytest.mark.parametrize(
@@ -60,7 +60,7 @@ def test_greatest_erosion(full_name, expected):
     ],
 )
 def test_item_firing_projectiles(full_name):
-    item = Item(ord("a"), np.array([ord(c) for c in full_name]), ItemClasses.WEAPONS.value, 0)
+    item = Item.from_inv(ord("a"), np.array([ord(c) for c in full_name]), ItemClasses.WEAPONS.value, 0)
     assert item.is_firing_projectile
 
 
@@ -86,7 +86,7 @@ def test_item_firing_projectiles(full_name):
     ],
 )
 def test_item_thrown_projectiles(full_name):
-    item = Item(ord("a"), np.array([ord(c) for c in full_name]), ItemClasses.WEAPONS.value, 0)
+    item = Item.from_inv(ord("a"), np.array([ord(c) for c in full_name]), ItemClasses.WEAPONS.value, 0)
     assert item.is_thrown_projectile
 
 
