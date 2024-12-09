@@ -94,6 +94,21 @@ class MiniHackZapWandFixed(MiniHackSkill):
         super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
 
 
+class MiniHackQuaffPotionFixed(MiniHackSkill):
+    """Environment for "apply" task."""
+
+    def __init__(self, *args, **kwargs):
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        lvl_gen.add_object("levitation", "!", place=(0, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["You start to float in the air"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
 register(
     id="CustomMiniHack-WearBoots-Fixed-v0",
     entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackWearBootsFixed",
@@ -122,4 +137,9 @@ register(
 register(
     id="CustomMiniHack-ZapWand-Fixed-v0",
     entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackZapWandFixed",
+)
+
+register(
+    id="CustomMiniHack-QuaffPotion-Fixed-v0",
+    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackQuaffPotionFixed",
 )

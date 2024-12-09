@@ -25,6 +25,10 @@ def pickup_closest_ring(bot: "Bot"):
     pickup_closest_item(bot, G.RING_CLASS)
 
 
+def pickup_closest_potion(bot: "Bot"):
+    pickup_closest_item(bot, G.POTION_CLASS)
+
+
 def pickup_closest_boots(bot: "Bot"):
     # TODO: add new class in G for boots
     boot_glyphs = [
