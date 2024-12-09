@@ -72,7 +72,7 @@ class Level:
         doors_closed_mask = utils.isin(self.objects, G.DOOR_CLOSED)
         self.objects[doors_closed_mask & mask] = glyphs[doors_closed_mask & mask] + 2  # from closed to opened doors
 
-        mask = utils.isin(glyphs, G.WALL, G.DOOR_CLOSED, G.BARS)
+        mask = utils.isin(glyphs, G.WALL, G.DOOR_CLOSED, G.BARS, frozenset({SS.S_lava}))
         self.seen[mask] = True
         self.objects[mask] = glyphs[mask]
         self.walkable[mask] = False
@@ -84,18 +84,6 @@ class Level:
 
         mask = utils.isin(glyphs, G.TRAPS)
         self.known_traps[mask] = glyphs[mask]
-
-        # NOTE: adjust for levitation (1024 in blstats)
-        if blstats.prop_mask & nethack.BL_MASK_LEV:
-            mask = utils.isin(glyphs, [SS.S_lava])
-            self.walkable[mask] = True
-            self.seen[mask] = True
-        else:
-            # make sure to turn back off when we are not levitating
-            mask = utils.isin(glyphs, [SS.S_lava])
-            self.walkable[mask] = False
-            self.seen[mask] = False
-
         self.was_on[blstats.y, blstats.x] = True
 
     def object_coords(self, obj: frozenset) -> List[Union[Any, Tuple[int64, int64]]]:
