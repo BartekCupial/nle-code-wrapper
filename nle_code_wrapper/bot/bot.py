@@ -222,6 +222,7 @@ class Bot:
         self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
+        self.pathfinder.update()
         self.pvp.update()
 
     def get_blstats(self, last_obs) -> BLStats:

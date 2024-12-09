@@ -167,7 +167,12 @@ class Pathfinder:
 
             for point in path:
                 # TODO: check if there is peaceful monster
-                if not self.bot.current_level.walkable[point]:
+                cardinal = np.abs(np.array(self.bot.entity.position) - point).sum() == 1
+                if cardinal:
+                    walkable = self.movements.walkable_cardinal(point)
+                else:
+                    walkable = self.movements.walkable_intermediate(self.bot.entity.position, point)
+                if not walkable:
                     cont = True
                     break
                 self.move(point)
@@ -213,3 +218,6 @@ class Pathfinder:
 
         idx = np.argmin(n_dist)
         return neighbors[idx]
+
+    def update(self):
+        self.movements.update()
