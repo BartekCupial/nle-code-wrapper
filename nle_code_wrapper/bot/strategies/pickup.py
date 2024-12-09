@@ -18,15 +18,15 @@ def pickup_closest_item(bot: "Bot", item=G.ITEMS):
 
 
 def pickup_closest_wand(bot: "Bot"):
-    pickup_closest_item(bot, G.WAND_CLASS)
+    return pickup_closest_item(bot, G.WAND_CLASS)
 
 
 def pickup_closest_ring(bot: "Bot"):
-    pickup_closest_item(bot, G.RING_CLASS)
+    return pickup_closest_item(bot, G.RING_CLASS)
 
 
 def pickup_closest_potion(bot: "Bot"):
-    pickup_closest_item(bot, G.POTION_CLASS)
+    return pickup_closest_item(bot, G.POTION_CLASS)
 
 
 def pickup_closest_boots(bot: "Bot"):
@@ -37,7 +37,7 @@ def pickup_closest_boots(bot: "Bot"):
         if obj["obj_class"] == chr(ItemClasses.ARMOR.value) and obj["obj"].oc_armcat == 4
     ]
     boot_glyphs = frozenset(boot_glyphs)
-    pickup_closest_item(bot, boot_glyphs)
+    return pickup_closest_item(bot, boot_glyphs)
 
 
 def pickup_closest_horn(bot: "Bot"):
@@ -47,4 +47,4 @@ def pickup_closest_horn(bot: "Bot"):
         if obj["obj_class"] == chr(ItemClasses.TOOLS.value) and obj["obj_description"] == "horn"
     ]
     horn_glyphs = frozenset(horn_glyphs)
-    pickup_closest_item(bot, horn_glyphs)
+    return pickup_closest_item(bot, horn_glyphs)

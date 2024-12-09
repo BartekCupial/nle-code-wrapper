@@ -2,7 +2,7 @@ import pytest
 
 from nle_code_wrapper.bot.exceptions import BotFinished
 from nle_code_wrapper.bot.strategies import explore_corridor, open_doors
-from nle_code_wrapper.bot.strategies.cross_lava_river import levitate, levitate_over_lava_river
+from nle_code_wrapper.bot.strategies.cross_lava_river import freeze_lava_river, levitate, levitate_over_lava_river
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -57,7 +57,27 @@ class TestCrossLavaRive:
         ],
     )
     @pytest.mark.parametrize("seed", [0, 2])
-    def test_quest_hard(self, env, seed):
+    def test_quest_hard_levitate(self, env, seed):
+        """
+        This test checks if we can levitate over the river in quest hard
+        """
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        explore_corridor(bot)
+        open_doors(bot)
+        open_doors(bot)
+        assert levitate_over_lava_river(bot)
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            "MiniHack-Quest-Hard-v0",
+        ],
+    )
+    @pytest.mark.parametrize("seed", [1, 3, 4])
+    def test_quest_hard_freeze(self, env, seed):
         """
         This test checks if we can levitate over the river in quest hard
         """
@@ -68,4 +88,4 @@ class TestCrossLavaRive:
         explore_corridor(bot)
         open_doors(bot)
         open_doors(bot)
-        assert levitate_over_lava_river(bot)
+        assert freeze_lava_river(bot)
