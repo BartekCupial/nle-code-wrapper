@@ -35,6 +35,11 @@ def fire(bot: "Bot"):
 
 
 @strategy
+def loot(bot: "Bot"):
+    bot.step(Command.LOOT)
+
+
+@strategy
 def invoke(bot: "Bot"):
     bot.step(Command.INVOKE)
 
