@@ -2,23 +2,23 @@ import pytest
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategies import goto_closest_staircase_down
-from nle_code_wrapper.bot.strategies.pickup import pickup_closest_potion, pickup_closest_ring
+from nle_code_wrapper.bot.strategies import goto_staircase_down
+from nle_code_wrapper.bot.strategies.pickup import pickup_potion, pickup_ring
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
 def solve(bot: "Bot"):
     while True:
-        if pickup_closest_potion(bot):
+        if pickup_potion(bot):
             pass
-        elif pickup_closest_ring(bot):
+        elif pickup_ring(bot):
             pass
 
         if quaff_potion(bot):
-            goto_closest_staircase_down(bot)
+            goto_staircase_down(bot)
         elif puton_ring(bot):
-            goto_closest_staircase_down(bot)
+            goto_staircase_down(bot)
 
 
 @pytest.mark.usefixtures("register_components")

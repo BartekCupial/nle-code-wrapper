@@ -2,7 +2,7 @@ import pytest
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies.pickup import pickup_closest_boots, pickup_closest_potion, pickup_closest_ring
+from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_potion, pickup_ring
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
 from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.utils.tests import create_bot
@@ -26,7 +26,7 @@ class TestSkillSimple:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_closest_boots(bot)
+        pickup_boots(bot)
         with pytest.raises(BotFinished):
             wear_boots(bot)
 
@@ -45,7 +45,7 @@ class TestSkillSimple:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_closest_ring(bot)
+        pickup_ring(bot)
         with pytest.raises(BotFinished):
             puton_ring(bot)
 
@@ -64,6 +64,6 @@ class TestSkillSimple:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_closest_potion(bot)
+        pickup_potion(bot)
         with pytest.raises(BotFinished):
             quaff_potion(bot)

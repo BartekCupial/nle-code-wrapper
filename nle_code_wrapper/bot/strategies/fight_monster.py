@@ -3,7 +3,7 @@ from nle_code_wrapper.bot.strategy import strategy
 
 
 @strategy
-def fight_closest_monster(bot: "Bot") -> bool:
+def fight_monster(bot: "Bot") -> bool:
     """
     Directs the bot to fight the closest monster.
     This function finds the closest monster entity that the bot can reach using its pathfinder.

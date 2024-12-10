@@ -5,7 +5,7 @@ from nle_code_wrapper.bot.strategies import (
     acquire_levitation,
     explore_corridor,
     freeze_lava_river,
-    goto_closest_corridor,
+    goto_corridor,
     levitate_over_lava_river,
     open_doors,
 )
@@ -117,7 +117,7 @@ class TestCrossLavaRive:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        goto_closest_corridor(bot)
+        goto_corridor(bot)
         explore_corridor(bot)
         try:
             assert freeze_lava_river(bot)

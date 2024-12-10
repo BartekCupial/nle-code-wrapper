@@ -5,10 +5,10 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_room,
-    fight_closest_monster,
-    goto_closest_staircase_down,
-    goto_closest_unexplored_corridor,
-    goto_closest_unexplored_room,
+    fight_monster,
+    goto_staircase_down,
+    goto_unexplored_corridor,
+    goto_unexplored_room,
     open_doors,
     run_away,
 )
@@ -37,18 +37,18 @@ class TestMazewalkMapped(object):
                 try:
                     if multiple_monsters_adjacent(bot):
                         pass
-                    elif fight_closest_monster(bot):
+                    elif fight_monster(bot):
                         pass
-                    elif goto_closest_staircase_down(bot):
+                    elif goto_staircase_down(bot):
                         pass
                     elif open_doors(bot):
                         pass
                     elif explore_room(bot):
                         pass
-                    elif goto_closest_unexplored_corridor(bot):
+                    elif goto_unexplored_corridor(bot):
                         pass
                     else:
-                        goto_closest_unexplored_room(bot)
+                        goto_unexplored_room(bot)
 
                 except BotPanic:
                     pass
@@ -76,12 +76,12 @@ class TestMazewalkMapped(object):
             while True:
                 for strategy in [
                     multiple_monsters_adjacent,
-                    fight_closest_monster,
-                    goto_closest_staircase_down,
+                    fight_monster,
+                    goto_staircase_down,
                     open_doors,
-                    goto_closest_unexplored_corridor,
+                    goto_unexplored_corridor,
                     explore_room,
-                    goto_closest_unexplored_room,
+                    goto_unexplored_room,
                 ]:
                     try:
                         strategy(bot)

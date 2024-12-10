@@ -2,12 +2,7 @@ import pytest
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies.pickup import (
-    pickup_closest_boots,
-    pickup_closest_horn,
-    pickup_closest_ring,
-    pickup_closest_wand,
-)
+from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_horn, pickup_ring, pickup_wand
 from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -17,14 +12,14 @@ class TestPickUp(object):
     @pytest.mark.parametrize(
         "env, fn, key",
         [
-            ("CustomMiniHack-ZapWand-Fixed-v0", pickup_closest_wand, "wands"),
-            ("CustomMiniHack-PutOnRing-Fixed-v0", pickup_closest_ring, "rings"),
-            ("CustomMiniHack-ApplyHorn-Fixed-v0", pickup_closest_horn, "tools"),
-            ("CustomMiniHack-WearBoots-Fixed-v0", pickup_closest_boots, "armor"),
+            ("CustomMiniHack-ZapWand-Fixed-v0", pickup_wand, "wands"),
+            ("CustomMiniHack-PutOnRing-Fixed-v0", pickup_ring, "rings"),
+            ("CustomMiniHack-ApplyHorn-Fixed-v0", pickup_horn, "tools"),
+            ("CustomMiniHack-WearBoots-Fixed-v0", pickup_boots, "armor"),
         ],
     )
     @pytest.mark.parametrize("seed", [0])
-    def test_pickup_closest_item(self, env, fn, key, seed):
+    def test_pickup_item(self, env, fn, key, seed):
         """
         This tests checks if we were able to pick up the closest item of type
         """
@@ -46,7 +41,7 @@ class TestPickUp(object):
         ],
     )
     @pytest.mark.parametrize("seed", [0])
-    def test_pickup_closest_boots(self, env, seed):
+    def test_pickup_boots(self, env, seed):
         """
         This tests checks if we were able to pick up the closest item of type
         """
@@ -54,7 +49,7 @@ class TestPickUp(object):
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_closest_boots(bot)
+        pickup_boots(bot)
 
         def wear_boots(bot):
             items = bot.inventory["armor"]
@@ -74,7 +69,7 @@ class TestPickUp(object):
         ],
     )
     @pytest.mark.parametrize("seed", [0])
-    def test_pickup_closest_horn(self, env, seed):
+    def test_pickup_horn(self, env, seed):
         """
         This tests checks if we were able to pick up the closest item of type
         """
@@ -82,7 +77,7 @@ class TestPickUp(object):
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_closest_horn(bot)
+        pickup_horn(bot)
 
         def use_horn(bot):
             items = bot.inventory["tools"]

@@ -10,10 +10,10 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_room,
-    fight_closest_monster,
-    goto_closest_staircase_down,
-    goto_closest_unexplored_corridor,
-    goto_closest_unexplored_room,
+    fight_monster,
+    goto_staircase_down,
+    goto_unexplored_corridor,
+    goto_unexplored_room,
     open_doors_kick,
     random_move,
 )
@@ -24,7 +24,7 @@ from nle_code_wrapper.utils import utils
 
 def general_mini(bot: "Bot", where, action):
     while True:
-        fight_closest_monster(bot)
+        fight_monster(bot)
         explore_room(bot)
         goto(bot, where, action)
 
@@ -105,7 +105,7 @@ class TestMazewalkMapped(object):
                 try:
                     open_doors_kick(bot)
                     explore_room(bot)
-                    goto_closest_staircase_down(bot)
+                    goto_staircase_down(bot)
                 except BotPanic:
                     pass
 
@@ -123,9 +123,9 @@ class TestMazewalkMapped(object):
                 try:
                     open_doors_kick(bot)
                     explore_room(bot)
-                    goto_closest_unexplored_corridor(bot)
-                    goto_closest_unexplored_room(bot)
-                    goto_closest_staircase_down(bot)
+                    goto_unexplored_corridor(bot)
+                    goto_unexplored_room(bot)
+                    goto_staircase_down(bot)
                 except BotPanic:
                     pass
 
