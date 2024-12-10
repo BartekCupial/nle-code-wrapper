@@ -60,16 +60,19 @@ class Pvp:
             while self.target:
                 path = pathfinder.get_path_from_to(self.bot.entity.position, self.target.position)
                 if path:
+                    # approach
                     if len(path) - 1 > self.attack_range:
                         path = pathfinder.get_path_to(self.target.position)
                         if path:
                             pathfinder.move(path[1])
+                            continue
+                    # attack
                     else:
-                        if self.target:
+                        if self.target:  # TODO: what about neutral monsters? we need to confirm attack
                             self.bot.pathfinder.direction(self.target.position)
-                else:
-                    # there is no path to the target
-                    self.target = None
+                            continue
+                # stop
+                self.target = None
 
         # TODO: write separate strategies for single monster and multiple monsters
         # 1) when we are fighting multiple monsters, we want to keep fighting
@@ -92,6 +95,10 @@ class Pvp:
                     continue
                 hit_targets = self.ray_simulator.simulate_ray(self.bot.entity.position, (i, j))
                 ray_simulations.append((hit_targets, (i, j)))
+
+            # Sort by:
+            # 1. Maximizing damage to target (primary)
+            # 2. Minimizing self-damage (secondary)
             ray_simulations = sorted(
                 ray_simulations,
                 key=lambda x: (
