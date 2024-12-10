@@ -26,3 +26,17 @@ def fight_monster(bot: "Bot") -> bool:
         return True
     else:
         return False
+
+
+@strategy
+def zap_monster_wand(bot: "Bot") -> bool:
+    entity = min(
+        (e for e in bot.entities if bot.pathfinder.get_path_to(e.position)),
+        key=lambda e: bot.pathfinder.distance(e.position, bot.entity.position),
+        default=None,
+    )
+
+    if entity:
+        return bot.pvp.zap_wand(entity)
+    else:
+        return False
