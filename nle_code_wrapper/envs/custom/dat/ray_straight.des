@@ -1,0 +1,15 @@
+MAZE: "mylevel",' '
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+MAP
+-------
+|.....|
+|.....|
+|.....|
+|.....|
+|.....|
+-------
+ENDMAP
+REGION:(0,0,6,6),lit,"ordinary"
+BRANCH:(3,3,3,3),(0,0,0,0)
+OBJECT:('/',"magic missile"),(3,3)
