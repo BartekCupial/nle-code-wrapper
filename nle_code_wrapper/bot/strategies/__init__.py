@@ -20,6 +20,14 @@ from nle_code_wrapper.bot.strategies.basic_items import (
     wield,
     zap,
 )
+from nle_code_wrapper.bot.strategies.cross_lava_river import (
+    acquire_levitation,
+    cross_lava_river,
+    freeze_lava_horn,
+    freeze_lava_river,
+    freeze_lava_wand,
+    levitate_over_lava_river,
+)
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.explore import (
     explore_corridor,
@@ -44,7 +52,7 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_west,
 )
 from nle_code_wrapper.bot.strategies.explore_items import explore_items
-from nle_code_wrapper.bot.strategies.fight_monster import fight_closest_monster
+from nle_code_wrapper.bot.strategies.fight_monster import approach_monster, fight_closest_monster
 from nle_code_wrapper.bot.strategies.goto import (
     goto_closest_corridor,
     goto_closest_corridor_east,
@@ -94,6 +102,13 @@ __all__ = [
     wear,
     wield,
     zap,
+    acquire_levitation,
+    cross_lava_river,
+    freeze_lava_horn,
+    freeze_lava_river,
+    freeze_lava_wand,
+    levitate_over_lava_river,
+    cross_lava_river,
     engrave_elbereth,
     explore_corridor,
     explore_corridor_east,
@@ -116,6 +131,7 @@ __all__ = [
     explore_room_systematically_west,
     explore_room_west,
     explore_items,
+    approach_monster,
     fight_closest_monster,
     goto_closest_corridor,
     goto_closest_corridor_east,

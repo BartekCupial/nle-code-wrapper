@@ -91,6 +91,7 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
     return path
 
 
+@strategy
 def freeze_lava_wand(bot: "Bot"):
     items = bot.inventory["wands"]
 
