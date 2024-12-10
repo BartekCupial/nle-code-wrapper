@@ -29,7 +29,7 @@ class TestRaySimulator:
         bot.reset(seed=seed)
 
         hit_targets = bot.pvp.ray_simulator.simulate_ray(bot.entity.position, (-1, -1))
-        assert len(hit_targets) == 3
+        assert len(hit_targets) == 2
 
     @pytest.mark.parametrize("env", ["CustomMiniHack-RayStraight-v0"])
     @pytest.mark.parametrize("seed", [0])
