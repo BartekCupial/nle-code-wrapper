@@ -133,6 +133,9 @@ class Item:
     def __str__(self):
         return f"{chr(self.letter)}) {self.full_name}"
 
+    def __repr__(self):
+        return f"{chr(self.letter)}) {self.full_name})"
+
     @property
     def in_use(self):
         if "(" in self.full_name:

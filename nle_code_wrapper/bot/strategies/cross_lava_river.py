@@ -20,7 +20,7 @@ from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features, room_detection, save_boolean_array_pillow
 
 
-def detect_lava_river(bot: "Bot"):
+def lava_river_detection(bot: "Bot"):
     lava = utils.isin(bot.glyphs, frozenset({SS.S_lava}))
     labels, num_rooms, num_corridors = label_dungeon_features(bot)
     features, num_features = ndimage.label(labels > 0)
@@ -29,7 +29,7 @@ def detect_lava_river(bot: "Bot"):
 
 
 @strategy
-def levitate(bot: "Bot"):
+def acquire_levitation(bot: "Bot"):
     # 1) if we don't have levitation and there is a lava river
     # pickup potion, ring, boots
     if pickup_closest_potion(bot) or pickup_closest_ring(bot) or pickup_closest_boots(bot):
@@ -41,17 +41,12 @@ def levitate(bot: "Bot"):
         pass
 
     # 3) return True if we are levitating
-    if bot.blstats.prop_mask & nethack.BL_MASK_LEV:
-        return True
-    else:
-        return False
+    return bot.blstats.prop_mask & nethack.BL_MASK_LEV
 
 
 @strategy
-def levitate_over_lava_river(bot: "Bot"):
-    # 2) detect lava river
-    starting_pos = bot.entity.position
-    features, num_features, features_lava, num_lava_features = detect_lava_river(bot)
+def cross_lava_river(bot: "Bot"):
+    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
     if num_features <= num_lava_features:
         return False
 
@@ -60,13 +55,24 @@ def levitate_over_lava_river(bot: "Bot"):
 
     unvisited_rooms = get_other_features(bot, f)
 
+    starting_pos = bot.entity.position
+    if goto_closest(bot, unvisited_rooms):
+        return features[starting_pos] != features[bot.entity.position]
+
+
+@strategy
+def levitate_over_lava_river(bot: "Bot"):
+    # 1) detect lava river
+    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
+    if num_features <= num_lava_features:
+        return False
+
     # 2) levitate
-    if not levitate(bot):
+    if not acquire_levitation(bot):
         return False
 
     # 3) cross river
-    if goto_closest(bot, unvisited_rooms):
-        return features[starting_pos] != features[bot.entity.position]
+    return cross_lava_river(bot)
 
 
 def shortest_path_to_the_other_side(bot: "Bot", positions):
@@ -78,6 +84,7 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
     distances = np.sum(np.abs(positions - bot.entity.position), axis=1)
     closest_position = positions[np.argmin(distances)]
 
+    # imagine that we are levitating to compute path to cross lava
     bot.pathfinder.movements.levitating = True
     path = bot.pathfinder.get_path_to(tuple(closest_position))
 
@@ -87,28 +94,26 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
 def freeze_lava_wand(bot: "Bot"):
     items = bot.inventory["wands"]
 
-    # try with wand of cold
-    for item in items:
-        if "wand of cold" in item.full_name:
-            bot.step(A.Command.ZAP)
-            bot.step(item.letter)
-            # TODO: compute this generally
-            bot.step(A.CompassCardinalDirection.E)
-            if "lava cools and solidifies" in bot.message:
-                return True
+    # First try wands of cold, then any other wands
+    wand_priorities = [
+        lambda item: "wand of cold" in item.full_name,  # First priority
+        lambda item: True,  # Fall back to any wand
+    ]
 
-    # if no wand of cold try with random wand
-    for item in items:
-        bot.step(A.Command.ZAP)
-        bot.step(item.letter)
-        # TODO: compute this generally
-        bot.step(A.CompassCardinalDirection.E)
-        if "lava cools and solidifies" in bot.message:
-            return True
+    for priority_check in wand_priorities:
+        for item in items:
+            if priority_check(item):
+                bot.step(A.Command.ZAP)
+                bot.step(item.letter)
+                # TODO: compute this generally
+                bot.step(A.CompassCardinalDirection.E)
+                if "lava cools and solidifies" in bot.message:
+                    return True
 
     return False
 
 
+@strategy
 def freeze_lava_horn(bot: "Bot"):
     items = bot.inventory["tools"]
     for item in items:
@@ -128,8 +133,7 @@ def freeze_lava_horn(bot: "Bot"):
 @strategy
 def freeze_lava_river(bot: "Bot"):
     # 1) detect lava river
-    starting_pos = bot.entity.position
-    features, num_features, features_lava, num_lava_features = detect_lava_river(bot)
+    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
     if num_features <= num_lava_features:
         return False
 
@@ -143,10 +147,10 @@ def freeze_lava_river(bot: "Bot"):
         pass
 
     # 3) break through lava with freezing
-    # imagine that we are levitating to compute path to cross lava
     path = shortest_path_to_the_other_side(bot, unvisited_rooms)
     path = path[1:]  # distard our position
 
+    starting_pos = bot.entity.position
     for point in path:
         if bot.glyphs[tuple(point)] == SS.S_lava:
             freeze_lava_horn(bot) or freeze_lava_wand(bot)
