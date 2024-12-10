@@ -15,7 +15,7 @@ class RaySimulator:
 
     def simulate_ray(self, start_pos: Tuple[int, int], direction: Tuple[int, int]):
         hit_targets = defaultdict(float)
-        self._simulate_ray(hit_targets, start_pos, direction, self.max_range, probability=1.0)
+        self._simulate_ray(hit_targets, start_pos, direction, self.min_range, probability=1.0)
 
         return hit_targets
 

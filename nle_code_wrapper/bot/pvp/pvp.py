@@ -1,4 +1,8 @@
+import itertools
 from typing import TYPE_CHECKING
+
+import numpy as np
+from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import EnemyAppeared
@@ -75,3 +79,63 @@ class Pvp:
         except Exception as e:
             self.target = None
             raise e
+
+    def zap_wand(self, entity: Entity):
+        self.target = entity
+        pathfinder = self.bot.pathfinder
+
+        while self.target:
+            # 1) check if there is a ray that can hit the target
+            ray_simulations = []
+            for i, j in itertools.product([-1, 0, 1], repeat=2):
+                if i == 0 and j == 0:
+                    continue
+                hit_targets = self.ray_simulator.simulate_ray(self.bot.entity.position, (i, j))
+                ray_simulations.append((hit_targets, (i, j)))
+            ray_simulations = sorted(
+                ray_simulations,
+                key=lambda x: (
+                    x[0][self.target.position],  # Maximize target damage
+                    -x[0][self.bot.entity.position],  # Minimize self damage
+                ),
+                reverse=True,
+            )
+
+            best_ray = ray_simulations[0][1]
+            best_hit = ray_simulations[0][0][self.target.position]
+            self_hit = ray_simulations[0][0][self.bot.entity.position]
+
+            # 2) if there is a ray, zap the wand
+            if best_hit > 0.8 and self_hit < 0.2:
+                wand = self.find_best_offensive_wand()
+                if wand:
+                    self.bot.step(A.Command.ZAP)
+                    self.bot.step(wand.letter)
+                    self.bot.pathfinder.direction(np.array(self.bot.entity.position) + best_ray)
+                    return True
+                else:
+                    return False
+            else:
+                # 3) if there is no ray, move towards the target
+                path = pathfinder.get_path_to(self.target.position)
+                if path:
+                    pathfinder.move(path[1])
+                else:
+                    self.target = None
+
+    def find_best_offensive_wand(self):
+        items = self.bot.inventory["wands"]
+
+        # First try wands of death, then cold, then any other wands
+        wand_priorities = [
+            lambda item: "wand of death" in item.full_name,
+            lambda item: "wand of cold" in item.full_name,
+            lambda item: True,
+        ]
+
+        for priority_check in wand_priorities:
+            for item in items:
+                if priority_check(item):
+                    return item
+
+        return None
