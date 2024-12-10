@@ -6,10 +6,10 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_corridor_systematically,
     explore_room,
-    fight_closest_monster,
-    goto_closest_corridor,
-    goto_closest_room,
-    goto_closest_staircase_down,
+    fight_monster,
+    goto_corridor,
+    goto_room,
+    goto_staircase_down,
     run_away,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
@@ -38,17 +38,17 @@ class TestMazewalkMapped(object):
                     if multiple_monsters_adjacent(bot):
                         if run_away(bot):
                             pass
-                    elif fight_closest_monster(bot):
+                    elif fight_monster(bot):
                         pass
-                    elif goto_closest_staircase_down(bot):
+                    elif goto_staircase_down(bot):
                         pass
                     elif explore_room(bot):
                         pass
                     elif explore_corridor_systematically(bot):
                         pass
-                    elif goto_closest_room(bot):
+                    elif goto_room(bot):
                         pass
-                    elif goto_closest_corridor(bot):
+                    elif goto_corridor(bot):
                         pass
                 except BotPanic:
                     pass

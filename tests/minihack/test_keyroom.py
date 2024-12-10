@@ -8,16 +8,16 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_corridor_systematically,
     explore_room,
-    goto_closest_staircase_down,
-    goto_closest_unexplored_corridor,
-    goto_closest_unexplored_room,
+    goto_staircase_down,
+    goto_unexplored_corridor,
+    goto_unexplored_room,
     open_doors_key,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
 
-def position_of_closest_object(bot, obj):
+def position_of_object(bot, obj):
     coords = utils.coords(bot.glyphs, obj)
     distances = bot.pathfinder.distances(bot.entity.position)
 
@@ -43,7 +43,7 @@ def position_of_reachable_adjacent_object(bot: "Bot", obj):
 
 
 def pickup_key(bot: "Bot"):
-    position = position_of_closest_object(bot, G.TOOL_CLASS)
+    position = position_of_object(bot, G.TOOL_CLASS)
 
     if position:
         bot.pathfinder.goto(position)
@@ -59,7 +59,7 @@ def solve(bot: "Bot"):
         try:
             closed_doors = position_of_reachable_adjacent_object(bot, G.DOOR_CLOSED)
 
-            if goto_closest_staircase_down(bot):
+            if goto_staircase_down(bot):
                 pass
             elif has_key and closed_doors:
                 open_doors_key(bot)
@@ -69,10 +69,10 @@ def solve(bot: "Bot"):
                 pass
             elif explore_corridor_systematically(bot):
                 pass
-            elif goto_closest_unexplored_room(bot):
+            elif goto_unexplored_room(bot):
                 pass
             else:
-                goto_closest_unexplored_corridor(bot)
+                goto_unexplored_corridor(bot)
 
         except BotPanic:
             pass
