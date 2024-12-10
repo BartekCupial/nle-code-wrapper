@@ -99,14 +99,18 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_mini_locked(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        bot = Bot(cfg)
 
-        bot.strategy(open_doors_kick)
-        bot.strategy(explore_room)
-        bot.strategy(goto_closest_staircase_down)
+        def solve(bot: "Bot"):
+            while True:
+                try:
+                    open_doors_kick(bot)
+                    explore_room(bot)
+                    goto_closest_staircase_down(bot)
+                except BotPanic:
+                    pass
 
-        cfg.strategies = [open_doors_kick, explore_room, goto_closest_staircase_down]
-        status = play(cfg)
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["MiniHack-LockedDoor-v0"])
