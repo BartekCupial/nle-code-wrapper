@@ -1,12 +1,14 @@
 import itertools
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 from nle_utils.glyph import SS, G
 from PIL import Image
 from scipy import ndimage
 
-from nle_code_wrapper.bot import Bot
+if TYPE_CHECKING:
+    from nle_code_wrapper.bot import Bot
+
 from nle_code_wrapper.utils import utils
 
 

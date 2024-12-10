@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING
 
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import EnemyAppeared
+from nle_code_wrapper.bot.pvp.ray import RaySimulator
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
@@ -15,6 +16,7 @@ class Pvp:
         self.target: Entity = None
 
         self.movements = bot.movements
+        self.ray_simulator = RaySimulator(bot)
 
         # How close the bot must be to the target entity to attack it.
         self.attack_range = 1
