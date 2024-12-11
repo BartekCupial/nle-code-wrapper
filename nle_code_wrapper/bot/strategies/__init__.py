@@ -52,7 +52,7 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_west,
 )
 from nle_code_wrapper.bot.strategies.explore_items import explore_items
-from nle_code_wrapper.bot.strategies.fight_monster import approach_monster, fight_monster
+from nle_code_wrapper.bot.strategies.fight_monster import fight_monster
 from nle_code_wrapper.bot.strategies.goto import (
     goto_corridor,
     goto_corridor_east,
@@ -98,6 +98,7 @@ from nle_code_wrapper.bot.strategies.search import (
     search_room_for_hidden_doors,
 )
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
+from nle_code_wrapper.bot.strategies.zap_monster import approach_and_zap_monster, approach_monster, zap_monster
 
 __all__ = [
     apply,
@@ -149,7 +150,6 @@ __all__ = [
     explore_room_systematically_west,
     explore_room_west,
     explore_items,
-    approach_monster,
     fight_monster,
     goto_corridor,
     goto_corridor_east,
@@ -192,4 +192,7 @@ __all__ = [
     search_corridor_for_hidden_doors,
     search_for_traps,
     search_room_for_hidden_doors,
+    approach_and_zap_monster,
+    zap_monster,
+    approach_monster,
 ]

@@ -2,9 +2,9 @@ import pytest
 
 from nle_code_wrapper.bot.exceptions import BotFinished
 from nle_code_wrapper.bot.strategies.explore import explore_room
-from nle_code_wrapper.bot.strategies.fight_monster import zap_monster_wand
 from nle_code_wrapper.bot.strategies.pickup import pickup_wand
 from nle_code_wrapper.bot.strategies.run_away import run_away
+from nle_code_wrapper.bot.strategies.zap_monster import approach_and_zap_monster
 from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
@@ -28,7 +28,7 @@ class TestCrossLavaRive:
         bot.reset(seed=seed)
 
         try:
-            zap_monster_wand(bot)
+            approach_and_zap_monster(bot)
         except BotFinished:
             pass
         assert bot.reward > 0
@@ -49,7 +49,7 @@ class TestCrossLavaRive:
         bot.reset(seed=seed)
 
         pickup_wand(bot)
-        zap_monster_wand(bot)
+        approach_and_zap_monster(bot)
 
         assert "You kill the minotaur!" in bot.message or "The death ray misses the minotaur." in bot.message
 
@@ -70,7 +70,7 @@ class TestCrossLavaRive:
 
         pickup_wand(bot)
         explore_room(bot)
-        zap_monster_wand(bot)
+        approach_and_zap_monster(bot)
 
         assert "You kill the minotaur!" in bot.message or "The death ray misses the minotaur." in bot.message
 
@@ -89,11 +89,11 @@ class TestCrossLavaRive:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        zap_monster_wand(bot)
+        approach_and_zap_monster(bot)
         run_away(bot)
 
         try:
-            zap_monster_wand(bot)
+            approach_and_zap_monster(bot)
         except BotFinished:
             pass
         assert bot.reward > 0

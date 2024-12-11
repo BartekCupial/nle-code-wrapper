@@ -1,8 +1,6 @@
 import pytest
 
-from nle_code_wrapper.bot.exceptions import BotFinished
 from nle_code_wrapper.bot.strategies.explore import explore_room, explore_room_systematically
-from nle_code_wrapper.bot.strategies.fight_monster import zap_monster_wand
 from nle_code_wrapper.bot.strategies.push_boulder import (
     align_boulder_for_bridge,
     goto_boulder,
