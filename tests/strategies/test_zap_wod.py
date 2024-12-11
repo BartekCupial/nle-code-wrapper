@@ -4,6 +4,8 @@ from nle_code_wrapper.bot.exceptions import BotFinished
 from nle_code_wrapper.bot.strategies.explore import explore_room
 from nle_code_wrapper.bot.strategies.fight_monster import zap_monster_wand
 from nle_code_wrapper.bot.strategies.pickup import pickup_wand
+from nle_code_wrapper.bot.strategies.run_away import run_away
+from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -69,5 +71,31 @@ class TestCrossLavaRive:
         pickup_wand(bot)
         explore_room(bot)
         zap_monster_wand(bot)
+
+        assert "You kill the minotaur!" in bot.message or "The death ray misses the minotaur." in bot.message
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            "CustomMiniHack-WoD-Melee-Full-v0",
+        ],
+    )
+    @pytest.mark.parametrize("seed", [0])
+    def test_wod_melee(self, env, seed):
+        """
+        This tests checks if we were able to zap WoD to kill monster
+        """
+        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        zap_monster_wand(bot)
+        run_away(bot)
+
+        try:
+            zap_monster_wand(bot)
+        except BotFinished:
+            pass
+        assert bot.reward > 0
 
         assert "You kill the minotaur!" in bot.message or "The death ray misses the minotaur." in bot.message
