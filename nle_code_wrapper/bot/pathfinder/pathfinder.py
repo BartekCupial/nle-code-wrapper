@@ -41,6 +41,19 @@ class Pathfinder:
         self.movements = bot.movements
         self.search = ChebyshevSearch(self.movements)
 
+    @property
+    def direction_movements(self) -> Dict[str, Tuple[int, int]]:
+        return {
+            "west": (0, -1),
+            "east": (0, 1),
+            "north": (-1, 0),
+            "south": (1, 0),
+            "northwest": (-1, -1),
+            "northeast": (-1, 1),
+            "southwest": (1, -1),
+            "southeast": (1, 1),
+        }
+
     def set_movements(self, movements: Movements):
         self.movements = movements
 
