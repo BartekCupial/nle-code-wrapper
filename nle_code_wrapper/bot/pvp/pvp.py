@@ -33,6 +33,7 @@ class Pvp:
         if self.target:
             pathfinder = self.bot.pathfinder
 
+            # TODO: this is faulty, because we could kill more monsters then one (e.g. with a wand of death)
             last_score = self.bot.get_blstats(self.bot.last_obs).score
             current_score = self.bot.blstats.score
             # for each monster kill, we get 4 times the difficulty in score
@@ -51,84 +52,72 @@ class Pvp:
             else:
                 self.target = None
 
-    def attack_melee(self, entity: Entity):
+    def approach_target(self, target_position, desired_range: int = 1):
+        """Common logic for approaching a target"""
+        path = self.bot.pathfinder.get_path_to(target_position)
+        if not path:
+            return False
+
+        if len(path) - 1 > desired_range:
+            self.bot.pathfinder.move(path[1])
+            return True
+        return False
+
+    def handle_combat(self, entity: Entity, action_func):
+        """Template method for combat actions"""
         self.target = entity
-        pathfinder = self.bot.pathfinder
 
         try:
-            # attack an entity until it is killed or told to stop.
             while self.target:
-                path = pathfinder.get_path_from_to(self.bot.entity.position, self.target.position)
-                if path:
-                    # approach
-                    if len(path) - 1 > self.attack_range:
-                        path = pathfinder.get_path_to(self.target.position)
-                        if path:
-                            pathfinder.move(path[1])
-                            continue
-                    # attack
-                    else:
-                        if self.target:  # TODO: what about neutral monsters? we need to confirm attack
-                            self.bot.pathfinder.direction(self.target.position)
-                            continue
-                # stop
-                self.target = None
+                if not action_func():
+                    self.target = None
 
-        # TODO: write separate strategies for single monster and multiple monsters
-        # 1) when we are fighting multiple monsters, we want to keep fighting
-        # 2) when we are fighting one monster and another monster appears, we want to stop fighting
         except EnemyAppeared:
             pass
         except Exception as e:
             self.target = None
             raise e
 
-    def zap_wand(self, entity: Entity):
-        self.target = entity
-        pathfinder = self.bot.pathfinder
+    def attack_melee(self, entity: Entity):
+        # TODO: write separate strategies for single monster and multiple monsters
+        # 1) when we are fighting multiple monsters, we want to keep fighting
+        # 2) when we are fighting one monster and another monster appears, we want to stop fighting
+        def melee_action():
+            if self.approach_target(self.target.position, self.attack_range):
+                return True
 
-        while self.target:
-            # 1) check if there is a ray that can hit the target
-            ray_simulations = []
-            for i, j in itertools.product([-1, 0, 1], repeat=2):
-                if i == 0 and j == 0:
-                    continue
-                hit_targets = self.ray_simulator.simulate_ray(self.bot.entity.position, (i, j))
-                ray_simulations.append((hit_targets, (i, j)))
+            # TODO: what about neutral monsters? we need to confirm attack
+            self.bot.pathfinder.direction(self.target.position)
+            return True
 
-            # Sort by:
-            # 1. Maximizing damage to target (primary)
-            # 2. Minimizing self-damage (secondary)
-            ray_simulations = sorted(
-                ray_simulations,
-                key=lambda x: (
-                    x[0][self.target.position],  # Maximize target damage
-                    -x[0][self.bot.entity.position],  # Minimize self damage
-                ),
-                reverse=True,
-            )
+        self.handle_combat(entity, melee_action)
 
-            best_ray = ray_simulations[0][1]
-            best_hit = ray_simulations[0][0][self.target.position]
-            self_hit = ray_simulations[0][0][self.bot.entity.position]
+    def _simulate_rays(self):
+        ray_simulations = []
+        for i, j in itertools.product([-1, 0, 1], repeat=2):
+            if i == 0 and j == 0:
+                continue
+            hit_targets = self.ray_simulator.simulate_ray(self.bot.entity.position, (i, j))
+            ray_simulations.append((hit_targets, (i, j)))
 
-            # 2) if there is a ray, zap the wand
-            if best_hit > 0.8 and self_hit < 0.2:
-                wand = self.find_best_offensive_wand()
-                if wand:
-                    self.bot.step(A.Command.ZAP)
-                    self.bot.step(wand.letter)
-                    self.bot.pathfinder.direction(np.array(self.bot.entity.position) + best_ray)
-                    return True
-                else:
-                    return False
-            else:
-                # 3) if there is no ray, move towards the target
-                path = pathfinder.get_path_to(self.target.position)
-                if path:
-                    pathfinder.move(path[1])
-                else:
-                    self.target = None
+        return ray_simulations
+
+    def _get_best_ray(self, ray_simulations):
+        """Find the best ray based on target damage and self damage"""
+        sorted_rays = sorted(
+            ray_simulations,
+            key=lambda x: (
+                x[0][self.target.position],
+                -x[0][self.bot.entity.position],
+            ),
+            reverse=True,
+        )
+        best = sorted_rays[0]
+        return (
+            best[1],  # best_ray
+            best[0][self.target.position],  # best_hit
+            best[0][self.bot.entity.position],  # self_hit
+        )
 
     def find_best_offensive_wand(self):
         items = self.bot.inventory["wands"]
@@ -146,3 +135,26 @@ class Pvp:
                     return item
 
         return None
+
+    def _execute_wand_zap(self, best_ray):
+        """Execute the wand zap action"""
+        wand = self.find_best_offensive_wand()
+        if not wand:
+            return False
+
+        self.bot.step(A.Command.ZAP)
+        self.bot.step(wand.letter)
+        self.bot.pathfinder.direction(np.array(self.bot.entity.position) + best_ray)
+        return True
+
+    def zap_wand(self, entity: Entity):
+        def wand_action():
+            ray_simulations = self._simulate_rays()
+            best_ray, best_hit, self_hit = self._get_best_ray(ray_simulations)
+
+            if best_hit > 0.8 and self_hit < 0.2:
+                return self._execute_wand_zap(best_ray)
+            else:
+                return self.approach_target(self.target.position)
+
+        self.handle_combat(entity, wand_action)
