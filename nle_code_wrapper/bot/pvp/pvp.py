@@ -78,6 +78,12 @@ class Pvp:
             self.target = None
             raise e
 
+    def approach_entity(self, entity: Entity, distance: int = 1):
+        def approach_action():
+            return self.approach_target(self.target.position, distance)
+
+        self.handle_combat(entity, approach_action)
+
     def attack_melee(self, entity: Entity):
         # TODO: write separate strategies for single monster and multiple monsters
         # 1) when we are fighting multiple monsters, we want to keep fighting
