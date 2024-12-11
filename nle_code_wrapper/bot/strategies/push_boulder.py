@@ -11,19 +11,6 @@ from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features
 
 
-def find_furthest_walkable_position(bot: "Bot", dir):
-    positions = np.argwhere(bot.current_level.walkable)
-
-    projections = np.dot(positions, dir)
-    furthest_index = np.argmax(projections)
-
-    return tuple(positions[furthest_index])
-
-
-def find_intersections(pos1, pos2):
-    return [(pos1[0], pos2[1]), (pos2[0], pos1[1])]
-
-
 @strategy
 def goto_boulder(bot: "Bot") -> bool:
     """
@@ -33,7 +20,7 @@ def goto_boulder(bot: "Bot") -> bool:
     boulder = utils.isin(bot.current_level.objects, G.BOULDER)
     positions = np.argwhere(boulder)
     if len(positions) == 0:
-        return False
+        return False  # no boulders
 
     # 2) find the position adjacent to a boulder closest to the agent
     distances = np.sum(np.abs(positions - bot.entity.position), axis=1)
@@ -89,7 +76,7 @@ def push_boulder_direction(bot: "Bot", direction) -> bool:
     # 1) check if we are standing next to a boulder
     boulder_pos = get_adjacent_boulder(bot)
     if boulder_pos is None:
-        return False
+        return False  # no boulders
 
     # 2) push the boulder in direction
     dir = bot.pathfinder.direction_movements[direction]
@@ -133,12 +120,14 @@ def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
     path = bot.pathfinder.get_path_from_to(boulder_pos, target_pos)
     bot.pathfinder.movements.levitating = lev
 
-    # TODO: this doesn't work when we have two boulders next to each other
     # 2) push the boulder to the target position
-    movements = np.diff(path, axis=0)
-    directions = {v: k for k, v in bot.pathfinder.direction_movements.items()}
+    movements = np.diff(path, axis=0).tolist()
+    first_move = movements.pop(0)
+    opposite_dir = tuple(np.array(first_move) * -1)
+    bot.pathfinder.goto(tuple(np.array(boulder_pos) + opposite_dir))
+    bot.pathfinder.move(tuple(np.array(bot.entity.position) + first_move))
     for move in movements:
-        push_boulder_direction(bot, directions[tuple(move)])
+        bot.pathfinder.move(tuple(np.array(bot.entity.position) + move))
 
 
 @strategy
@@ -149,7 +138,7 @@ def push_boulder_into_river(bot: "Bot") -> bool:
     # 1) check if we are standing next to a boulder
     boulder_pos = get_adjacent_boulder(bot)
     if boulder_pos is None:
-        return False
+        return False  # no boulders
 
     # 2) check if there is a river
     water = utils.isin(bot.glyphs, frozenset({SS.S_water}))
@@ -157,14 +146,42 @@ def push_boulder_into_river(bot: "Bot") -> bool:
     if len(water_positions) == 0:
         return None  # no river
 
-    # 3) find furthest walkable position to the east (river is to the east)
-    #    then add one step to the east to find the target position
-    dir = bot.pathfinder.direction_movements["east"]
-    river_bridge_pos = find_furthest_walkable_position(bot, dir)
-    target_pos = tuple(np.array(river_bridge_pos) + dir)
+    # 3) find water position exactly to the east of the boulder
+    dir = np.array(bot.pathfinder.direction_movements["east"])
+    diff = water_positions - boulder_pos
+    mask = np.all((diff == 0) & (dir == 0) | (diff * dir > 0) & (dir != 0), axis=1)
+    valid_positions = water_positions[mask]
+    target_pos = valid_positions[np.argmin(np.sum(np.abs(valid_positions - boulder_pos), axis=1))]
 
     # 4) push the boulder into the river
-    push_boulder_to_pos(bot, boulder_pos, target_pos)
+    push_boulder_to_pos(bot, boulder_pos, tuple(target_pos))
+
+
+def find_furthest_walkable_position(bot: "Bot", start_pos, dir):
+    positions = np.argwhere(bot.current_level.walkable)
+
+    # Calculate projections along the direction
+    projections = np.dot(positions, dir)
+
+    # Find the maximum projection value
+    max_projection = np.max(projections)
+
+    # Get all positions that have the maximum projection
+    furthest_positions = positions[projections == max_projection]
+
+    if len(furthest_positions) == 1:
+        return tuple(furthest_positions[0])
+
+    # If multiple positions exist at the furthest distance,
+    # find the one closest to current position
+    distances_to_pos = np.sum(np.abs(furthest_positions - start_pos), axis=1)
+    closest_index = np.argmin(distances_to_pos)
+
+    return tuple(furthest_positions[closest_index])
+
+
+def find_intersections(pos1, pos2):
+    return [(pos1[0], pos2[1]), (pos2[0], pos1[1])]
 
 
 @strategy
@@ -176,7 +193,7 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
     # 1) check if we are standing next to a boulder
     boulder_pos = get_adjacent_boulder(bot)
     if boulder_pos is None:
-        return False
+        return False  # no boulders
 
     # 2) check if there is a river
     water = utils.isin(bot.glyphs, frozenset({SS.S_water}))
@@ -186,7 +203,7 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
 
     # 3) find vertical position which aligns horizontally with furthest water position
     dir = bot.pathfinder.direction_movements["east"]
-    river_bridge_pos = find_furthest_walkable_position(bot, dir)
+    river_bridge_pos = find_furthest_walkable_position(bot, boulder_pos, dir)
     intersections = find_intersections(boulder_pos, river_bridge_pos)
     target_pos = [pos for pos in intersections if bot.current_level.walkable[pos]][0]
 
