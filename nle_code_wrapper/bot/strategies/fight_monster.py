@@ -3,6 +3,21 @@ from nle_code_wrapper.bot.strategy import strategy
 
 
 @strategy
+def approach_monster(bot: "Bot"):
+    entity = min(
+        (e for e in bot.entities if bot.pathfinder.get_path_to(e.position)),
+        key=lambda e: bot.pathfinder.distance(e.position, bot.entity.position),
+        default=None,
+    )
+
+    if entity:
+        bot.pvp.approach_entity(entity, distance=3)
+        return True
+    else:
+        return False
+
+
+@strategy
 def fight_monster(bot: "Bot") -> bool:
     """
     Directs the bot to fight the closest monster.
