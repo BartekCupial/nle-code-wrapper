@@ -17,7 +17,7 @@ def goto_boulder(bot: "Bot") -> bool:
     Moves the agent adjacent to the closest boulder.
     """
     # 1) check if we are standing next to a boulder
-    boulder = utils.isin(bot.current_level.objects, G.BOULDER)
+    boulder = utils.isin(bot.glyphs, G.BOULDER)
     positions = np.argwhere(boulder)
     if len(positions) == 0:
         return False  # no boulders
@@ -36,7 +36,7 @@ def goto_boulder_closest_to_river(bot: "Bot") -> bool:
     Moves the agent to closest boulder to river.
     """
     # 1) check if we are standing next to a boulder
-    boulder = utils.isin(bot.current_level.objects, G.BOULDER)
+    boulder = utils.isin(bot.glyphs, G.BOULDER)
     boulder_positions = np.argwhere(boulder)
     if len(boulder_positions) == 0:
         return False  # no boulders
@@ -63,7 +63,7 @@ def get_adjacent_boulder(bot: "Bot"):
     for i, j in itertools.product([-1, 0, 1], repeat=2):
         if i == 0 and j == 0:
             continue
-        if bot.current_level.objects[bot_pos[0] + i, bot_pos[1] + j] in G.BOULDER:
+        if bot.glyphs[bot_pos[0] + i, bot_pos[1] + j] in G.BOULDER:
             return (bot_pos[0] + i, bot_pos[1] + j)
     return None
 
@@ -157,27 +157,18 @@ def push_boulder_into_river(bot: "Bot") -> bool:
     push_boulder_to_pos(bot, boulder_pos, tuple(target_pos))
 
 
-def find_furthest_walkable_position(bot: "Bot", start_pos, dir):
-    positions = np.argwhere(bot.current_level.walkable)
+def find_furthest_reachable_position(bot: "Bot", start_pos, dir):
+    positions, distances = zip(*bot.pathfinder.distances(start_pos).items())
+    positions, distances = np.array(positions), np.array(distances)
 
     # Calculate projections along the direction
     projections = np.dot(positions, dir)
 
-    # Find the maximum projection value
-    max_projection = np.max(projections)
+    # filter with maximum projection value
+    positions, distances = positions[projections == max(projections)], distances[projections == max(projections)]
 
-    # Get all positions that have the maximum projection
-    furthest_positions = positions[projections == max_projection]
-
-    if len(furthest_positions) == 1:
-        return tuple(furthest_positions[0])
-
-    # If multiple positions exist at the furthest distance,
     # find the one closest to current position
-    distances_to_pos = np.sum(np.abs(furthest_positions - start_pos), axis=1)
-    closest_index = np.argmin(distances_to_pos)
-
-    return tuple(furthest_positions[closest_index])
+    return positions[np.argmin(distances)]
 
 
 def find_intersections(pos1, pos2):
@@ -203,7 +194,7 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
 
     # 3) find vertical position which aligns horizontally with furthest water position
     dir = bot.pathfinder.direction_movements["east"]
-    river_bridge_pos = find_furthest_walkable_position(bot, boulder_pos, dir)
+    river_bridge_pos = find_furthest_reachable_position(bot, boulder_pos, dir)
     intersections = find_intersections(boulder_pos, river_bridge_pos)
     target_pos = [pos for pos in intersections if bot.current_level.walkable[pos]][0]
 
