@@ -23,7 +23,7 @@ class Pvp:
         self.ray_simulator = RaySimulator(bot)
 
         # How close the bot must be to the target entity to attack it.
-        self.attack_range = 1
+        self.melee_range = 1
 
     def update(self):
         # Updates the bot's target.
@@ -83,7 +83,7 @@ class Pvp:
         # 1) when we are fighting multiple monsters, we want to keep fighting
         # 2) when we are fighting one monster and another monster appears, we want to stop fighting
         def melee_action():
-            if self.approach_target(self.target.position, self.attack_range):
+            if self.approach_target(self.target.position, self.melee_range):
                 return True
 
             # TODO: what about neutral monsters? we need to confirm attack
@@ -92,12 +92,12 @@ class Pvp:
 
         self.handle_combat(entity, melee_action)
 
-    def _simulate_rays(self):
+    def _simulate_rays(self, ray_range):
         ray_simulations = []
         for i, j in itertools.product([-1, 0, 1], repeat=2):
             if i == 0 and j == 0:
                 continue
-            hit_targets = self.ray_simulator.simulate_ray(self.bot.entity.position, (i, j))
+            hit_targets = self.ray_simulator.simulate_ray(self.bot.entity.position, (i, j), ray_range=ray_range)
             ray_simulations.append((hit_targets, (i, j)))
 
         return ray_simulations
@@ -115,11 +115,11 @@ class Pvp:
         best = sorted_rays[0]
         return (
             best[1],  # best_ray
-            best[0][self.target.position],  # best_hit
+            best[0][self.target.position],  # target_hit
             best[0][self.bot.entity.position],  # self_hit
         )
 
-    def find_best_offensive_wand(self):
+    def _find_best_offensive_wand(self):
         items = self.bot.inventory["wands"]
 
         # First try wands of death, then cold, then any other wands
@@ -138,7 +138,7 @@ class Pvp:
 
     def _execute_wand_zap(self, best_ray):
         """Execute the wand zap action"""
-        wand = self.find_best_offensive_wand()
+        wand = self._find_best_offensive_wand()
         if not wand:
             return False
 
@@ -149,12 +149,28 @@ class Pvp:
 
     def zap_wand(self, entity: Entity):
         def wand_action():
-            ray_simulations = self._simulate_rays()
-            best_ray, best_hit, self_hit = self._get_best_ray(ray_simulations)
+            # 1) check if we have a wand
+            if self._find_best_offensive_wand() is None:
+                return False
 
-            if best_hit > 0.8 and self_hit < 0.2:
+            # 2) come in range of the target
+            if self.approach_target(self.target.position, self.ray_simulator.min_range):
+                return True
+
+            # try to be optimistic about ray_distance
+            ray_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
+            best_ray, target_hit, self_hit = self._get_best_ray(ray_simulations)
+
+            # 3) zap the wand if criteria are met
+            if target_hit > 0.8 and self_hit < 0.2:
                 return self._execute_wand_zap(best_ray)
+            # 4) if we can't zap, try to move closer
             else:
-                return self.approach_target(self.target.position)
+                # 5) try to move closer
+                if len(self.bot.pathfinder.get_path_to(self.target.position)) - 1 > self.melee_range:
+                    return self.approach_target(self.target.position)
+                # 6) we are in melee range, but we can't zap the wand (e.g. we are near a wall), abort
+                else:
+                    return False
 
         self.handle_combat(entity, wand_action)
