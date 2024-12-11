@@ -83,6 +83,7 @@ def push_boulder_direction(bot: "Bot", direction) -> bool:
     opposite_dir = tuple(np.array(dir) * -1)
     bot.pathfinder.goto(tuple(np.array(boulder_pos) + opposite_dir))
     bot.pathfinder.move(tuple(np.array(bot.entity.position) + dir))
+
     return True
 
 
@@ -129,6 +130,8 @@ def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
     for move in movements:
         bot.pathfinder.move(tuple(np.array(bot.entity.position) + move))
 
+    return True
+
 
 @strategy
 def push_boulder_into_river(bot: "Bot") -> bool:
@@ -154,7 +157,7 @@ def push_boulder_into_river(bot: "Bot") -> bool:
     target_pos = valid_positions[np.argmin(np.sum(np.abs(valid_positions - boulder_pos), axis=1))]
 
     # 4) push the boulder into the river
-    push_boulder_to_pos(bot, boulder_pos, tuple(target_pos))
+    return push_boulder_to_pos(bot, boulder_pos, tuple(target_pos))
 
 
 def find_furthest_reachable_position(bot: "Bot", start_pos, dir):
@@ -196,7 +199,14 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
     dir = bot.pathfinder.direction_movements["east"]
     river_bridge_pos = find_furthest_reachable_position(bot, boulder_pos, dir)
     intersections = find_intersections(boulder_pos, river_bridge_pos)
+
+    # boulder is already aligned
+    if np.any(np.all(river_bridge_pos == intersections, axis=1)) and np.any(
+        np.all(np.array(boulder_pos) == intersections, axis=1)
+    ):
+        return False
+
     target_pos = [pos for pos in intersections if bot.current_level.walkable[pos]][0]
 
     # 4) align the horizontally boulder with the furthest water position
-    push_boulder_to_pos(bot, boulder_pos, target_pos)
+    return push_boulder_to_pos(bot, boulder_pos, target_pos)
