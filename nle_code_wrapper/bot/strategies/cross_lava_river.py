@@ -79,8 +79,10 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
     closest_position = positions[np.argmin(distances)]
 
     # imagine that we are levitating to compute path to cross lava
+    lev = bot.pathfinder.movements.levitating
     bot.pathfinder.movements.levitating = True
     path = bot.pathfinder.get_path_to(tuple(closest_position))
+    bot.pathfinder.movements.levitating = lev
 
     return path
 

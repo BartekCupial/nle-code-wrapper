@@ -72,7 +72,7 @@ class Level:
         doors_closed_mask = utils.isin(self.objects, G.DOOR_CLOSED)
         self.objects[doors_closed_mask & mask] = glyphs[doors_closed_mask & mask] + 2  # from closed to opened doors
 
-        mask = utils.isin(glyphs, G.WALL, G.DOOR_CLOSED, G.BARS, frozenset({SS.S_lava}))
+        mask = utils.isin(glyphs, G.WALL, G.DOOR_CLOSED, G.BARS, G.BOULDER, frozenset({SS.S_lava, SS.S_water}))
         self.seen[mask] = True
         self.objects[mask] = glyphs[mask]
         self.walkable[mask] = False

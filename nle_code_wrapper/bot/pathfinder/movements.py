@@ -47,7 +47,7 @@ class Movements:
     def walkable_cardinal(self, pos: Tuple[int64, int64]) -> bool:
         level = self.bot.current_level
         glyph_walkable = level.walkable[pos]
-        if self.levitating and level.objects[pos] == SS.S_lava:
+        if self.levitating and level.objects[pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
             glyph_walkable = True
         walkable = glyph_walkable and not (level.objects[pos] in G.BOULDER)
         return walkable
@@ -90,7 +90,7 @@ class Movements:
         # the character can only move diagonally if his or her total inventory weight is 600 or less.
         # Otherwise, "You are carrying too much to get through."
         glyph_walkable = level.walkable[new_pos]
-        if self.levitating and level.objects[new_pos] == SS.S_lava:
+        if self.levitating and level.objects[new_pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
             glyph_walkable = True
         walkable = (
             # can we walk there
