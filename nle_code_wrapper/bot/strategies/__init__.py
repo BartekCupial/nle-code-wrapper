@@ -72,6 +72,16 @@ from nle_code_wrapper.bot.strategies.goto import (
 )
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup_items import pickup_items
+from nle_code_wrapper.bot.strategies.push_boulder import (
+    align_boulder_for_bridge,
+    goto_boulder,
+    goto_boulder_closest_to_river,
+    push_boulder_east,
+    push_boulder_into_river,
+    push_boulder_north,
+    push_boulder_south,
+    push_boulder_west,
+)
 from nle_code_wrapper.bot.strategies.quaff import quaff_potion_from_inv
 from nle_code_wrapper.bot.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategies.run_away import run_away
@@ -152,6 +162,14 @@ __all__ = [
     open_doors_kick,
     open_doors_key,
     pickup_items,
+    align_boulder_for_bridge,
+    goto_boulder,
+    goto_boulder_closest_to_river,
+    push_boulder_east,
+    push_boulder_into_river,
+    push_boulder_north,
+    push_boulder_south,
+    push_boulder_west,
     quaff_potion_from_inv,
     random_move,
     run_away,
