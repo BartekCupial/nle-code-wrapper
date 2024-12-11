@@ -153,7 +153,25 @@ class Pvp:
         self.bot.pathfinder.direction(np.array(self.bot.entity.position) + best_ray)
         return True
 
-    def zap_wand(self, entity: Entity):
+    def zap_entity(self, entity: Entity):
+        def wand_action():
+            # 1) check if we have a wand
+            if self._find_best_offensive_wand() is None:
+                return False
+
+            # try to be optimistic about ray_distance
+            ray_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
+            best_ray, target_hit, self_hit = self._get_best_ray(ray_simulations)
+
+            # 3) zap the wand if criteria are met
+            if target_hit > 0.8 and self_hit < 0.2:
+                return self._execute_wand_zap(best_ray)
+            else:
+                return False
+
+        self.handle_combat(entity, wand_action)
+
+    def approach_and_zap_entity(self, entity: Entity):
         def wand_action():
             # 1) check if we have a wand
             if self._find_best_offensive_wand() is None:
