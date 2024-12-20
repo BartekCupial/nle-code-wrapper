@@ -153,7 +153,7 @@ class Pvp:
         self.bot.pathfinder.direction(np.array(self.bot.entity.position) + best_ray)
         return True
 
-    def zap_entity(self, entity: Entity):
+    def zap(self, entity: Entity):
         def wand_action():
             # 1) check if we have a wand
             if self._find_best_offensive_wand() is None:
@@ -171,7 +171,7 @@ class Pvp:
 
         self.handle_combat(entity, wand_action)
 
-    def approach_and_zap_entity(self, entity: Entity):
+    def approach_and_zap(self, entity: Entity):
         def wand_action():
             # 1) check if we have a wand
             if self._find_best_offensive_wand() is None:

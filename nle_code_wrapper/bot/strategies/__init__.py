@@ -52,7 +52,7 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_west,
 )
 from nle_code_wrapper.bot.strategies.explore_items import explore_items
-from nle_code_wrapper.bot.strategies.fight_monster import fight_monster
+from nle_code_wrapper.bot.strategies.fight_monster import fight_monster, fight_multiple_monsters
 from nle_code_wrapper.bot.strategies.goto import (
     goto_corridor,
     goto_corridor_east,
@@ -151,6 +151,7 @@ __all__ = [
     explore_room_west,
     explore_items,
     fight_monster,
+    fight_multiple_monsters,
     goto_corridor,
     goto_corridor_east,
     goto_corridor_north,
