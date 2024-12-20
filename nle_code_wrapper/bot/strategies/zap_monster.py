@@ -40,6 +40,6 @@ def approach_and_zap_monster(bot: "Bot"):
     )
 
     if entity:
-        return bot.pvp.approach_and_zap_entity(entity)
+        return bot.pvp.approach_and_zap(entity)
     else:
         return False

@@ -15,6 +15,8 @@ def goto(bot: "Bot", y: int, x: int) -> bool:
 
 
 def goto_closest(bot, positions):
+    positions = np.asanyarray(positions)
+
     # If no positions, return False
     if len(positions) == 0:
         return False
@@ -156,6 +158,10 @@ def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
         - Background (label 0) is excluded from features consideration
     """
     labeled_features, num_labels = feature_detection(bot)
+
+    # if there is only one feature (background), return empty array
+    if (labeled_features == labeled_features[0][0]).all():
+        return False
 
     level = bot.current_level
     unvisited_features = []

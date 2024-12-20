@@ -39,10 +39,7 @@ def repeat(func):
 
     @wraps(func)
     def wrapper(bot: "Bot", *args, **kwargs):
-        try:
-            while func(bot, *args, **kwargs):
-                pass
-        except BotPanic:
+        while func(bot, *args, **kwargs):
             pass
 
     return wrapper

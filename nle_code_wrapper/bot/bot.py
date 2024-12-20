@@ -201,6 +201,14 @@ class Bot:
         for i, j in itertools.product([-1, 0, 1], repeat=2):
             self.current_level.search_count[y + i, x + j] += 1
 
+    def wait(self) -> None:
+        if A.Command.SEARCH in self.env.actions:
+            self.search()
+        elif A.MiscDirection.WAIT in self.env.actions:
+            self.step(A.MiscDirection.WAIT)
+        else:
+            self.pathfinder.random_move()
+
     def type_text(self, text: str) -> None:
         for char in text:
             self.step(ord(char))
