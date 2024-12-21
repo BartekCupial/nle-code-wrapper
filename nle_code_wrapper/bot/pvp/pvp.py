@@ -181,9 +181,13 @@ class Pvp:
             if self.approach_target(self.target.position, self.ray_simulator.min_range):
                 return True
 
-            # try to be optimistic about ray_distance
-            ray_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
-            best_ray, target_hit, self_hit = self._get_best_ray(ray_simulations)
+            # be pessimisic for target hit and optimistic for self hit
+            max_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
+            min_simulations = self._simulate_rays(ray_range=self.ray_simulator.min_range)
+            # update self hits to be optimistic, leave rest pessimistic
+            for i in range(len(max_simulations)):
+                min_simulations[i][0][self.bot.entity.position] = max_simulations[i][0][self.bot.entity.position]
+            best_ray, target_hit, self_hit = self._get_best_ray(min_simulations)
 
             # 3) zap the wand if criteria are met
             if target_hit > 0.8 and self_hit < 0.2:
@@ -198,3 +202,22 @@ class Pvp:
                     return False
 
         self.handle_combat(entity, wand_action)
+
+    # def attack_ranged(self, entity: Entity):
+    #     self.target = entity
+    #     pathfinder = self.bot.pathfinder
+
+    #     try:
+    #         while self.target:
+    #             assert False
+    #     except EnemyAppeared:
+    #         pass
+    #     except Exception as e:
+    #         self.target = None
+    #         raise e
+
+    # def find_best_ranged_set(self):
+    #     items = self.bot.inventory["weapons"]
+
+    #     # First
+    #     assert False
