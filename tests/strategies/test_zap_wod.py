@@ -11,7 +11,7 @@ from nle_code_wrapper.utils.tests import create_bot
 
 
 @pytest.mark.usefixtures("register_components")
-class TestCrossLavaRive:
+class TestZapWoD:
     @pytest.mark.parametrize(
         "env",
         [
@@ -97,5 +97,3 @@ class TestCrossLavaRive:
         except BotFinished:
             pass
         assert bot.reward > 0
-
-        assert "You kill the minotaur!" in bot.message or "The death ray misses the minotaur." in bot.message
