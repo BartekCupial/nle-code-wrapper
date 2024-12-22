@@ -154,6 +154,9 @@ def push_boulder_into_river(bot: "Bot") -> bool:
     diff = water_positions - boulder_pos
     mask = np.all((diff == 0) & (dir == 0) | (diff * dir > 0) & (dir != 0), axis=1)
     valid_positions = water_positions[mask]
+    if len(valid_positions) == 0:
+        return None  # no river to the east
+
     target_pos = valid_positions[np.argmin(np.sum(np.abs(valid_positions - boulder_pos), axis=1))]
 
     # 4) push the boulder into the river
