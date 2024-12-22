@@ -51,8 +51,12 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_systematically_west,
     explore_room_west,
 )
-from nle_code_wrapper.bot.strategies.explore_items import explore_items
-from nle_code_wrapper.bot.strategies.fight_monster import fight_monster, fight_multiple_monsters
+from nle_code_wrapper.bot.strategies.fight_monster import (
+    fight_monster,
+    fight_multiple_monsters,
+    goto_tactical_position,
+    wait_for_monster,
+)
 from nle_code_wrapper.bot.strategies.goto import (
     goto_corridor,
     goto_corridor_east,
@@ -89,7 +93,6 @@ from nle_code_wrapper.bot.strategies.push_boulder import (
     push_boulder_south,
     push_boulder_west,
 )
-from nle_code_wrapper.bot.strategies.quaff import quaff_potion_from_inv
 from nle_code_wrapper.bot.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategies.run_away import run_away
 from nle_code_wrapper.bot.strategies.search import (
@@ -149,9 +152,10 @@ __all__ = [
     explore_room_systematically_south,
     explore_room_systematically_west,
     explore_room_west,
-    explore_items,
     fight_monster,
     fight_multiple_monsters,
+    goto_tactical_position,
+    wait_for_monster,
     goto_corridor,
     goto_corridor_east,
     goto_corridor_north,
@@ -187,7 +191,6 @@ __all__ = [
     push_boulder_north,
     push_boulder_south,
     push_boulder_west,
-    quaff_potion_from_inv,
     random_move,
     run_away,
     search_corridor_for_hidden_doors,
