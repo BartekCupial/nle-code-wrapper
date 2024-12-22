@@ -124,26 +124,33 @@ def find_tactical_positions(bot: "Bot", nearby_monsters: List[Entity]) -> List[T
 
     nx.set_node_attributes(graph, dict(zip(nodes, positions)), "positions")
 
-    for node in nx.articulation_points(graph):
-        tactical_spots.extend(bot.pathfinder.neighbors(tuple(graph._node[node]["positions"])))
-
-    for spot in tactical_spots:
-        bot.pathfinder.neighbors(spot)
-
-    def count_monsters_in_neighboring_tiles(spot, monsters):
+    def count_reachable_monsters(spot, monsters):
+        reachable_count = 0
         neighbors = bot.pathfinder.neighbors(spot)
-        monster_count = 0
 
         for neighbor in neighbors:
             for monster in monsters:
-                if monster.position == neighbor:
-                    monster_count += 1
+                # Check if there's a path from monster to neighbor, excluding the spot itself
+                path = bot.pathfinder.get_path_from_to(monster.position, neighbor)
+                if spot not in path:
+                    reachable_count += 1
+                    break  # Count this neighbor and move to the next
 
-        return monster_count
+        return reachable_count
 
-    # only consider spots which are not surrounded by monsters
-    tactical_spots = [
-        spot for spot in tactical_spots if count_monsters_in_neighboring_tiles(spot, nearby_monsters) <= 1
-    ]
+    def is_good_tactical_spot(spot, monsters):
+        reachable_monsters = count_reachable_monsters(spot, monsters)
+        return reachable_monsters <= 1
+
+    # Find articulation points (potential corridor/chokepoint positions)
+    for node in nx.articulation_points(graph):
+        pos = tuple(graph._node[node]["positions"])
+        # Check neighbors of articulation points
+        for neighbor in bot.pathfinder.neighbors(pos):
+            if is_good_tactical_spot(neighbor, nearby_monsters):
+                tactical_spots.append(neighbor)
+
+    # Remove duplicates while preserving order
+    tactical_spots = list(dict.fromkeys(tactical_spots))
 
     return tactical_spots
