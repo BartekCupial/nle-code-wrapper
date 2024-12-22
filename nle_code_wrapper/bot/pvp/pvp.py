@@ -108,10 +108,17 @@ class Pvp:
 
         return ray_simulations
 
-    def _get_best_ray(self, ray_simulations):
+    def _get_best_ray(self):
         """Find the best ray based on target damage and self damage"""
+        # be pessimisic for target hit and optimistic for self hit
+        max_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
+        min_simulations = self._simulate_rays(ray_range=self.ray_simulator.min_range)
+        # update self hits to be optimistic, leave rest pessimistic
+        for i in range(len(max_simulations)):
+            min_simulations[i][0][self.bot.entity.position] = max_simulations[i][0][self.bot.entity.position]
+
         sorted_rays = sorted(
-            ray_simulations,
+            min_simulations,
             key=lambda x: (
                 x[0][self.target.position],
                 -x[0][self.bot.entity.position],
@@ -159,9 +166,7 @@ class Pvp:
             if self._find_best_offensive_wand() is None:
                 return False
 
-            # try to be optimistic about ray_distance
-            ray_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
-            best_ray, target_hit, self_hit = self._get_best_ray(ray_simulations)
+            best_ray, target_hit, self_hit = self._get_best_ray()
 
             # 3) zap the wand if criteria are met
             if target_hit > 0.8 and self_hit < 0.2:
@@ -181,13 +186,7 @@ class Pvp:
             if self.approach_target(self.target.position, self.ray_simulator.min_range):
                 return True
 
-            # be pessimisic for target hit and optimistic for self hit
-            max_simulations = self._simulate_rays(ray_range=self.ray_simulator.max_range)
-            min_simulations = self._simulate_rays(ray_range=self.ray_simulator.min_range)
-            # update self hits to be optimistic, leave rest pessimistic
-            for i in range(len(max_simulations)):
-                min_simulations[i][0][self.bot.entity.position] = max_simulations[i][0][self.bot.entity.position]
-            best_ray, target_hit, self_hit = self._get_best_ray(min_simulations)
+            best_ray, target_hit, self_hit = self._get_best_ray()
 
             # 3) zap the wand if criteria are met
             if target_hit > 0.8 and self_hit < 0.2:
