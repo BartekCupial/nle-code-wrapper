@@ -170,7 +170,7 @@ class Bot:
                     self.current_strategy(self, *self.current_args)
                     self.current_strategy = None
                     self.current_args = None
-        except (BotPanic, BotFinished):
+        except (BotPanic, BotFinished) as e:
             self.current_strategy = None
             self.current_args = None
 
