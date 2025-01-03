@@ -1,5 +1,5 @@
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategies import explore, fight_all_monsters, goto_closest_staircase_down
+from nle_code_wrapper.bot.strategies import explore, fight_monster, goto_staircase_down
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args, register_minihack_components
 
 
@@ -7,8 +7,8 @@ def main():
     register_minihack_components()
     cfg = parse_minihack_args(argv=["--env=big_room_dark"])
     bot = Bot(cfg)
-    bot.strategy(fight_all_monsters)
-    bot.strategy(goto_closest_staircase_down)
+    bot.strategy(fight_monster)
+    bot.strategy(goto_staircase_down)
     bot.strategy(explore)
     bot.main()
 

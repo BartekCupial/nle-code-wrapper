@@ -1,0 +1,19 @@
+MAZE: "mylevel",' '
+INIT_MAP:solidfill,' '
+GEOMETRY:center,center
+MAP
+    ------
+    |....|
+    |....|
+    |....|
+-----....|
+|........|
+|........|
+|........|
+----------
+ENDMAP
+REGION:(0,0,9,8),lit,"ordinary"
+BRANCH:(7,7,7,7),(0,0,0,0)
+OBJECT:('/',"magic missile"),(7,7)
+MONSTER: ('F', "red mold"),(7,1),asleep
+MONSTER: ('x', "grid bug"),(1,7),asleep

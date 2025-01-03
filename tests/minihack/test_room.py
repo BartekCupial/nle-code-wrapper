@@ -3,7 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore_room, fight_closest_monster, goto_closest_staircase_down, run_away
+from nle_code_wrapper.bot.strategies import explore_room, fight_monster, goto_staircase_down, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -31,7 +31,7 @@ class TestMazewalkMapped(object):
         def solve(bot: "Bot"):
             while True:
                 try:
-                    if goto_closest_staircase_down(bot):
+                    if goto_staircase_down(bot):
                         pass
                     else:
                         explore_room(bot)
@@ -56,9 +56,9 @@ class TestMazewalkMapped(object):
         def general_fight(bot: "Bot"):
             while True:
                 try:
-                    if fight_closest_monster(bot):
+                    if fight_monster(bot):
                         pass
-                    elif goto_closest_staircase_down(bot):
+                    elif goto_staircase_down(bot):
                         pass
                     else:
                         explore_room(bot)
@@ -82,7 +82,7 @@ class TestMazewalkMapped(object):
         def general_traps(bot: "Bot"):
             while True:
                 try:
-                    if goto_closest_staircase_down(bot):
+                    if goto_staircase_down(bot):
                         pass
                     else:
                         explore_room(bot)
@@ -106,11 +106,9 @@ class TestMazewalkMapped(object):
         def general_smart_fight(bot: "Bot"):
             while True:
                 try:
-                    if multiple_monsters_adjacent(bot):
+                    if fight_monster(bot):
                         pass
-                    elif fight_closest_monster(bot):
-                        pass
-                    elif goto_closest_staircase_down(bot):
+                    elif goto_staircase_down(bot):
                         pass
                     else:
                         explore_room(bot)

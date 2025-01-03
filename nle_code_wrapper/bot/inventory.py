@@ -1,66 +1,233 @@
+from __future__ import annotations
+
 from typing import Dict, List
 
 import numpy as np
-from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemShopStatus
+from nle import nethack
+from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
+
+GLYPH_TO_OBJECT = {}
+for glyph in range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS):
+    obj = nethack.objclass(nethack.glyph_to_obj(glyph))
+    GLYPH_TO_OBJECT[glyph] = dict(
+        obj=obj, obj_class=obj.oc_class, obj_name=nethack.OBJ_NAME(obj), obj_description=nethack.OBJ_DESCR(obj)
+    )
+
+
+def get_object(full_name, obj_class):
+    candidates = []
+
+    for glyph, obj in GLYPH_TO_OBJECT.items():
+        if obj["obj_name"] is None:
+            continue
+
+        if obj["obj_name"] in full_name and obj["obj_class"] == chr(obj_class.value):
+            candidates.append((obj["obj_name"], obj["obj"]))
+
+    for glyph, obj in GLYPH_TO_OBJECT.items():
+        if obj["obj_description"] is None:
+            continue
+
+        if obj["obj_description"] in full_name and obj["obj_class"] == chr(obj_class.value):
+            candidates.append((obj["obj_description"], obj["obj"]))
+
+    if len(candidates) > 1:
+        # take longest match, example "dark green" will match with green and dark green, take dark green
+        candidates = [sorted(candidates, key=lambda x: len(x[0]), reverse=True)[0]]
+
+    assert len(candidates) == 1, f"Multiple candidates found: {candidates}"
+    return candidates[0][1]
+
+
+def get_object_name(obj):
+    return nethack.objdescr.from_idx(obj.oc_name_idx).oc_name
+
+
+def get_object_weight(obj):
+    """
+    Calculate the weight of the given object, including recursive calculation
+    of contained objects' weights.
+
+    Args:
+        obj: The object to calculate weight for
+
+    Returns:
+        int: Total weight of the object
+    """
+    # TODO: recursive calculation
+    return obj.oc_weight
+
+
+def arm_bonus(obj, enchantment: int, erosion: int):
+    return obj.a_ac + enchantment - min(erosion, obj.a_ac)
 
 
 class Item:
     def __init__(
         self,
-        letter: int,
-        name: np.ndarray,
-        oclass: int,
-        glyph: int,
-        shop_status: int = None,
-        value: int = None,
-        weight: int = None,
+        letter=None,
+        glyph=None,
+        full_name=None,
+        item_class=None,
+        beatitude=None,
+        enchantment=None,
+        erosion=None,
+        shop_status=None,  # TODO:
+        object=None,
+        name=None,
+        weight=None,
     ):
         self.letter = letter
-        self.name = "".join(map(chr, name)).rstrip("\x00")
-        self.item_class = ItemClasses(oclass)
         self.glyph = glyph
-
-        self.shop_status = ItemShopStatus(shop_status) if shop_status is not None else None
-        self.value = value
+        self.full_name = full_name
+        self.item_class = item_class
+        self.beatitude = beatitude
+        self.enchantment = enchantment
+        self.erosion = erosion
+        self.shop_status = shop_status
+        self.object = object
+        self.name = name
         self.weight = weight
 
-    @property
-    def beatitude(self):
-        if "blessed" in self.name:
-            return ItemBeatitude.BLESSED
-        elif "uncursed" in self.name:
-            return ItemBeatitude.UNCURSED
-        elif "cursed" in self.name:
-            return ItemBeatitude.CURSED
-        else:
-            return ItemBeatitude.UNKNOWN
+    @staticmethod
+    def from_inv(inv_letter, inv_str, inv_oclass, inv_glyph):
+        full_name = "".join(map(chr, inv_str)).rstrip("\x00")
+        item_class = ItemClasses.from_oclass(inv_oclass)
+        beatitude = ItemBeatitude.from_name(full_name)
+        enchantment = ItemEnchantment.from_name(full_name)
+        erosion = ItemErosion.from_name(full_name)
+        object = get_object(full_name, item_class)
+        name = get_object_name(object)
+        weight = get_object_weight(object)
+
+        return Item(
+            letter=inv_letter,
+            glyph=inv_glyph,
+            full_name=full_name,
+            item_class=item_class,
+            beatitude=beatitude,
+            enchantment=enchantment,
+            erosion=erosion,
+            object=object,
+            name=name,
+            weight=weight,
+        )
+
+    @staticmethod
+    def from_obj(obj):
+        object = obj
+        name = get_object_name(object)
+        weight = get_object_weight(object)
+
+        item_class = ItemClasses.from_oclass(obj.oc_class)
+        inv_glyph = [glyph for glyph, o in GLYPH_TO_OBJECT.items() if o["obj"] == obj][0]
+
+        return Item(
+            glyph=inv_glyph,
+            item_class=item_class,
+            object=object,
+            name=name,
+            weight=weight,
+        )
+
+    def __str__(self):
+        return f"{chr(self.letter)}) {self.full_name}"
+
+    def __repr__(self):
+        return f"{chr(self.letter)}) {self.full_name})"
 
     @property
     def in_use(self):
-        if "(" in self.name:
+        if "(" in self.full_name:
             return True
         else:
             return False
 
     @property
     def quantity(self):
-        if self.name.split(" ")[0].isdigit():
-            return int(self.name.split(" ")[0])
+        if self.full_name.split(" ")[0].isdigit():
+            return int(self.full_name.split(" ")[0])
         else:
             return 1
 
-    @property
-    def enchantment(self):
-        if "+" in self.name:
-            ench = int(self.name.split("+")[1].split(" ")[0])
-        elif "-" in self.name:
-            ench = int(self.name.split("-")[1].split(" ")[0])
-        else:
-            ench = None
-        return ItemEnchantment(ench)
+    """
+    WEAPON
+    """
 
-    def __str__(self):
-        return f"{chr(self.letter)}) {self.name}"
+    @property
+    def is_weapon(self):
+        return self.item_class == ItemClasses.WEAPONS
+
+    @property
+    def is_launcher(self):
+        if not self.is_weapon:
+            return False
+
+        return self.name in ["bow", "long bow", "elven bow", "orcish bow", "yumi", "crossbow", "sling"]
+
+    @property
+    def is_firing_projectile(self, launcher: Item = None):
+        if not self.is_weapon:
+            return False
+
+        arrows = ["arrow", "elven arrow", "orcish arrow", "silver arrow", "ya"]
+
+        if launcher is None:
+            return arrows + ["crossbow bolt"]  # TODO: sling ammo
+
+        if launcher.name == "crossbow":
+            return self.name == "crossbow bolt"
+
+        if launcher.name == "sling":
+            # TODO: implement sling ammo validation
+            return False
+
+        bows = ["bow", "long bow", "elven bow", "orcish bow", "yumi"]
+        if launcher.name in bows:
+            return self.name in arrows
+
+        raise ValueError(f"Unknown launcher type: {launcher.name}")
+
+    @property
+    def is_thrown_projectile(self):
+        if not self.is_weapon:
+            return False
+
+        return self.name in [
+            "boomerang",
+            "dagger",
+            "elven dagger",
+            "orcish dagger",
+            "silver dagger",
+            "worm tooth",
+            "crysknife",
+            "knife",
+            "athame",
+            "scalpel",
+            "stiletto",
+            "dart",
+            "shuriken",
+        ]
+
+    """
+    ARMOR
+    """
+
+    @property
+    def is_armor(self):
+        return self.item_class == ItemClasses.ARMOR
+
+    @property
+    def arm_bonus(self):
+        return arm_bonus(self.object, self.enchantment.value, self.erosion.value)
+
+    """
+    TOOLS
+    """
+
+    @property
+    def is_key(self):
+        return self.item_class == ItemClasses.TOOLS and self.name in ["skeleton key", "lock pick", "credit card"]
 
 
 class Inventory:
@@ -75,7 +242,7 @@ class Inventory:
             if letter == 0:
                 break
 
-            item = Item(letter, name, oclass, glyph)
+            item = Item.from_inv(letter, name, oclass, glyph)
             self.items.append(item)
 
         self.inventory: Dict[str, List[Item]] = {}

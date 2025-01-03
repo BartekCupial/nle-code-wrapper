@@ -10,10 +10,10 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_room,
-    fight_all_monsters,
-    goto_closest_staircase_down,
-    goto_closest_unexplored_corridor,
-    goto_closest_unexplored_room,
+    fight_monster,
+    goto_staircase_down,
+    goto_unexplored_corridor,
+    goto_unexplored_room,
     open_doors_kick,
     random_move,
 )
@@ -24,7 +24,7 @@ from nle_code_wrapper.utils import utils
 
 def general_mini(bot: "Bot", where, action):
     while True:
-        fight_all_monsters(bot)
+        fight_monster(bot)
         explore_room(bot)
         goto(bot, where, action)
 
@@ -99,14 +99,18 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_mini_locked(self, env, seed):
         cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        bot = Bot(cfg)
 
-        bot.strategy(open_doors_kick)
-        bot.strategy(explore_room)
-        bot.strategy(goto_closest_staircase_down)
+        def solve(bot: "Bot"):
+            while True:
+                try:
+                    open_doors_kick(bot)
+                    explore_room(bot)
+                    goto_staircase_down(bot)
+                except BotPanic:
+                    pass
 
-        cfg.strategies = [open_doors_kick, explore_room, goto_closest_staircase_down]
-        status = play(cfg)
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize("env", ["MiniHack-LockedDoor-v0"])
@@ -119,9 +123,9 @@ class TestMazewalkMapped(object):
                 try:
                     open_doors_kick(bot)
                     explore_room(bot)
-                    goto_closest_unexplored_corridor(bot)
-                    goto_closest_unexplored_room(bot)
-                    goto_closest_staircase_down(bot)
+                    goto_unexplored_corridor(bot)
+                    goto_unexplored_room(bot)
+                    goto_staircase_down(bot)
                 except BotPanic:
                     pass
 

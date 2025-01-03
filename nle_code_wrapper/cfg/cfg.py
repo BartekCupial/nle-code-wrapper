@@ -14,3 +14,10 @@ def add_code_wrapper_cli_args(p: ArgumentParser) -> None:
         help="where to search for strategies implementation",
     )
     p.add_argument("--max_strategy_steps", type=int, default=1000, help="Strategy episode horizon.")
+    p.add_argument("--panics", type=ast.literal_eval, default=[], help="List of panic names")
+    p.add_argument(
+        "--panics_loc",
+        type=str,
+        default="nle_code_wrapper.bot.panics",
+        help="where to search for panics implementation",
+    )

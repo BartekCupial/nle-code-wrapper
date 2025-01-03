@@ -21,14 +21,15 @@ def more(bot: Bot) -> bool:
 
 @strategy
 def letter_strategy(bot: Bot, letter: str) -> bool:
-    # only use the letter strategy if the bot is asking for a letter
     if bot.cursor[0] == [0]:
-        bot.step(ord(letter))
         # Note:we don't want to count strategy steps when we are typing a letter
         bot.strategy_steps -= 1
-        return True
-    else:
-        return False
+    # TODO: for now allow typing letters because:
+    #       1) inventory cannot be shown when we allow letters only on first row
+    #       2) sometimes we need to type a letter when we are asked about the item pile "Pick up what?"
+    #       3) sometimes we need to type a letter when looting a chest
+    bot.step(ord(letter))
+    return True
 
 
 @strategy
@@ -45,10 +46,18 @@ def direction_strategy(
 
 class NLECodeWrapper(gym.Wrapper):
     def __init__(
-        self, env: GymV21CompatibilityV0, strategies: List[Callable], max_strategy_steps: int = 100, gamma: float = 0.99
+        self,
+        env: GymV21CompatibilityV0,
+        strategies: List[Callable],
+        panics: List[Callable],
+        max_strategy_steps: int = 100,
+        gamma: float = 0.99,
     ) -> None:
         super().__init__(env)
         self.bot = Bot(env, max_strategy_steps=max_strategy_steps)
+
+        for panic_func in panics:
+            self.bot.panic(panic_func)
 
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)

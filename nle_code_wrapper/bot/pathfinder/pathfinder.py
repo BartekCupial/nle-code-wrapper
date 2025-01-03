@@ -38,8 +38,24 @@ class Pathfinder:
 
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
-        self.movements: Movements = Movements(bot)
+        self.movements = bot.movements
         self.search = ChebyshevSearch(self.movements)
+
+    @property
+    def direction_movements(self) -> Dict[str, Tuple[int, int]]:
+        return {
+            "west": (0, -1),
+            "east": (0, 1),
+            "north": (-1, 0),
+            "south": (1, 0),
+            "northwest": (-1, -1),
+            "northeast": (-1, 1),
+            "southwest": (1, -1),
+            "southeast": (1, 1),
+        }
+
+    def set_movements(self, movements: Movements):
+        self.movements = movements
 
     def astar(
         self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
@@ -76,7 +92,10 @@ class Pathfinder:
             List[Tuple[int64, int64]]: Path from start
         """
         result = self.search.astar(start, goal)
-        return result
+        if result is None:
+            return None
+        else:
+            return list(result)
 
     def random_move(self) -> None:
         """
@@ -152,8 +171,7 @@ class Pathfinder:
             path = self.get_path_to(goal)
             if path is None:
                 raise BotPanic("end point is no longer accessible")
-            orig_path = list(path)
-            path = orig_path[1:]
+            path = path[1:]
 
             # TODO: implement fast_goto
             # if fast and len(path) > 2:
@@ -162,7 +180,12 @@ class Pathfinder:
 
             for point in path:
                 # TODO: check if there is peaceful monster
-                if not self.bot.current_level.walkable[point]:
+                cardinal = np.abs(np.array(self.bot.entity.position) - point).sum() == 1
+                if cardinal:
+                    walkable = self.movements.walkable_cardinal(point)
+                else:
+                    walkable = self.movements.walkable_intermediate(self.bot.entity.position, point)
+                if not walkable:
                     cont = True
                     break
                 self.move(point)
@@ -208,3 +231,6 @@ class Pathfinder:
 
         idx = np.argmin(n_dist)
         return neighbors[idx]
+
+    def update(self):
+        self.movements.update()

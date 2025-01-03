@@ -95,7 +95,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         [
             n
             for n in np.argwhere(current_corridor)
-            if len(bot.pathfinder.neighbors(tuple(n), cardinal_only=True)) == 1 and level.search_count[tuple(n)] < 40
+            if len(bot.pathfinder.neighbors(tuple(n), cardinal_only=True)) <= 1 and level.search_count[tuple(n)] < 40
         ]
     )
 

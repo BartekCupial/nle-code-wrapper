@@ -6,7 +6,7 @@ from nle_utils.scripts.play_nethack import get_action as play_using_nethack
 
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 from nle_code_wrapper.envs.custom.custom_env import CUSTOM_ENVS, make_custom_env
-from nle_code_wrapper.utils.play import play_using_strategies
+from nle_code_wrapper.utils.play import play_using_strategies_autocomplete
 
 
 def register_custom_envs():
@@ -31,7 +31,7 @@ def main():
     cfg = parse_custom_args()
 
     if cfg.code_wrapper:
-        play(cfg, get_action=play_using_strategies)
+        play(cfg, get_action=play_using_strategies_autocomplete)
     else:
         play(cfg, get_action=play_using_nethack)
 

@@ -15,6 +15,8 @@ def goto(bot: "Bot", y: int, x: int) -> bool:
 
 
 def goto_closest(bot, positions):
+    positions = np.asanyarray(positions)
+
     # If no positions, return False
     if len(positions) == 0:
         return False
@@ -27,7 +29,7 @@ def goto_closest(bot, positions):
     return True
 
 
-def goto_closest_object(bot: "Bot", object_type: frozenset[int]) -> bool:
+def goto_object(bot: "Bot", object_type: frozenset[int]) -> bool:
     """
     Directs the bot to move towards the object on the current level.
     This function attempts to find the coordinates of the object on the current level
@@ -44,7 +46,7 @@ def goto_closest_object(bot: "Bot", object_type: frozenset[int]) -> bool:
     return goto_closest(bot, item_positions)
 
 
-def goto_closest_glyph(bot: "Bot", object_type: frozenset[int]) -> bool:
+def goto_glyph(bot: "Bot", object_type: frozenset[int]) -> bool:
     """
     Directs the bot to move towards the object on the current level.
     This function attempts to find the coordinates of the object on the current level
@@ -62,22 +64,26 @@ def goto_closest_glyph(bot: "Bot", object_type: frozenset[int]) -> bool:
 
 
 @strategy
-def goto_closest_item(bot: "Bot") -> bool:
-    return goto_closest_glyph(bot, G.ITEMS)
+def goto_item(bot: "Bot") -> bool:
+    return goto_glyph(bot, G.ITEMS)
 
 
 @strategy
-def goto_closest_staircase_down(bot: "Bot") -> bool:
-    return goto_closest_object(bot, G.STAIR_DOWN)
+def goto_staircase_down(bot: "Bot") -> bool:
+    return goto_object(bot, G.STAIR_DOWN)
 
 
 @strategy
-def goto_closest_staircase_up(bot: "Bot") -> bool:
-    return goto_closest_object(bot, G.STAIR_UP)
+def goto_staircase_up(bot: "Bot") -> bool:
+    return goto_object(bot, G.STAIR_UP)
 
 
 def get_other_features(bot: "Bot", feature_detection):
     labeled_features, num_labels = feature_detection(bot)
+
+    # if there is only one feature (background), return empty array
+    if (labeled_features == labeled_features[0][0]).all():
+        return np.array([])
 
     my_position = bot.entity.position
     level = bot.current_level
@@ -95,7 +101,7 @@ def get_other_features(bot: "Bot", feature_detection):
     return np.array(unvisited_features)
 
 
-def goto_closest_feature_direction(bot: "Bot", direction: str, feature_detection) -> bool:
+def goto_feature_direction(bot: "Bot", direction: str, feature_detection) -> bool:
     """
     Directs the bot to the closest room in the level.
 
@@ -133,7 +139,7 @@ def goto_closest_feature_direction(bot: "Bot", direction: str, feature_detection
     return False
 
 
-def goto_closest_unexplored_feature(bot: "Bot", feature_detection) -> bool:
+def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
     """
     Directs the bot to the closest unexplored feature in the level.
 
@@ -153,6 +159,10 @@ def goto_closest_unexplored_feature(bot: "Bot", feature_detection) -> bool:
     """
     labeled_features, num_labels = feature_detection(bot)
 
+    # if there is only one feature (background), return empty array
+    if (labeled_features == labeled_features[0][0]).all():
+        return False
+
     level = bot.current_level
     unvisited_features = []
     # exclude 0 because this is background
@@ -170,60 +180,60 @@ def goto_closest_unexplored_feature(bot: "Bot", feature_detection) -> bool:
 
 
 @strategy
-def goto_closest_unexplored_room(bot: "Bot") -> bool:
-    return goto_closest_unexplored_feature(bot, room_detection)
+def goto_unexplored_room(bot: "Bot") -> bool:
+    return goto_unexplored_feature(bot, room_detection)
 
 
 @strategy
-def goto_closest_unexplored_corridor(bot: "Bot") -> bool:
-    return goto_closest_unexplored_feature(bot, corridor_detection)
+def goto_unexplored_corridor(bot: "Bot") -> bool:
+    return goto_unexplored_feature(bot, corridor_detection)
 
 
 @strategy
-def goto_closest_corridor_west(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "west", corridor_detection)
+def goto_corridor_west(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "west", corridor_detection)
 
 
 @strategy
-def goto_closest_corridor_east(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "east", corridor_detection)
+def goto_corridor_east(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "east", corridor_detection)
 
 
 @strategy
-def goto_closest_corridor_north(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "north", corridor_detection)
+def goto_corridor_north(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "north", corridor_detection)
 
 
 @strategy
-def goto_closest_corridor_south(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "south", corridor_detection)
+def goto_corridor_south(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "south", corridor_detection)
 
 
 @strategy
-def goto_closest_corridor(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "all", corridor_detection)
+def goto_corridor(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "all", corridor_detection)
 
 
 @strategy
-def goto_closest_room_west(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "west", room_detection)
+def goto_room_west(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "west", room_detection)
 
 
 @strategy
-def goto_closest_room_east(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "east", room_detection)
+def goto_room_east(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "east", room_detection)
 
 
 @strategy
-def goto_closest_room_north(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "north", room_detection)
+def goto_room_north(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "north", room_detection)
 
 
 @strategy
-def goto_closest_room_south(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "south", room_detection)
+def goto_room_south(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "south", room_detection)
 
 
 @strategy
-def goto_closest_room(bot: "Bot") -> bool:
-    return goto_closest_feature_direction(bot, "all", room_detection)
+def goto_room(bot: "Bot") -> bool:
+    return goto_feature_direction(bot, "all", room_detection)

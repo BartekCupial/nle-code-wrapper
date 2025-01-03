@@ -1,12 +1,14 @@
 import itertools
-from typing import Tuple
+from typing import TYPE_CHECKING, Tuple
 
 import numpy as np
 from nle_utils.glyph import SS, G
 from PIL import Image
 from scipy import ndimage
 
-from nle_code_wrapper.bot import Bot
+if TYPE_CHECKING:
+    from nle_code_wrapper.bot import Bot
+
 from nle_code_wrapper.utils import utils
 
 
@@ -71,12 +73,11 @@ def label_dungeon_features(bot: "Bot"):
             - num_corridors (int): The number of labeled corridors.
     """
     level = bot.current_level
-    position = bot.entity.position
     structure = ndimage.generate_binary_structure(2, 1)
 
     # rooms
     room_floor = frozenset({SS.S_room, SS.S_darkroom})
-    rooms = utils.isin(level.objects, room_floor, G.STAIR_DOWN, G.STAIR_UP)
+    rooms = utils.isin(level.objects, room_floor)
     labeled_rooms, num_rooms = ndimage.label(rooms, structure=structure)
 
     # corridors
@@ -92,24 +93,29 @@ def label_dungeon_features(bot: "Bot"):
     labeled_features[rooms] = labeled_rooms[rooms]
     labeled_features[corridors] = labeled_corridors[corridors] + num_rooms
 
-    # include our position
-    # if all neighbors which are dungeon features have the same label
-    neighbors = []
-    for x, y in itertools.product([-1, 0, 1], repeat=2):
-        if x == 0 and y == 0:
-            continue
+    def label_walkable_features(position):
+        # if all neighbors which are dungeon features have the same label
+        neighbors = []
+        for x, y in itertools.product([-1, 0, 1], repeat=2):
+            if x == 0 and y == 0:
+                continue
 
-        neighbor = labeled_features[position[0] + y, position[1] + x]
-        if neighbor != 0:
-            neighbors.append(neighbor)
-    neighbors = np.array(neighbors)
+            neighbor = labeled_features[position[0] + y, position[1] + x]
+            if neighbor != 0:
+                neighbors.append(neighbor)
+        neighbors = np.array(neighbors)
 
-    if len(neighbors) > 0:
-        # if all neighbors are rooms or corridors
-        if np.all(neighbors <= num_rooms):
-            rooms[position] = True
-        else:
-            corridors[position] = True
+        if len(neighbors) > 0:
+            # if all neighbors are rooms or corridors
+            if np.all(neighbors <= num_rooms):
+                rooms[position] = True
+            else:
+                corridors[position] = True
+
+    # missing features (items, corpses, monsters, chests, etc.)
+    # this includes our position
+    for p in np.argwhere(np.logical_and(level.walkable, labeled_features == 0)):
+        label_walkable_features(tuple(p))
 
     # we include doors only at the end to be able to detect if we are standing on the door, overall we treat doors as part of the corridor
     corridors[doors] = True

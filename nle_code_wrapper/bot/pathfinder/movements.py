@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING, Any, List, Tuple, Union
 
-from nle_utils.glyph import C, G
+from nle import nethack
+from nle_utils.glyph import SS, C, G
 from nle_utils.level import Level as DungeonLevel
 from numpy import int64
 
@@ -33,9 +34,10 @@ class Movements:
     The player can only move diagonally if his or her total inventory weight is 600 or less.  Otherwise, the player will receive the message "You are carrying too much to get through."
     """
 
-    def __init__(self, bot: "Bot", allow_walking_through_traps: bool = True) -> None:
+    def __init__(self, bot: "Bot", allow_walking_through_traps: bool = True, levitating: bool = False) -> None:
         self.bot: "Bot" = bot
         self.allow_walking_through_traps = allow_walking_through_traps
+        self.levitating = levitating
 
     @property
     def walkable_diagonally(self) -> bool:
@@ -44,7 +46,10 @@ class Movements:
 
     def walkable_cardinal(self, pos: Tuple[int64, int64]) -> bool:
         level = self.bot.current_level
-        walkable = level.walkable[pos] and not (level.objects[pos] in G.BOULDER)
+        glyph_walkable = level.walkable[pos]
+        if self.levitating and level.objects[pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
+            glyph_walkable = True
+        walkable = glyph_walkable and not (level.objects[pos] in G.BOULDER)
         return walkable
 
     def get_move_cardinal(
@@ -84,9 +89,12 @@ class Movements:
         # TODO: handle moving diagonally when heavy
         # the character can only move diagonally if his or her total inventory weight is 600 or less.
         # Otherwise, "You are carrying too much to get through."
+        glyph_walkable = level.walkable[new_pos]
+        if self.levitating and level.objects[new_pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
+            glyph_walkable = True
         walkable = (
             # can we walk there
-            level.walkable[new_pos]
+            glyph_walkable
             # cannot move diagonally throught doors and boulders
             and not level.objects[new_pos] in frozenset.union(G.BOULDER, G.DOOR_OPENED)
             and not level.objects[pos] in frozenset.union(G.BOULDER, G.DOOR_OPENED)
@@ -138,3 +146,9 @@ class Movements:
                     self.get_move_intermediate(node, dir, neighbors)
 
         return neighbors
+
+    def update(self):
+        if self.bot.blstats.prop_mask & nethack.BL_MASK_LEV:
+            self.levitating = True
+        else:
+            self.levitating = False
