@@ -75,14 +75,7 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_unexplored_room,
 )
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
-from nle_code_wrapper.bot.strategies.pickup import (
-    pickup_boots,
-    pickup_horn,
-    pickup_item,
-    pickup_potion,
-    pickup_ring,
-    pickup_wand,
-)
+from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_horn, pickup_potion, pickup_ring, pickup_wand
 from nle_code_wrapper.bot.strategies.push_boulder import (
     align_boulder_for_bridge,
     goto_boulder,
@@ -174,7 +167,6 @@ __all__ = [
     open_doors,
     open_doors_kick,
     open_doors_key,
-    pickup_item,
     pickup_ring,
     pickup_potion,
     pickup_wand,
