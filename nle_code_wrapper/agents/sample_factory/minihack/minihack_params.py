@@ -25,6 +25,8 @@ def add_extra_params_model(parser):
     p.add_argument("--use_resnet", type=str2bool, default=False)
     p.add_argument("--lm_model_name", type=str, default="meta-llama/Llama-3.2-3B-Instruct")
     p.add_argument("--use_lm", type=str2bool, default=False, help="Use language model as a policy.")
+    p.add_argument("--lm_max_act_tokens", type=int, default=20)
+    p.add_argument("--lm_max_obs_tokens", type=int, default=550)
 
 
 def add_extra_params_general(parser):
