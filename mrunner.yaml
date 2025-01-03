@@ -28,4 +28,4 @@ contexts:
     singularity_container: -H $PWD:/homeplaceholder --env WANDBPWD=$PWD --env PYTHONPATH=/homeplaceholder/external/nle_utils:/homeplaceholder/external/sample_factory:${PYTHONPATH} -B /scratch/project_465001230/bcupial/tmpdir:/tmp -B /scratch:/scratch /pfs/lustrep3/projappl/project_465001230/bcupial/ncw_rocm.sif
     slurm_url: bartomie@lumi.csc.fi
     storage_dir: /scratch/project_465001230/bcupial
-    time: 120
+    time: 240
