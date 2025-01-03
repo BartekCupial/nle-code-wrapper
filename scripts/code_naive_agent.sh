@@ -41,5 +41,5 @@ python3 -u -m nle_code_wrapper.agents.llm.eval \
   eval.num_episodes.minihack=$EVAL_NUM_EPISODES \
   tasks.minihack_tasks=[MiniHack-KeyRoom-S5-v0] \
   code_wrapper=True \
-  strategies=[goto_stairs,open_doors_key,pickup_key,explore] \
+  strategies=[goto_closest_staircase_down] \
   use_language_action=False
