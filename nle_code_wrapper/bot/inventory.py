@@ -7,7 +7,9 @@ from nle import nethack
 from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
 
 GLYPH_TO_OBJECT = {}
-for glyph in range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS):
+item_range = list(range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS))
+corpse_range = list(range(nethack.GLYPH_BODY_OFF, nethack.GLYPH_BODY_OFF + nethack.NUMMONS))
+for glyph in item_range + corpse_range:
     obj = nethack.objclass(nethack.glyph_to_obj(glyph))
     GLYPH_TO_OBJECT[glyph] = dict(
         obj=obj, obj_class=obj.oc_class, obj_name=nethack.OBJ_NAME(obj), obj_description=nethack.OBJ_DESCR(obj)
@@ -30,6 +32,7 @@ def get_object_weight(obj):
         int: Total weight of the object
     """
     # TODO: recursive calculation
+    # TODO: monster weight (corpse)
     return obj.oc_weight
 
 
