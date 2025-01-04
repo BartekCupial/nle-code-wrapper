@@ -111,35 +111,35 @@ class MiniHackQuaffPotionFixed(MiniHackSkill):
 
 register(
     id="CustomMiniHack-WearBoots-Fixed-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackWearBootsFixed",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearBootsFixed",
 )
 
 register(
     id="CustomMiniHack-WearBoots-Distr-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackWearBootsDistr",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearBootsDistr",
 )
 
 register(
     id="CustomMiniHack-ApplyHorn-Fixed-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackApplyHornFixed",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackApplyHornFixed",
 )
 
 register(
     id="CustomMiniHack-ApplyHorn-Distr-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackApplyHornDistr",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackApplyHornDistr",
 )
 
 register(
     id="CustomMiniHack-PutOnRing-Fixed-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackPutOnRingFixed",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackPutOnRingFixed",
 )
 
 register(
     id="CustomMiniHack-ZapWand-Fixed-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackZapWandFixed",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackZapWandFixed",
 )
 
 register(
     id="CustomMiniHack-QuaffPotion-Fixed-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_simple:MiniHackQuaffPotionFixed",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackQuaffPotionFixed",
 )

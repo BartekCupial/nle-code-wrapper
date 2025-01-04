@@ -20,20 +20,20 @@ class CustomMiniHackKeyRoom(MiniHack):
 
 class CustomMiniHackKeyDoor(CustomMiniHackKeyRoom):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, des_file="nle_code_wrapper/envs/custom/dat/key_and_door.des", **kwargs)
+        super().__init__(*args, des_file="nle_code_wrapper/envs/minihack/dat/key_and_door.des", **kwargs)
 
 
 class CustomMiniHackKeyWandDoor(CustomMiniHackKeyRoom):
     def __init__(self, *args, **kwargs):
-        super().__init__(*args, des_file="nle_code_wrapper/envs/custom/dat/key_wand_and_door.des", **kwargs)
+        super().__init__(*args, des_file="nle_code_wrapper/envs/minihack/dat/key_wand_and_door.des", **kwargs)
 
 
 register(
     id="CustomMiniHack-KeyDoor-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.key_room_items:CustomMiniHackKeyDoor",
+    entry_point="nle_code_wrapper.envs.minihack.envs.key_room_items:CustomMiniHackKeyDoor",
 )
 
 register(
     id="CustomMiniHack-KeyWandDoor-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.key_room_items:CustomMiniHackKeyWandDoor",
+    entry_point="nle_code_wrapper.envs.minihack.envs.key_room_items:CustomMiniHackKeyWandDoor",
 )
