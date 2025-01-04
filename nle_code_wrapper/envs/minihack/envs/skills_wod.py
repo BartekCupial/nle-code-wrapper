@@ -30,5 +30,5 @@ class MiniHackWoDMelee(MiniHackSkill):
 
 register(
     id="CustomMiniHack-WoD-Melee-Full-v0",
-    entry_point="nle_code_wrapper.envs.custom.envs.skills_wod:MiniHackWoDMelee",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_wod:MiniHackWoDMelee",
 )

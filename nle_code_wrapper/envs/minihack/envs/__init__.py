@@ -1,4 +1,5 @@
-from nle_code_wrapper.envs.custom.envs import (
+from nle_code_wrapper.envs.minihack.envs import (
+    corridor,
     fight_corridor,
     key_room_items,
     premapped_corridor,

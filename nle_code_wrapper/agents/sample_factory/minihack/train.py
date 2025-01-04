@@ -1,6 +1,5 @@
 import sys
 
-from nle_utils.envs.minihack.minihack_env import MINIHACK_ENVS
 from nle_utils.envs.minihack.minihack_params import add_extra_params_minihack_env
 from sample_factory.algo.utils.context import global_model_factory
 from sample_factory.cfg.arguments import parse_full_cfg, parse_sf_args
@@ -17,10 +16,11 @@ from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
 )
 from nle_code_wrapper.agents.sample_factory.minihack.models import MODELS_LOOKUP
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
+from nle_code_wrapper.envs.minihack.minihack_env import CUSTOM_ENVS, MINIHACK_ENVS
 
 
 def register_minihack_envs():
-    for env_name in MINIHACK_ENVS:
+    for env_name in MINIHACK_ENVS + CUSTOM_ENVS:
         register_env(env_name, make_minihack_env)
 
 

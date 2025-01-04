@@ -8,6 +8,7 @@ from nle_utils.wrappers import GymV21CompatibilityV0, NLETimeLimit
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
+import nle_code_wrapper.envs.minihack.envs  # noqa: E402
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers.nle_code_wrapper import NLECodeWrapper
 
@@ -16,6 +17,12 @@ for env_spec in gym.envs.registry.all():
     id = env_spec.id
     if id.split("-")[0] == "MiniHack":
         MINIHACK_ENVS.append(id)
+
+CUSTOM_ENVS = []
+for env_spec in gym.envs.registry.all():
+    id = env_spec.id
+    if id.split("-")[0] == "CustomMiniHack":
+        CUSTOM_ENVS.append(id)
 
 
 def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = None):
