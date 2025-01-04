@@ -44,7 +44,6 @@ def get_unvisited_positions(bot: "Bot", labeled_features):
     return unexplored_positions
 
 
-@strategy
 def explore_once(
     bot: "Bot", feature_detection: Union[corridor_detection, room_detection], get_positions: Callable, direction: str
 ):
@@ -87,16 +86,19 @@ def explore_once(
     return False
 
 
+@strategy
 @repeat_n_times(5)
 def explore_five(bot: "Bot", *args, **kwargs):
     return explore_once(bot, *args, **kwargs)
 
 
+@strategy
 @repeat_until_discovery
 def explore_discovery(bot: "Bot", *args, **kwargs):
     return explore_once(bot, *args, **kwargs)
 
 
+@strategy
 @repeat
 def explore_complete(bot: "Bot", *args, **kwargs):
     return explore_once(bot, *args, **kwargs)
