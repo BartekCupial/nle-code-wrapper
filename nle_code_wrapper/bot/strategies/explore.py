@@ -5,7 +5,7 @@ from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategies.goto import goto_closest
-from nle_code_wrapper.bot.strategy import repeat, strategy
+from nle_code_wrapper.bot.strategy import repeat, repeat_n_times, repeat_until_discovery, strategy
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
 
 
@@ -45,8 +45,7 @@ def get_unvisited_positions(bot: "Bot", labeled_features):
 
 
 @strategy
-@repeat
-def explore(
+def explore_once(
     bot: "Bot", feature_detection: Union[corridor_detection, room_detection], get_positions: Callable, direction: str
 ):
     """
@@ -86,6 +85,24 @@ def explore(
         unexplored_positions = np.array([position for position in unexplored_positions if filter_func(position)])
         return goto_closest(bot, unexplored_positions)
     return False
+
+
+@repeat_n_times(5)
+def explore_five(bot: "Bot", *args, **kwargs):
+    return explore_once(bot, *args, **kwargs)
+
+
+@repeat_until_discovery
+def explore_discovery(bot: "Bot", *args, **kwargs):
+    return explore_once(bot, *args, **kwargs)
+
+
+@repeat
+def explore_complete(bot: "Bot", *args, **kwargs):
+    return explore_once(bot, *args, **kwargs)
+
+
+explore = explore_discovery
 
 
 def explore_room(bot: "Bot") -> bool:
