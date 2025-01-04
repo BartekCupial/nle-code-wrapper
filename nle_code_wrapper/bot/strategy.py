@@ -118,24 +118,24 @@ def repeat_until_discovery(func):
             new_features, new_num_rooms, new_num_corridors = label_dungeon_features(bot)
             new_labels = get_labels(new_features)
             if len(labels) < len(new_labels):
-                return
+                return True
 
             # 2) if we have new door break
             new_doors = get_doors()
             for door in new_doors.difference(doors).intersection(new_seen):
                 if bot.pathfinder.reachable_adjacent(bot.entity.position, door):
-                    return
+                    return True
 
             # 3) if we have dead new end break
             new_dead_ends = get_dead_ends(new_features)
             if new_dead_ends.difference(dead_ends):
-                return
+                return True
 
             # 4) if we have new item break
             new_items = get_items()
             for item in new_items.difference(items).intersection(new_seen):
                 if bot.pathfinder.get_path_to(item):
-                    return
+                    return True
 
             seen = bot.current_level.seen.copy()
 

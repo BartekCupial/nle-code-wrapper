@@ -26,8 +26,8 @@ class TestRiver:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        explore_room_systematically(bot)
-        goto_boulder(bot)
+        explore_room(bot)
+        goto_boulder_closest_to_river(bot)
         push_boulder_direction(bot, "west")
         push_boulder_direction(bot, "north")
         assert "With great effort you move the boulder" in bot.message
@@ -44,8 +44,8 @@ class TestRiver:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        explore_room_systematically(bot)
-        goto_boulder(bot)
+        explore_room(bot)
+        goto_boulder_closest_to_river(bot)
         push_boulder_into_river(bot)
         assert "It sinks without a trace!" in bot.message or "You push the boulder into the water." in bot.message
 

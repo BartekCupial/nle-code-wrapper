@@ -75,7 +75,8 @@ class TestCrossLavaRive:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        explore_corridor(bot)
+        while explore_corridor(bot):
+            pass
         open_doors(bot)
         open_doors(bot)
         assert levitate_over_lava_river(bot)
@@ -95,7 +96,8 @@ class TestCrossLavaRive:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        explore_corridor(bot)
+        while explore_corridor(bot):
+            pass
         open_doors(bot)
         open_doors(bot)
         assert freeze_lava_river(bot)
