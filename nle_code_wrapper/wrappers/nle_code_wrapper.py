@@ -50,11 +50,11 @@ class NLECodeWrapper(gym.Wrapper):
         env: GymV21CompatibilityV0,
         strategies: List[Callable],
         panics: List[Callable],
-        max_strategy_steps: int = 100,
+        max_strategy_steps: int = 1000,
         gamma: float = 0.99,
     ) -> None:
         super().__init__(env)
-        self.bot = Bot(env, max_strategy_steps=max_strategy_steps)
+        self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma)
 
         for panic_func in panics:
             self.bot.panic(panic_func)

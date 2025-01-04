@@ -25,7 +25,7 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 class Bot:
     def __init__(
-        self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 100, gamma: float = 0.99
+        self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 1000, gamma: float = 0.99
     ) -> None:
         """
         Gym environment or Namespace with the same attributes as the gym environment
