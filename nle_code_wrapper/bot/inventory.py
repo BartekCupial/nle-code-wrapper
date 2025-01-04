@@ -14,31 +14,6 @@ for glyph in range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OB
     )
 
 
-def get_object(full_name, obj_class):
-    candidates = []
-
-    for glyph, obj in GLYPH_TO_OBJECT.items():
-        if obj["obj_name"] is None:
-            continue
-
-        if obj["obj_name"] in full_name and obj["obj_class"] == chr(obj_class.value):
-            candidates.append((obj["obj_name"], obj["obj"]))
-
-    for glyph, obj in GLYPH_TO_OBJECT.items():
-        if obj["obj_description"] is None:
-            continue
-
-        if obj["obj_description"] in full_name and obj["obj_class"] == chr(obj_class.value):
-            candidates.append((obj["obj_description"], obj["obj"]))
-
-    if len(candidates) > 1:
-        # take longest match, example "dark green" will match with green and dark green, take dark green
-        candidates = [sorted(candidates, key=lambda x: len(x[0]), reverse=True)[0]]
-
-    assert len(candidates) == 1, f"Multiple candidates found: {candidates}"
-    return candidates[0][1]
-
-
 def get_object_name(obj):
     return nethack.objdescr.from_idx(obj.oc_name_idx).oc_name
 
@@ -96,7 +71,7 @@ class Item:
         beatitude = ItemBeatitude.from_name(full_name)
         enchantment = ItemEnchantment.from_name(full_name)
         erosion = ItemErosion.from_name(full_name)
-        object = get_object(full_name, item_class)
+        object = GLYPH_TO_OBJECT[inv_glyph]["obj"]
         name = get_object_name(object)
         weight = get_object_weight(object)
 
@@ -119,7 +94,7 @@ class Item:
         name = get_object_name(object)
         weight = get_object_weight(object)
 
-        item_class = ItemClasses.from_oclass(obj.oc_class)
+        item_class = ItemClasses.from_oclass(ord(obj.oc_class))
         inv_glyph = [glyph for glyph, o in GLYPH_TO_OBJECT.items() if o["obj"] == obj][0]
 
         return Item(
