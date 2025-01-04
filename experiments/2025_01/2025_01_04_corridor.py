@@ -24,6 +24,7 @@ config = {
     "decorrelate_envs_on_one_worker": False,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
+    "max_strategy_steps": 100,
 }
 
 strategies = [
@@ -77,9 +78,7 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-Corridor-R2-v0",
-        "MiniHack-Corridor-R3-v0",
-        "MiniHack-Corridor-R5-v0",
+        "CustomMiniHack-Corridor-R10-v0",
     ]
 ]
 
