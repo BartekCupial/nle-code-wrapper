@@ -57,9 +57,13 @@ use_language_action: True
 
 # nle code wrapper
 code_wrapper: False # Do we want to wrap the env with code wrapper?
-strategies: # List of strategy names that the agent can use
-  - goto_stairs
+strategies: [] # List of strategy names that the agent can use
 strategies_loc: nle_code_wrapper.bot.strategies # Where to search for strategies implementation.
+panics: []
+max_strategy_steps: 1000
+add_letter_strategies: False
+add_direction_strategies: False
+add_more_strategy: False
 
 hydra:
   run:
