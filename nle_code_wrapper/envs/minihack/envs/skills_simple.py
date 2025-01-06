@@ -33,6 +33,43 @@ class MiniHackWearBootsDistr(MiniHackSkill):
         super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
 
 
+class MiniHackWearSuitFixed(MiniHackSkill):
+    """Environment for "wear" task."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        lvl_gen.add_object("plate mail", "[", place=(0, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["The bolt of cold bounces!"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
+class MiniHackWearSuitDistr(MiniHackSkill):
+    """Environment for "wear" task."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        lvl_gen.add_object("plate mail", "[", place=(0, 0))
+        lvl_gen.add_object("levitation boots", "[", place=(1, 0))
+        lvl_gen.add_object("dwarvish cloak", "[", place=(2, 0))
+        lvl_gen.add_object("Hawaiian shirt", "[", place=(3, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["The bolt of cold bounces!"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
 class MiniHackApplyHornFixed(MiniHackSkill):
     """Environment for "apply" task."""
 
@@ -117,6 +154,16 @@ register(
 register(
     id="CustomMiniHack-WearBoots-Distr-v0",
     entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearBootsDistr",
+)
+
+register(
+    id="CustomMiniHack-WearSuit-Fixed-v0",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitFixed",
+)
+
+register(
+    id="CustomMiniHack-WearSuit-Distr-v0",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitDistr",
 )
 
 register(

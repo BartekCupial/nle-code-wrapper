@@ -35,7 +35,7 @@ def create_item_pickup_function(item_class: ItemClasses) -> Callable[["Bot"], bo
     return pickup_func
 
 
-def pickup_coins(bot: "Bot") -> bool:
+def pickup_coin(bot: "Bot") -> bool:
     ...
 
 
@@ -55,7 +55,7 @@ def pickup_compestibles(bot: "Bot") -> bool:
     ...
 
 
-def pickup_scross(bot: "Bot") -> bool:
+def pickup_scroll(bot: "Bot") -> bool:
     ...
 
 
@@ -83,7 +83,7 @@ def pickup_gem(bot: "Bot") -> bool:
     ...
 
 
-def pickup_rocks(bot: "Bot") -> bool:
+def pickup_rock(bot: "Bot") -> bool:
     ...
 
 
@@ -130,11 +130,11 @@ def pickup_shirt(bot: "Bot") -> bool:
 def create_armor_pickup_function(armor_class: ArmorType) -> Callable[["Bot"], bool]:
     """Dynamically create a function that picks up a given armor type."""
 
-    def pickup_func(bot: "Bot", a_type=armor_class) -> bool:
+    def pickup_func(bot: "Bot") -> bool:
         armor_glyphs = frozenset(
             glyph
             for glyph, obj in GLYPH_TO_OBJECT.items()
-            if obj["obj_class"] == chr(ItemClasses.ARMOR.value) and obj["obj"].oc_armcat == a_type.value
+            if obj["obj_class"] == chr(ItemClasses.ARMOR.value) and obj["obj"].oc_armcat == armor_class.value
         )
         return pickup_item(bot, armor_glyphs)
 
