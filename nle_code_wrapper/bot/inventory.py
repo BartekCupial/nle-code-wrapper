@@ -134,7 +134,7 @@ class Item:
 
     @property
     def is_weapon(self):
-        return self.item_class == ItemClasses.WEAPONS
+        return self.item_class == ItemClasses.WEAPON
 
     @property
     def is_launcher(self):
@@ -205,7 +205,7 @@ class Item:
 
     @property
     def is_key(self):
-        return self.item_class == ItemClasses.TOOLS and self.name in ["skeleton key", "lock pick", "credit card"]
+        return self.item_class == ItemClasses.TOOL and self.name in ["skeleton key", "lock pick", "credit card"]
 
 
 class Inventory:
@@ -226,18 +226,18 @@ class Inventory:
         self.inventory: Dict[str, List[Item]] = {}
         inventory_classes = {
             "coins": [ItemClasses.COINS],
-            "amulets": [ItemClasses.AMULETS],
-            "weapons": [ItemClasses.WEAPONS],
+            "amulets": [ItemClasses.AMULET],
+            "weapons": [ItemClasses.WEAPON],
             "armor": [ItemClasses.ARMOR],
             "compestibles": [ItemClasses.COMPESTIBLES],
-            "scrolls": [ItemClasses.SCROLLS],
-            "spellbooks": [ItemClasses.SPELLBOOKS],
-            "potions": [ItemClasses.POTIONS],
-            "rings": [ItemClasses.RINGS],
-            "wands": [ItemClasses.WANDS],
+            "scrolls": [ItemClasses.SCROLL],
+            "spellbooks": [ItemClasses.SPELLBOOK],
+            "potions": [ItemClasses.POTION],
+            "rings": [ItemClasses.RING],
+            "wands": [ItemClasses.WAND],
             "tools": [
-                ItemClasses.TOOLS,
-                ItemClasses.GEMS,
+                ItemClasses.TOOL,
+                ItemClasses.GEM,
                 ItemClasses.ROCKS,
                 ItemClasses.BALL,
                 ItemClasses.CHAIN,

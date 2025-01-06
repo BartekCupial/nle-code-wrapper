@@ -39,7 +39,7 @@ def test_item_firing_projectiles(full_name):
     for glyph, obj_dict in GLYPH_TO_OBJECT.items():
         if (obj_dict["obj_name"] == full_name or obj_dict["obj_description"] == full_name) and ord(
             obj_dict["obj_class"]
-        ) == ItemClasses.WEAPONS.value:
+        ) == ItemClasses.WEAPON.value:
             break
 
     item = Item.from_inv(
@@ -76,7 +76,7 @@ def test_item_thrown_projectiles(full_name):
     for glyph, obj_dict in GLYPH_TO_OBJECT.items():
         if (obj_dict["obj_name"] == full_name or obj_dict["obj_description"] == full_name) and ord(
             obj_dict["obj_class"]
-        ) == ItemClasses.WEAPONS.value:
+        ) == ItemClasses.WEAPON.value:
             break
 
     item = Item.from_inv(
