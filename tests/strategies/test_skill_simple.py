@@ -4,7 +4,7 @@ from nle.nethack import actions as A
 from nle_code_wrapper.bot.exceptions import BotFinished
 from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_potion, pickup_ring
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
+from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
 
@@ -22,7 +22,7 @@ class TestSkillSimple:
         """
         This tests checks if we were able to pick up the closest item of type
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -41,7 +41,7 @@ class TestSkillSimple:
         """
         This tests checks if we were able to pick up the closest item of type
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -60,7 +60,7 @@ class TestSkillSimple:
         """
         This tests checks if we were able to pick up the closest item of type
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 

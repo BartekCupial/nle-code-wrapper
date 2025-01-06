@@ -1,7 +1,7 @@
 import pytest
 
 from nle_code_wrapper.bot.strategies import explore_corridor_systematically, goto_corridor, goto_room, open_doors
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
+from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import corridor_detection
 from nle_code_wrapper.utils.tests import create_bot
@@ -15,7 +15,7 @@ class TestFeatures(object):
         """
         check if corridors are detected correctly:
         """
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[
                 f"--env={env}",
                 f"--seed={seed}",

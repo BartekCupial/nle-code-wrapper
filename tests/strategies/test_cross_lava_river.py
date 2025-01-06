@@ -9,7 +9,6 @@ from nle_code_wrapper.bot.strategies import (
     levitate_over_lava_river,
     open_doors,
 )
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -113,7 +112,7 @@ class TestCrossLavaRive:
         """
         This test checks if we can freeze the river in quest medium
         """
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
         )
         bot = create_bot(cfg)
@@ -137,7 +136,7 @@ class TestCrossLavaRive:
         """
         This test checks if we can freeze the river in quest easy
         """
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
         )
         bot = create_bot(cfg)
