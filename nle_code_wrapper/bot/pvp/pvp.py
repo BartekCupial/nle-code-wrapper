@@ -36,10 +36,14 @@ class Pvp:
             # TODO: this is faulty, because we could kill more monsters then one (e.g. with a wand of death)
             last_score = self.bot.get_blstats(self.bot.last_obs).score
             current_score = self.bot.blstats.score
-            # for each monster kill, we get 4 times the difficulty in score
-            if current_score - last_score == self.target.difficulty * 4:
-                self.target = None
-                return
+
+            # TODO: when should we fight monsters when we are blind?
+            # when monsters are invisible or when we are blind
+            if self.target.difficulty is not None:
+                # for each monster kill, we get 4 times the difficulty in score
+                if current_score - last_score == self.target.difficulty * 4:
+                    self.target = None
+                    return
 
             entities = [entity for entity in self.bot.entities if entity.glyph == self.target.glyph]
             closest_entity = min(
