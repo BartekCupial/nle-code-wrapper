@@ -72,7 +72,16 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         panics.append(panic_func)
 
     if cfg.code_wrapper:
-        env = NLECodeWrapper(env, strategies, panics, max_strategy_steps=cfg.max_strategy_steps, gamma=cfg.gamma)
+        env = NLECodeWrapper(
+            env,
+            strategies,
+            panics,
+            max_strategy_steps=cfg.max_strategy_steps,
+            add_letter_strategies=cfg.add_letter_strategies,
+            add_direction_strategies=cfg.add_direction_strategies,
+            add_more_strategy=cfg.add_more_strategy,
+            gamma=cfg.gamma,
+        )
 
     if cfg.model == "default_make_encoder_func":
         env = AddChanngelDim(env)

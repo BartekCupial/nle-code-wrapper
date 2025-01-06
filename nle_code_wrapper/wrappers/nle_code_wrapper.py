@@ -51,6 +51,9 @@ class NLECodeWrapper(gym.Wrapper):
         strategies: List[Callable],
         panics: List[Callable],
         max_strategy_steps: int = 1000,
+        add_letter_strategies: bool = True,
+        add_direction_strategies: bool = True,
+        add_more_strategy: bool = True,
         gamma: float = 0.99,
     ) -> None:
         super().__init__(env)
@@ -62,11 +65,12 @@ class NLECodeWrapper(gym.Wrapper):
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)
 
-        # add letter strategies to action space
-        for char in ascii_lowercase + ascii_uppercase:
-            strategy_func = partial(letter_strategy, letter=char)
-            strategy_func.__name__ = char
-            self.bot.strategy(strategy_func)
+        if add_letter_strategies:
+            # add letter strategies to action space
+            for char in ascii_lowercase + ascii_uppercase:
+                strategy_func = partial(letter_strategy, letter=char)
+                strategy_func.__name__ = char
+                self.bot.strategy(strategy_func)
 
         directions = {
             "north": A.CompassCardinalDirection.N,
@@ -82,14 +86,16 @@ class NLECodeWrapper(gym.Wrapper):
             "wait": A.MiscDirection.WAIT,
         }
 
-        # add direction strategies to action space
-        for direction, action in directions.items():
-            strategy_func = partial(direction_strategy, direction=action)
-            strategy_func.__name__ = direction
-            self.bot.strategy(strategy_func)
+        if add_direction_strategies:
+            # add direction strategies to action space
+            for direction, action in directions.items():
+                strategy_func = partial(direction_strategy, direction=action)
+                strategy_func.__name__ = direction
+                self.bot.strategy(strategy_func)
 
-        # add more strategy
-        self.bot.strategy(more)
+        if add_more_strategy:
+            # add more strategy
+            self.bot.strategy(more)
 
         self.action_space = gym.spaces.Discrete(len(self.bot.strategies))
         self.observation_space = gym.spaces.Dict(
