@@ -55,10 +55,11 @@ base_script="python3 -u -m nle_code_wrapper.agents.llm.eval \
 # DEBUG flags
 if [ "$DEBUG" == "True" ]; then
   base_script="$base_script \
-  eval.max_steps_per_episode=5 \
+  eval.max_steps_per_episode=20 \
   eval.wandb_save=False \
   eval.num_episodes.minihack=1 \
-  strategies=[goto_corridor]"
+  strategies=[goto_corridor,goto_corridor_north,goto_corridor_south,goto_corridor_east,goto_corridor_west,goto_room,goto_room_north,goto_room_south,goto_room_east,goto_room_west,explore_room,explore_room_north,explore_room_south,explore_room_west,explore_room_east] \
+  client.generate_kwargs.temperature=0.7"
 else
   base_script="$base_script \
   eval.max_steps_per_episode=100 \
@@ -104,3 +105,4 @@ eval $base_script
 
 # SAMPLE USAGE
 # sh scripts/llm_agent.slurm --agent_type=code_naive --llm_model=meta-llama/Llama-3.2-3B-Instruct --task=MiniHack-Corridor-R3-v0 --debug=True
+# sh scripts/llm_agent.slurm --agent_type=code_naive --llm_model=gpt-4o-2024-08-06 --task=MiniHack-Corridor-R3-v0 --debug=True
