@@ -198,7 +198,12 @@ class Bot:
 
         blstats = self.blstats
         x, y = blstats.x, blstats.y
+        height, width = self.glyphs.shape
         for i, j in itertools.product([-1, 0, 1], repeat=2):
+            # make sure we don't have out of bounds
+            if not (0 <= y + i < height) or not (0 <= x + j < width):
+                continue
+
             self.current_level.search_count[y + i, x + j] += 1
 
     def wait(self) -> None:

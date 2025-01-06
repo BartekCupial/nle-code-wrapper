@@ -96,8 +96,13 @@ def label_dungeon_features(bot: "Bot"):
     def label_walkable_features(position):
         # if all neighbors which are dungeon features have the same label
         neighbors = []
+        height, width = bot.glyphs.shape
         for x, y in itertools.product([-1, 0, 1], repeat=2):
             if x == 0 and y == 0:
+                continue
+
+            # make sure we don't have out of bounds
+            if not (0 <= position[0] + y < height) or not (0 <= position[1] + x < width):
                 continue
 
             neighbor = labeled_features[position[0] + y, position[1] + x]

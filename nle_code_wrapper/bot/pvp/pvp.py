@@ -78,7 +78,7 @@ class Pvp:
             self.target = None
             raise e
 
-    def approach_entity(self, entity: Entity, distance: int = 1):
+    def approach(self, entity: Entity, distance: int = 1):
         def approach_action():
             return self.approach_target(self.target.position, distance)
 

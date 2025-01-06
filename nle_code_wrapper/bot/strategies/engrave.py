@@ -41,4 +41,4 @@ def engrave(bot: "Bot", text: str):
 
 @strategy
 def engrave_elbereth(bot: "Bot"):
-    bot.engrave("Elbereth")
+    engrave(bot, "Elbereth")
