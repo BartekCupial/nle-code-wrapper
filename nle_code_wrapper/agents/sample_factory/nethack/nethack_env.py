@@ -14,7 +14,7 @@ from nle_code_wrapper.wrappers.nle_code_wrapper import NLECodeWrapper
 NETHACK_ENVS = []
 for env_spec in gym.envs.registry.all():
     id = env_spec.id
-    if id.split("-")[0] == "NetHack":
+    if id.startswith("NetHack"):
         NETHACK_ENVS.append(id)
 
 

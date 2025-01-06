@@ -11,7 +11,7 @@ def approach_monster(bot: "Bot"):
     )
 
     if entity:
-        bot.pvp.approach_entity(entity, distance=3)
+        bot.pvp.approach(entity, distance=3)
         return True
     else:
         return False
@@ -26,7 +26,7 @@ def zap_monster(bot: "Bot") -> bool:
     )
 
     if entity:
-        return bot.pvp.zap_entity(entity)
+        return bot.pvp.zap(entity)
     else:
         return False
 

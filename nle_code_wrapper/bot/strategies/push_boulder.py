@@ -64,10 +64,14 @@ def get_adjacent_boulder(bot: "Bot"):
     for i, j in itertools.product([-1, 0, 1], repeat=2):
         if i == 0 and j == 0:
             continue
+
+        # make sure we don't have out of bounds
         new_x, new_y = bot_pos[0] + i, bot_pos[1] + j
-        if 0 <= new_x < height and 0 <= new_y < width:
-            if bot.glyphs[new_x, new_y] in G.BOULDER:
-                return (new_x, new_y)
+        if not (0 <= new_x < height) or not (0 <= new_y < width):
+            continue
+
+        if bot.glyphs[new_x, new_y] in G.BOULDER:
+            return (new_x, new_y)
     return None
 
 
