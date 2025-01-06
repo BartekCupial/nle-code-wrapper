@@ -1,8 +1,8 @@
-import inspect
-from typing import Optional
+from typing import Optional, Tuple
 
 import gym
 import nle  # NOQA: F401
+from nle.nethack import NETHACKOPTIONS
 from nle_utils.wrappers import GymV21CompatibilityV0, NLETimeLimit
 
 import nle_code_wrapper.bot.panics as panic_module
@@ -51,8 +51,13 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     if cfg.character is not None:
         kwargs["character"] = cfg.character
 
-    if cfg.autopickup is not None:
-        kwargs["autopickup"] = cfg.autopickup
+    # NetHack options
+    options: Tuple = NETHACKOPTIONS
+    if not cfg.autopickup:
+        options += ("!autopickup",)
+    if not cfg.pet:
+        options += ("pettype:none",)
+    kwargs["options"] = kwargs.pop("options", options)
 
     env = gym.make(env_name, **kwargs)
 
