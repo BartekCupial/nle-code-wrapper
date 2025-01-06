@@ -1,4 +1,4 @@
-from typing import Callable
+from typing import Callable, Optional
 
 from nle.nethack import actions as A
 from nle_utils.item import ArmorType
@@ -7,43 +7,60 @@ from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
 
 
-def remove_armor_if_worn(bot: "Bot", cat: ArmorType) -> bool:
+def remove_if_worn(bot: "Bot", cat: ArmorType) -> Optional[int]:
     """
     Removes armor of the given type if it is currently worn.
     Returns True if removal was attempted, False otherwise.
     """
     for item in bot.inventory["armor"]:
         if item.object.oc_armcat == cat.value and item.is_worn:
-            bot.step(A.Command.REMOVE)
+            bot.step(A.Command.TAKEOFF)
+            bot.step(item.letter)
+            return item.letter
+    return None
+
+
+def wear_atype(bot: "Bot", a_type):
+    for item in bot.inventory["armor"]:
+        if item.object.oc_armcat == a_type.value:
+            bot.step(A.Command.WEAR)
             bot.step(item.letter)
             return True
     return False
 
 
+def wear_if_removed(bot: "Bot", letter: Optional[int]) -> bool:
+    if letter is not None:
+        bot.step(A.Command.WEAR)
+        bot.step(letter)
+
+
 def create_wear_function(armor_type: ArmorType) -> Callable[["Bot"], bool]:
     """Dynamically create a function that wears a given armor type."""
 
+    # TODO: fix and write tests for wearing
     def wear_func(bot: "Bot", a_type=armor_type) -> bool:
         # 1) Take off
-
         # Handle special prerequisites:
-        if a_type == ArmorType.SUIT:
+        if armor_type == ArmorType.SUIT:
             # Must take off cloak before wearing a suit
-            remove_armor_if_worn(bot, ArmorType.CLOAK)
-
-        elif a_type == ArmorType.SHIRT:
+            removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
+        elif armor_type == ArmorType.SHIRT:
             # Must take off suit, then cloak, in that order
-            remove_armor_if_worn(bot, ArmorType.SUIT)
-            remove_armor_if_worn(bot, ArmorType.CLOAK)
+            removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
+            removed_suit = remove_if_worn(bot, ArmorType.SUIT)
 
         # 2) Wear an item of this armor type (if present in inventory)
-        for item in bot.inventory["armor"]:
-            if item.object.oc_armcat == a_type.value:
-                bot.step(A.Command.WEAR)
-                bot.step(item.letter)
-                return True
+        ret = wear_atype(bot, a_type)
 
-        return False
+        # put on suit and shirt back
+        if armor_type == ArmorType.SUIT:
+            wear_if_removed(bot, removed_cloak)
+        elif armor_type == ArmorType.SHIRT:
+            wear_if_removed(bot, removed_suit)
+            wear_if_removed(bot, removed_cloak)
+
+        return ret
 
     wear_func.__name__ = f"wear_{armor_type.name.lower()}"
     wear_func.__doc__ = f"Wears {armor_type.name.lower()} from inventory."

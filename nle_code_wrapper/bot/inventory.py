@@ -229,7 +229,7 @@ class Inventory:
 
         self.inventory: Dict[str, List[Item]] = {}
         inventory_classes = {
-            "coins": [ItemClasses.COINS],
+            "coins": [ItemClasses.COIN],
             "amulets": [ItemClasses.AMULET],
             "weapons": [ItemClasses.WEAPON],
             "armor": [ItemClasses.ARMOR],
@@ -242,7 +242,7 @@ class Inventory:
             "tools": [
                 ItemClasses.TOOL,
                 ItemClasses.GEM,
-                ItemClasses.ROCKS,
+                ItemClasses.ROCK,
                 ItemClasses.BALL,
                 ItemClasses.CHAIN,
                 ItemClasses.VENOM,

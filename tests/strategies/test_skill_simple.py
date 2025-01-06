@@ -2,8 +2,15 @@ import pytest
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_potion, pickup_ring
-from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
+from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_boots, pickup_potion, pickup_ring
+from nle_code_wrapper.bot.strategies.skill_simple import (
+    puton_ring,
+    quaff_potion,
+    wear_boots,
+    wear_cloak,
+    wear_shirt,
+    wear_suit,
+)
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -29,6 +36,32 @@ class TestSkillSimple:
         pickup_boots(bot)
         with pytest.raises(BotFinished):
             wear_boots(bot)
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            ("CustomMiniHack-WearSuit-Fixed-v0"),
+            ("CustomMiniHack-WearSuit-Distr-v0"),
+        ],
+    )
+    @pytest.mark.parametrize("seed", [0])
+    def test_wear_suit(self, env, seed):
+        """
+        This tests checks if we were able to pick up the closest item of type
+        """
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        while pickup_armor(bot):
+            pass
+        wear_boots(bot)
+        wear_cloak(bot)
+        wear_suit(bot)
+        wear_shirt(bot)
+        for item in bot.inventory["armor"]:
+            if item.is_armor:
+                assert item.is_worn
 
     @pytest.mark.parametrize(
         "env",
