@@ -60,11 +60,14 @@ def goto_boulder_closest_to_river(bot: "Bot") -> bool:
 
 def get_adjacent_boulder(bot: "Bot"):
     bot_pos = bot.entity.position
+    height, width = bot.glyphs.shape
     for i, j in itertools.product([-1, 0, 1], repeat=2):
         if i == 0 and j == 0:
             continue
-        if bot.glyphs[bot_pos[0] + i, bot_pos[1] + j] in G.BOULDER:
-            return (bot_pos[0] + i, bot_pos[1] + j)
+        new_x, new_y = bot_pos[0] + i, bot_pos[1] + j
+        if 0 <= new_x < height and 0 <= new_y < width:
+            if bot.glyphs[new_x, new_y] in G.BOULDER:
+                return (new_x, new_y)
     return None
 
 
