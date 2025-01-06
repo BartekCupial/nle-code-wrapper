@@ -4,7 +4,7 @@ from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.strategies import goto_room, goto_staircase_up, goto_unexplored_room
 from nle_code_wrapper.bot.strategies.goto import goto_feature_direction
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
+from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import (
     corridor_detection,
@@ -25,7 +25,7 @@ class TestGoTo(object):
         we delibrately stard with Premapped Environment so we can be sure that the room labeling will be the same
         and that multiple rooms will be visible from the start
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -41,7 +41,7 @@ class TestGoTo(object):
         """
         check if we can go to the closest room in a specific direction
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -64,7 +64,7 @@ class TestGoTo(object):
         check if we can go to the closest unexplored room,
         also check if we stop exploring when we visited all rooms
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -80,7 +80,7 @@ class TestGoTo(object):
         """
         check if we can go to the closest staircase up
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 

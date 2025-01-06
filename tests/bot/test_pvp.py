@@ -1,6 +1,6 @@
 import pytest
 
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
+from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
 
@@ -9,7 +9,7 @@ class TestRaySimulator:
     @pytest.mark.parametrize("env", ["CustomMiniHack-RayStraight-v0"])
     @pytest.mark.parametrize("seed", [0])
     def test_ray_straight(self, env, seed):
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
         )
         bot = create_bot(cfg)
@@ -22,7 +22,7 @@ class TestRaySimulator:
     @pytest.mark.parametrize("env", ["CustomMiniHack-RayAngled-v0"])
     @pytest.mark.parametrize("seed", [0])
     def test_ray_angled(self, env, seed):
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
         )
         bot = create_bot(cfg)
@@ -34,7 +34,7 @@ class TestRaySimulator:
     @pytest.mark.parametrize("env", ["CustomMiniHack-RayStraight-v0"])
     @pytest.mark.parametrize("seed", [0])
     def test_ray_concave_corner(self, env, seed):
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
         )
         bot = create_bot(cfg)
@@ -47,7 +47,7 @@ class TestRaySimulator:
     @pytest.mark.parametrize("env", ["CustomMiniHack-RayConvexCorner-v0"])
     @pytest.mark.parametrize("seed", [0])
     def test_ray_convex_corner(self, env, seed):
-        cfg = parse_custom_args(
+        cfg = parse_minihack_args(
             argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
         )
         bot = create_bot(cfg)

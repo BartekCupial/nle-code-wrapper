@@ -5,7 +5,6 @@ from nle_code_wrapper.bot.strategies.explore import explore_room
 from nle_code_wrapper.bot.strategies.pickup import pickup_wand
 from nle_code_wrapper.bot.strategies.run_away import run_away
 from nle_code_wrapper.bot.strategies.zap_monster import approach_and_zap_monster
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -85,7 +84,7 @@ class TestZapWoD:
         """
         This tests checks if we were able to zap WoD to kill monster
         """
-        cfg = parse_custom_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 

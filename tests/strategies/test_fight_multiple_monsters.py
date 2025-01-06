@@ -13,7 +13,6 @@ from nle_code_wrapper.bot.strategies import (
     goto_unexplored_room,
     open_doors,
 )
-from nle_code_wrapper.envs.custom.play_custom import parse_custom_args
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
