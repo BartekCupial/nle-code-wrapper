@@ -1,7 +1,7 @@
 import numpy as np
 import pytest
 from nle import nethack
-from nle_utils.item import ItemClasses, ItemErosion
+from nle_utils.item import ItemClasses, ItemEnchantment, ItemErosion
 
 from nle_code_wrapper.bot.inventory import GLYPH_TO_OBJECT, Item, arm_bonus
 
@@ -117,3 +117,19 @@ def test_arm_bonus(full_name, base_ac, enchantment, erosion, expected_bonus):
 
     assert obj.a_ac == base_ac
     assert bonus == expected_bonus
+
+
+@pytest.mark.parametrize(
+    "full_name,enchantment",
+    [
+        ("battle-axe", None),
+        ("+2 battle-axe", 2),
+        ("-1 battle-axe", -1),
+        ("a +1 dagger", 1),
+        ("51 +2 crossbow bolts (in quiver pouch)", 2),
+        ("37 blessed +0 crossbow bolts", 0),
+        ("an uncursed +2 cloak of displacement (being worn)", 2),
+    ],
+)
+def test_enchantment(full_name, enchantment):
+    assert ItemEnchantment.from_name(full_name).value == enchantment
