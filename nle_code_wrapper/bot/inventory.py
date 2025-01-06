@@ -199,6 +199,10 @@ class Item:
     def arm_bonus(self):
         return arm_bonus(self.object, self.enchantment.value, self.erosion.value)
 
+    @property
+    def is_worn(self):
+        return "(being worn)" in self.full_name
+
     """
     TOOLS
     """
