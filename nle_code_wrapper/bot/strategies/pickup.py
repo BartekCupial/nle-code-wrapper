@@ -15,7 +15,7 @@ from nle_code_wrapper.bot.strategy import strategy
 def pickup_item(bot: "Bot", item_class: ItemClasses):
     item_glyphs = getattr(G, f"{item_class.name}_CLASS")
 
-    if goto_glyph(bot, item_glyphs):
+    if goto_glyph(bot, item_glyphs) or goto_glyph(bot, G.ITEMS):
         bot.step(A.Command.PICKUP)
 
         if bot.xwaitingforspace:
@@ -25,7 +25,7 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
                 line = lines.pop(0)
 
                 # 1) when we reach item category we are interested in start marking
-                if line.lower() == item_class.name.lower():
+                if line.lower().startswith(item_class.name.lower()):
                     mark_items = True
                     continue
 
@@ -42,7 +42,8 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
                         # first character in line is an item letter
                         bot.type_text(line[0])
                     else:
-                        bot.step(A.MiscAction.MORE)  # confirm
+                        if line != "":
+                            bot.step(A.MiscAction.MORE)  # confirm
                         break
 
         return True

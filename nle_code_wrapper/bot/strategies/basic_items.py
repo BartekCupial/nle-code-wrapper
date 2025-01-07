@@ -40,6 +40,11 @@ def loot(bot: "Bot"):
 
 
 @strategy
+def kick(bot: "Bot"):
+    bot.step(Command.KICK)
+
+
+@strategy
 def invoke(bot: "Bot"):
     bot.step(Command.INVOKE)
 

@@ -41,11 +41,30 @@ class TestSkillSimple:
         "env",
         [
             ("CustomMiniHack-WearSuit-Fixed-v0"),
-            ("CustomMiniHack-WearSuit-Distr-v0"),
         ],
     )
     @pytest.mark.parametrize("seed", [0])
-    def test_wear_suit(self, env, seed):
+    def test_wear_one(self, env, seed):
+        """
+        This tests checks if we were able to pick up the closest item of type
+        """
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        pickup_armor(bot)
+        assert wear_suit(bot)
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            ("CustomMiniHack-WearSuit-Distr-v0"),
+            ("CustomMiniHack-WearSuit-Pile-v0"),
+            ("CustomMiniHack-WearSuit-HugePile-v0"),
+        ],
+    )
+    @pytest.mark.parametrize("seed", [0])
+    def test_wear_multiple(self, env, seed):
         """
         This tests checks if we were able to pick up the closest item of type
         """
@@ -55,13 +74,68 @@ class TestSkillSimple:
 
         while pickup_armor(bot):
             pass
-        wear_boots(bot)
-        wear_cloak(bot)
-        wear_suit(bot)
-        wear_shirt(bot)
-        for item in bot.inventory["armor"]:
-            if item.is_armor:
-                assert item.is_worn
+        assert wear_boots(bot)
+        assert wear_cloak(bot)
+        assert wear_suit(bot)
+        assert wear_shirt(bot)
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            ("CustomMiniHack-WearSuit-Pile-v0"),
+            ("CustomMiniHack-WearSuit-HugePile-v0"),
+        ],
+    )
+    @pytest.mark.parametrize("seed", [0])
+    def test_pickup_pile(self, env, seed):
+        """
+        This tests checks if we were able to pick up the closest item of type
+        """
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        pickup_armor(bot)
+        assert wear_boots(bot)
+        assert wear_cloak(bot)
+        assert wear_suit(bot)
+        assert wear_shirt(bot)
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            ("CustomMiniHack-WearSuit-HugePile-v0"),
+        ],
+    )
+    @pytest.mark.parametrize("seed", [0])
+    def test_pickup_later(self, env, seed):
+        """
+        This tests checks if we were able to pick up the closest item of type
+        """
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        pickup_potion(bot)
+        assert len(bot.inventory["potions"]) >= 1
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            ("CustomMiniHack-WearSuit-CloakPile-v0"),
+        ],
+    )
+    @pytest.mark.parametrize("seed", [0])
+    def test_pickup_more(self, env, seed):
+        """
+        This tests checks if we were able to pick up the closest item of type
+        """
+        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
+
+        pickup_armor(bot)
+        assert len(bot.inventory["armor"]) >= 20
 
     @pytest.mark.parametrize(
         "env",

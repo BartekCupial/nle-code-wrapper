@@ -70,6 +70,93 @@ class MiniHackWearSuitDistr(MiniHackSkill):
         super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
 
 
+class MiniHackWearSuitSmallPile(MiniHackSkill):
+    """Environment for "wear" task."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
+        kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
+
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        lvl_gen.add_object("booze", "!", place=(0, 0))
+        lvl_gen.add_object("levitation boots", "[", place=(0, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["The bolt of cold bounces!"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
+class MiniHackWearSuitPile(MiniHackSkill):
+    """Environment for "wear" task."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
+        kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
+
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        lvl_gen.add_object("booze", "!", place=(0, 0))
+        lvl_gen.add_object("plate mail", "[", place=(0, 0))
+        lvl_gen.add_object("levitation boots", "[", place=(0, 0))
+        lvl_gen.add_object("dwarvish cloak", "[", place=(0, 0))
+        lvl_gen.add_object("Hawaiian shirt", "[", place=(0, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["The bolt of cold bounces!"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
+class MiniHackWearSuitHugePile(MiniHackSkill):
+    """Environment for "wear" task."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
+        kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
+
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        lvl_gen.add_object("booze", "!", place=(0, 0))
+        lvl_gen.add_object("plate mail", "[", place=(0, 0))
+        lvl_gen.add_object("levitation boots", "[", place=(0, 0))
+        for i in range(30):
+            lvl_gen.add_object("dwarvish cloak", "[", place=(0, 0))
+        lvl_gen.add_object("Hawaiian shirt", "[", place=(0, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["The bolt of cold bounces!"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
+class MiniHackWearSuitCloakPile(MiniHackSkill):
+    """Environment for "wear" task."""
+
+    def __init__(self, *args, **kwargs):
+        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
+        kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
+
+        lvl_gen = LevelGenerator(w=5, h=5, lit=True)
+        for i in range(30):
+            lvl_gen.add_object("dwarvish cloak", "[", place=(1, 0))
+        lvl_gen.set_start_pos((2, 2))
+        des_file = lvl_gen.get_des()
+
+        reward_manager = RewardManager()
+        reward_manager.add_message_event(["The bolt of cold bounces!"])
+
+        super().__init__(*args, des_file=des_file, reward_manager=reward_manager, **kwargs)
+
+
 class MiniHackApplyHornFixed(MiniHackSkill):
     """Environment for "apply" task."""
 
@@ -164,6 +251,26 @@ register(
 register(
     id="CustomMiniHack-WearSuit-Distr-v0",
     entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitDistr",
+)
+
+register(
+    id="CustomMiniHack-WearSuit-SmallPile-v0",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitSmallPile",
+)
+
+register(
+    id="CustomMiniHack-WearSuit-Pile-v0",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitPile",
+)
+
+register(
+    id="CustomMiniHack-WearSuit-HugePile-v0",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitHugePile",
+)
+
+register(
+    id="CustomMiniHack-WearSuit-CloakPile-v0",
+    entry_point="nle_code_wrapper.envs.minihack.envs.skills_simple:MiniHackWearSuitCloakPile",
 )
 
 register(
