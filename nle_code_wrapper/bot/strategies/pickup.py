@@ -122,14 +122,6 @@ def pickup_gem(bot: "Bot") -> bool:
     ...
 
 
-def pickup_rock(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_ball(bot: "Bot") -> bool:
-    ...
-
-
 for item_class in ItemClasses:
     func_name = f"pickup_{item_class.name.lower()}"
     globals()[func_name] = create_item_pickup_function(item_class)
