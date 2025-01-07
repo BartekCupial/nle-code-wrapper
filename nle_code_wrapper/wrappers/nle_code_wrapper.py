@@ -21,15 +21,16 @@ def more(bot: Bot) -> bool:
 
 @strategy
 def letter_strategy(bot: Bot, letter: str) -> bool:
-    if bot.cursor[0] == [0]:
-        # Note:we don't want to count strategy steps when we are typing a letter
+    # allow typing letters because:
+    #   1) `in_yn_function` for yes/no answer
+    #   2) `in_getlin`, for typing in topline, example engraving
+    #   3) `xwaitingforspace` for typing a letter when we are asked about the item pile "Pick up what?" or when looting a chest
+    if bot.in_yn_function or bot.in_getlin or bot.xwaitingforspace:
+        bot.step(ord(letter))
         bot.strategy_steps -= 1
-    # TODO: for now allow typing letters because:
-    #       1) inventory cannot be shown when we allow letters only on first row
-    #       2) sometimes we need to type a letter when we are asked about the item pile "Pick up what?"
-    #       3) sometimes we need to type a letter when looting a chest
-    bot.step(ord(letter))
-    return True
+        return True
+    else:
+        return False
 
 
 @strategy
