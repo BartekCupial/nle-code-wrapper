@@ -34,9 +34,6 @@ class RaySimulator:
             x += dx
             y += dy
 
-            room_features, num_labels = room_detection(self.bot)
-            room_features[x, y] = num_labels + 1
-
             if self.bot.current_level.walkable[x, y]:
                 for entity in self.bot.entities + [self.bot.entity]:
                     if entity.position == (x, y):
