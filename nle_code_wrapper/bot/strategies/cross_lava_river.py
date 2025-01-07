@@ -7,7 +7,7 @@ from scipy import ndimage
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategies.explore import explore_room
 from nle_code_wrapper.bot.strategies.goto import get_other_features, goto_closest
-from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_horn, pickup_potion, pickup_ring, pickup_wand
+from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_potion, pickup_ring, pickup_tool, pickup_wand
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
@@ -140,7 +140,7 @@ def freeze_lava_river(bot: "Bot"):
     unvisited_rooms = get_other_features(bot, f)
 
     # 2) pickup stuff
-    while pickup_wand(bot) or pickup_horn(bot):
+    while pickup_wand(bot) or pickup_tool(bot):
         pass
 
     # 3) break through lava with freezing

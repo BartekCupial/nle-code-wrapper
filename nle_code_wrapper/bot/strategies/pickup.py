@@ -1,5 +1,4 @@
-from functools import wraps
-from types import FunctionType
+import re
 from typing import Callable
 
 from nle.nethack import actions as A
@@ -13,8 +12,38 @@ from nle_code_wrapper.bot.strategy import strategy
 
 
 @strategy
-def pickup_item(bot: "Bot", item=G.ITEMS):
-    if goto_glyph(bot, item):
+def pickup_item(bot: "Bot", item_class: ItemClasses):
+    item_glyphs = getattr(G, f"{item_class.name}_CLASS")
+
+    if goto_glyph(bot, item_glyphs):
+        bot.step(A.Command.PICKUP)
+
+        if bot.xwaitingforspace:
+            lines = bot.popup_message.split("\n")
+            mark_items = False
+            for line in lines:
+                if mark_items:
+                    if re.match("[a-zA-Z] -", line):  # example: e - a cloudy potion
+                        # mark item for picking up
+                        bot.type_text(line[0])  # first character in line is an item letter
+                    else:
+                        break
+
+                # when we reach item category we are interested in
+                if line.lower() == item_class.name.lower():
+                    mark_items = True
+
+            if mark_items:  # confirm only if we reached desired category
+                bot.step(A.MiscAction.MORE)  # confirm
+
+        return True
+    else:
+        return False
+
+
+@strategy
+def pickup_glyph(bot: "Bot", item_glyph):
+    if goto_glyph(bot, item_glyph):
         bot.step(A.Command.PICKUP)
         return True
     else:
@@ -28,7 +57,7 @@ def create_item_pickup_function(item_class: ItemClasses) -> Callable[["Bot"], bo
     """Dynamically create a function that picks up a given item class type."""
 
     def pickup_func(bot: "Bot"):
-        return pickup_item(bot, getattr(G, f"{item_class.name}_CLASS"))
+        return pickup_item(bot, item_class)
 
     pickup_func.__name__ = f"pickup_{item_class.name.lower()}"
     pickup_func.__doc__ = f"Picks up {item_class.name.lower()} from the ground."
@@ -136,7 +165,7 @@ def create_armor_pickup_function(armor_class: ArmorType) -> Callable[["Bot"], bo
             for glyph, obj in GLYPH_TO_OBJECT.items()
             if obj["obj_class"] == chr(ItemClasses.ARMOR.value) and obj["obj"].oc_armcat == armor_class.value
         )
-        return pickup_item(bot, armor_glyphs)
+        return pickup_glyph(bot, armor_glyphs)
 
     pickup_func.__name__ = f"pickup_{armor_class.name.lower()}"
     pickup_func.__doc__ = f"Picks up {armor_class.name.lower()} from the ground."
@@ -151,32 +180,32 @@ for armor_class in ArmorType:
 # PICKUP TOOLS
 
 
-def create_tool_pickup_function(description: str, name: str) -> Callable[["Bot"], bool]:
-    """
-    Creates a pickup function for specific tools
+# def create_tool_pickup_function(description: str, name: str) -> Callable[["Bot"], bool]:
+#     """
+#     Creates a pickup function for specific tools
 
-    Args:
-        description (str): The tool description to match
-        name (str): Name of the tool type for the function name
+#     Args:
+#         description (str): The tool description to match
+#         name (str): Name of the tool type for the function name
 
-    Returns:
-        function: A pickup function for the specified tool
-    """
+#     Returns:
+#         function: A pickup function for the specified tool
+#     """
 
-    def pickup_tool(bot: "Bot"):
-        tool_glyphs = frozenset(
-            glyph
-            for glyph, obj in GLYPH_TO_OBJECT.items()
-            if obj["obj_class"] == chr(ItemClasses.TOOL.value) and obj["obj_description"] == description
-        )
-        return pickup_item(bot, tool_glyphs)
+#     def pickup_tool(bot: "Bot"):
+#         tool_glyphs = frozenset(
+#             glyph
+#             for glyph, obj in GLYPH_TO_OBJECT.items()
+#             if obj["obj_class"] == chr(ItemClasses.TOOL.value) and obj["obj_description"] == description
+#         )
+#         return pickup_glyph(bot, tool_glyphs)
 
-    pickup_tool.__name__ = f"pickup_{name}"
-    return pickup_tool
-
-
-def pickup_horn(bot: "Bot") -> bool:
-    ...
+#     pickup_tool.__name__ = f"pickup_{name}"
+#     return pickup_tool
 
 
-pickup_horn = create_tool_pickup_function("horn", "horn")
+# def pickup_horn(bot: "Bot") -> bool:
+#     ...
+
+
+# pickup_horn = create_tool_pickup_function("horn", "horn")
