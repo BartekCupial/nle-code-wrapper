@@ -78,6 +78,7 @@ class TestPickUp(object):
         bot.reset(seed=seed)
 
         pickup_tool(bot)
+        pickup_tool(bot)
 
         def use_horn(bot):
             items = bot.inventory["tools"]
