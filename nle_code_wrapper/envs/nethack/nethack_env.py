@@ -38,17 +38,19 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         penalty_mode=cfg.fn_penalty_step,
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
-        wizard=False,
-        allow_all_yn_questions=True,
-        allow_all_modes=True,
         actions=nethack.ACTIONS,
     )
 
-    if cfg.max_episode_steps is not None:
-        kwargs["max_episode_steps"] = cfg.max_episode_steps
+    param_mapping = {
+        "max_episode_steps": cfg.max_episode_steps,
+        "character": cfg.character,
+        "allow_all_yn_questions": cfg.allow_all_yn_questions,
+        "allow_all_modes": cfg.allow_all_modes,
+    }
 
-    if cfg.character is not None:
-        kwargs["character"] = cfg.character
+    for param_name, param_value in param_mapping.items():
+        if param_value is not None:
+            kwargs[param_name] = param_value
 
     # NetHack options
     options: Tuple = NETHACKOPTIONS
