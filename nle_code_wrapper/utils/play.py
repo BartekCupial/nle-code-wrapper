@@ -6,7 +6,7 @@ import tty
 from functools import partial
 
 
-def play_using_strategies(env, action_mode="human", obs=None):
+def play_using_strategies(env, action_mode="human"):
     if action_mode == "random":
         action = env.action_space.sample()
     elif action_mode == "human":
@@ -47,7 +47,7 @@ def setup_autocomplete(completer_fn):
     readline.set_completer(completer_fn)
 
 
-def play_using_strategies_autocomplete(env, action_mode="human", obs=None):
+def play_using_strategies_autocomplete(env, action_mode="human"):
     if action_mode == "random":
         action = env.action_space.sample()
     elif action_mode == "human":
