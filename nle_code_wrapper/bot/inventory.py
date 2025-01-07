@@ -9,7 +9,8 @@ from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemEros
 GLYPH_TO_OBJECT = {}
 item_range = list(range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS))
 corpse_range = list(range(nethack.GLYPH_BODY_OFF, nethack.GLYPH_BODY_OFF + nethack.NUMMONS))
-for glyph in item_range + corpse_range:
+statue_range = list(range(nethack.GLYPH_STATUE_OFF, nethack.GLYPH_STATUE_OFF + nethack.NUMMONS))
+for glyph in item_range + corpse_range + statue_range:
     obj = nethack.objclass(nethack.glyph_to_obj(glyph))
     GLYPH_TO_OBJECT[glyph] = dict(
         obj=obj, obj_class=obj.oc_class, obj_name=nethack.OBJ_NAME(obj), obj_description=nethack.OBJ_DESCR(obj)
