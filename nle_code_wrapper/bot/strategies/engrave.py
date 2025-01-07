@@ -21,12 +21,12 @@ def engrave(bot: "Bot", text: str):
 
     bot.step(A.Command.ENGRAVE)
 
-    if "What do you want to write with?" not in bot.message:
+    if "What do you want to write with?" in bot.message:
+        # write with fingertips
+        bot.type_text("-")
+    else:
         bot.step(A.Command.ESC)
         return False
-
-    # write with fingertips
-    bot.type_text("-")
 
     if "Do you want to add to the current engraving?" in bot.message:
         bot.type_text("n")
@@ -36,6 +36,7 @@ def engrave(bot: "Bot", text: str):
         return False
 
     bot.type_text(text)
+    bot.step(A.MiscAction.MORE)
     return True
 
 
