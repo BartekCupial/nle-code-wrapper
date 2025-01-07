@@ -21,20 +21,29 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
         if bot.xwaitingforspace:
             lines = bot.popup_message.split("\n")
             mark_items = False
-            for line in lines:
-                if mark_items:
-                    if re.match("[a-zA-Z] -", line):  # example: e - a cloudy potion
-                        # mark item for picking up
-                        bot.type_text(line[0])  # first character in line is an item letter
-                    else:
-                        break
+            while lines:
+                line = lines.pop(0)
 
-                # when we reach item category we are interested in
+                # 1) when we reach item category we are interested in start marking
                 if line.lower() == item_class.name.lower():
                     mark_items = True
+                    continue
 
-            if mark_items:  # confirm only if we reached desired category
-                bot.step(A.MiscAction.MORE)  # confirm
+                # 2) if we ehxausted the current page go to the next one
+                if re.match("\(\d+ of \d+\)", line):  # NOQA: W605
+                    bot.type_text(" ")
+                    lines = bot.popup_message.split("\n")
+                    continue
+
+                # 3) mark items for picking up
+                if mark_items:
+                    # example: e - a cloudy potion
+                    if re.match("[a-zA-Z] -", line):
+                        # first character in line is an item letter
+                        bot.type_text(line[0])
+                    else:
+                        bot.step(A.MiscAction.MORE)  # confirm
+                        break
 
         return True
     else:
