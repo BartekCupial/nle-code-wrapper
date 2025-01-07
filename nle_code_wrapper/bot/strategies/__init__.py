@@ -6,6 +6,7 @@ from nle_code_wrapper.bot.strategies.basic_items import (
     engrave,
     fire,
     invoke,
+    kick,
     loot,
     pickup,
     put_on,
@@ -20,6 +21,7 @@ from nle_code_wrapper.bot.strategies.basic_items import (
     wield,
     zap,
 )
+from nle_code_wrapper.bot.strategies.container import loot_container, open_container_key, open_container_kick
 from nle_code_wrapper.bot.strategies.cross_lava_river import (
     acquire_levitation,
     cross_lava_river,
@@ -136,6 +138,7 @@ __all__ = [
     eat,
     engrave,
     fire,
+    kick,
     loot,
     invoke,
     pickup,
@@ -150,6 +153,9 @@ __all__ = [
     wear,
     wield,
     zap,
+    loot_container,
+    open_container_key,
+    open_container_kick,
     acquire_levitation,
     cross_lava_river,
     freeze_lava_horn,
