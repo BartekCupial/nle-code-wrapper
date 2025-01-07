@@ -121,6 +121,11 @@ class Bot:
         if self.terminated or self.truncated:
             raise BotFinished
 
+        internal = self.env.gym_env.unwrapped.last_observation[self.env.gym_env.unwrapped._internal_index]
+        self.in_yn_function = internal[1]
+        self.in_getlin = internal[2]
+        self.xwaitingforspace = internal[3]
+
         self.update()
         self.check_panics()
 

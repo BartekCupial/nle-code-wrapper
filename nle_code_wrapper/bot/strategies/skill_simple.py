@@ -38,8 +38,7 @@ def wear_if_removed(bot: "Bot", letter: Optional[int]) -> bool:
 def create_wear_function(armor_type: ArmorType) -> Callable[["Bot"], bool]:
     """Dynamically create a function that wears a given armor type."""
 
-    # TODO: fix and write tests for wearing
-    def wear_func(bot: "Bot", a_type=armor_type) -> bool:
+    def wear_func(bot: "Bot") -> bool:
         # 1) Take off
         # Handle special prerequisites:
         if armor_type == ArmorType.SUIT:
@@ -51,7 +50,7 @@ def create_wear_function(armor_type: ArmorType) -> Callable[["Bot"], bool]:
             removed_suit = remove_if_worn(bot, ArmorType.SUIT)
 
         # 2) Wear an item of this armor type (if present in inventory)
-        ret = wear_atype(bot, a_type)
+        ret = wear_atype(bot, armor_type)
 
         # put on suit and shirt back
         if armor_type == ArmorType.SUIT:
