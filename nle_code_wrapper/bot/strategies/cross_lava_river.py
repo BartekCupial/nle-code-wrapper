@@ -74,14 +74,15 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
     if len(positions) == 0:
         return False
 
-    # Go to the closest position
-    distances = np.sum(np.abs(positions - bot.entity.position), axis=1)
-    closest_position = positions[np.argmin(distances)]
-
     # imagine that we are levitating to compute path to cross lava
     lev = bot.pathfinder.movements.levitating
     bot.pathfinder.movements.levitating = True
-    path = bot.pathfinder.get_path_to(tuple(closest_position))
+
+    # select path which will cross lava (there could be other rooms)
+    for pos in positions:
+        path = bot.pathfinder.get_path_to(tuple(pos))
+        if any([bot.glyphs[tuple(point)] == SS.S_lava for point in path if point]):
+            break
     bot.pathfinder.movements.levitating = lev
 
     return path
@@ -128,6 +129,32 @@ def freeze_lava_horn(bot: "Bot"):
 
 
 @strategy
+def approach_lava_river(bot: "Bot"):
+    # 1) detect lava river
+    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
+    if num_features <= num_lava_features:
+        return False
+
+    def f(x):
+        return features, num_features
+
+    unvisited_rooms = get_other_features(bot, f)
+
+    # 2) go to the edge of lava
+    path = shortest_path_to_the_other_side(bot, unvisited_rooms)
+    if not path:
+        return False
+    path = path[1:]  # distard our position
+
+    for point in path:
+        if bot.glyphs[tuple(point)] == SS.S_lava:
+            return True
+        bot.pathfinder.move(point)
+
+    return False
+
+
+@strategy
 def freeze_lava_river(bot: "Bot"):
     # 1) detect lava river
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
@@ -145,6 +172,8 @@ def freeze_lava_river(bot: "Bot"):
 
     # 3) break through lava with freezing
     path = shortest_path_to_the_other_side(bot, unvisited_rooms)
+    if not path:
+        return False
     path = path[1:]  # distard our position
 
     starting_pos = bot.entity.position

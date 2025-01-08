@@ -127,6 +127,8 @@ def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
     bot.pathfinder.movements.levitating = True
     path = bot.pathfinder.get_path_from_to(boulder_pos, target_pos)
     bot.pathfinder.movements.levitating = lev
+    if not path:
+        return False
 
     # 2) push the boulder to the target position
     movements = np.diff(path, axis=0).tolist()

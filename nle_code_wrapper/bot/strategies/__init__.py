@@ -24,6 +24,7 @@ from nle_code_wrapper.bot.strategies.basic_items import (
 from nle_code_wrapper.bot.strategies.container import loot_container, open_container_key, open_container_kick
 from nle_code_wrapper.bot.strategies.cross_lava_river import (
     acquire_levitation,
+    approach_lava_river,
     cross_lava_river,
     freeze_lava_horn,
     freeze_lava_river,
@@ -154,6 +155,7 @@ __all__ = [
     open_container_key,
     open_container_kick,
     acquire_levitation,
+    approach_lava_river,
     cross_lava_river,
     freeze_lava_horn,
     freeze_lava_river,
