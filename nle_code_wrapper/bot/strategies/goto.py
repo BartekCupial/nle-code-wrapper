@@ -14,7 +14,7 @@ def goto(bot: "Bot", y: int, x: int) -> bool:
     return bot.pathfinder.goto(position)
 
 
-def goto_closest(bot, positions):
+def goto_closest(bot: "Bot", positions):
     positions = np.asanyarray(positions)
 
     # If no positions, return False
