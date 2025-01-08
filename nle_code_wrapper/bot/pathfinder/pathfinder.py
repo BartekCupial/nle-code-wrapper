@@ -14,7 +14,11 @@ if TYPE_CHECKING:
 
 
 def calc_direction(from_y: int64, from_x: int64, to_y: int64, to_x: int64) -> str:
-    assert abs(from_y - to_y) <= 1 and abs(from_x - to_x) <= 1, ((from_y, from_x), (to_y, to_x))
+    # sometimes you can be moved by a monster, or be stunned
+    if not (abs(from_y - to_y) <= 1 and abs(from_x - to_x) <= 1):
+        raise BotPanic(
+            f"direction cannot be calculated: abs(from_y - to_y) {abs(from_y - to_y)}, abs(from_x - to_x) {abs(from_x - to_x)}"
+        )
 
     ret = ""
     if to_y == from_y + 1:
