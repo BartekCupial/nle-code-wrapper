@@ -7,7 +7,7 @@ from nle_code_wrapper.utils.tests import create_bot
 
 
 @pytest.mark.usefixtures("register_components")
-class TestCrossLavaRive:
+class TestContainer:
     @pytest.mark.parametrize(
         "env",
         [
