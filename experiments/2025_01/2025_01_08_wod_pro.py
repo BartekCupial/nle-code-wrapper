@@ -1,6 +1,26 @@
+import itertools
 import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
+
+from nle_code_wrapper.utils.granularity import (
+    boulder_easy,
+    boulder_hard,
+    compositional,
+    container,
+    cross_lava_river_easy,
+    cross_lava_river_hard,
+    emergency,
+    explore,
+    fight_monster_hard,
+    goto,
+    open_doors,
+    pickup,
+    search,
+    skill_simple,
+    zap_monster_easy,
+    zap_monster_hard,
+)
 
 name = globals()["script"][:-3]
 
@@ -46,81 +66,44 @@ config = {
     "lr_schedule": "linear_decay",
 }
 
-strategies = [
-    # for getting to lava river
-    "approach_lava_river",
-    # for freezing lava river
-    "freeze_lava_horn",
-    "freeze_lava_wand",
-    # for floating above lava
-    "acquire_levitation",
-    "cross_lava_river",
-    # other
-    "engrave_elbereth",
-    "explore_corridor",
-    "explore_corridor_east",
-    "explore_corridor_north",
-    "explore_corridor_south",
-    "explore_corridor_west",
-    "explore_room",
-    "explore_room_east",
-    "explore_room_north",
-    "explore_room_south",
-    "explore_room_west",
-    "fight_monster",
-    "wait_for_monster",
-    "goto_corridor",
-    "goto_corridor_east",
-    "goto_corridor_north",
-    "goto_corridor_south",
-    "goto_corridor_west",
-    "goto_room",
-    "goto_room_east",
-    "goto_room_north",
-    "goto_room_south",
-    "goto_room_west",
-    "goto_staircase_down",
-    "goto_staircase_up",
-    "open_doors",
-    "open_doors_kick",
-    "open_doors_key",
-    "pickup_amulet",
-    "pickup_armor",
-    "pickup_coin",
-    "pickup_compestibles",
-    "pickup_gem",
-    "pickup_potion",
-    "pickup_ring",
-    "pickup_scroll",
-    "pickup_spellbook",
-    "pickup_tool",
-    "pickup_wand",
-    "pickup_weapon",
-    "puton_ring",
-    "quaff_potion",
-    "run_away",
-    "search_corridor_for_hidden_doors",
-    "search_room_for_hidden_doors",
-    "zap_monster",
-    "approach_monster",
+nested = [
+    # compositional,
+    container,
+    # cross_lava_river_easy,
+    # cross_lava_river_hard,
+    # emergency,
+    explore,
+    fight_monster_hard,
+    goto,
+    open_doors,
+    pickup,
+    # boulder_easy,
+    # boulder_hard,
+    search,
+    skill_simple,
+    # zap_monster_easy,
+    # zap_monster_hard,
+    ["zap"],
 ]
+flat = list(itertools.chain.from_iterable(nested))
 
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(3)),
+        "seed": list(range(1)),
         "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
-        "strategies": [strategies],
+        "strategies": [flat],
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_point": [env],
         "group": [env],
+        "add_letter_strategies": [True],
+        "add_direction_strategies": [True],
     }
     for env in [
-        "MiniHack-Quest-Easy-v0",
-        "MiniHack-Quest-Medium-v0",
-        "MiniHack-Quest-Hard-v0",
+        "MiniHack-WoD-Hard-Full-v0",
+        "MiniHack-WoD-Pro-Full-v0",
     ]
 ]
 
