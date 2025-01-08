@@ -6,7 +6,7 @@ name = globals()["script"][:-3]
 
 num_minibatches = 1
 num_epochs = 1
-num_envs = 32
+num_envs = 128
 num_steps = 32
 num_workers = 16
 
@@ -68,6 +68,7 @@ strategies = [
     "explore_room_south",
     "explore_room_west",
     "fight_monster",
+    "wait_for_monster",
     "goto_corridor",
     "goto_corridor_east",
     "goto_corridor_north",
