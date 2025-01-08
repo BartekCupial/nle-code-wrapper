@@ -41,7 +41,7 @@ config = {
     "learning_rate": 2e-4,
     "exploration_loss_coeff": 0.001,
     "gamma": 0.999,
-    "gae_lambda": 1.0,
+    "gae_lambda": 0.95,
     "value_loss_coeff": 0.5,
     "lr_schedule": "linear_decay",
 }
