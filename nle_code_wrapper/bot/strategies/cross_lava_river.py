@@ -38,37 +38,6 @@ def acquire_levitation(bot: "Bot"):
     return bot.blstats.prop_mask & nethack.BL_MASK_LEV
 
 
-@strategy
-def cross_lava_river(bot: "Bot"):
-    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
-    if num_features <= num_lava_features:
-        return False
-
-    def f(x):
-        return features, num_features
-
-    unvisited_rooms = get_other_features(bot, f)
-
-    starting_pos = bot.entity.position
-    if goto_closest(bot, unvisited_rooms):
-        return features[starting_pos] != features[bot.entity.position]
-
-
-@strategy
-def levitate_over_lava_river(bot: "Bot"):
-    # 1) detect lava river
-    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
-    if num_features <= num_lava_features:
-        return False
-
-    # 2) levitate
-    if not acquire_levitation(bot):
-        return False
-
-    # 3) cross river
-    return cross_lava_river(bot)
-
-
 def shortest_path_to_the_other_side(bot: "Bot", positions):
     # If no positions, return False
     if len(positions) == 0:
@@ -89,6 +58,38 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
 
     # return shortest path
     return min(lava_paths, key=len, default=None)
+
+
+@strategy
+def cross_lava_river(bot: "Bot"):
+    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
+    if num_features <= num_lava_features:
+        return False
+
+    def f(x):
+        return features, num_features
+
+    unvisited_rooms = get_other_features(bot, f)
+
+    path = shortest_path_to_the_other_side(bot, unvisited_rooms)
+    starting_pos = bot.entity.position
+    if bot.pathfinder.goto(tuple(path[-1])):
+        return features[starting_pos] != features[bot.entity.position]
+
+
+@strategy
+def levitate_over_lava_river(bot: "Bot"):
+    # 1) detect lava river
+    features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
+    if num_features <= num_lava_features:
+        return False
+
+    # 2) levitate
+    if not acquire_levitation(bot):
+        return False
+
+    # 3) cross river
+    return cross_lava_river(bot)
 
 
 @strategy
