@@ -4,16 +4,16 @@ from mrunner.helpers.specification_helper import create_experiments_helper
 
 name = globals()["script"][:-3]
 
-num_minibatches = 4
-num_epochs = 4
+num_minibatches = 1
+num_epochs = 1
 num_envs = 128
-num_steps = 128
+num_steps = 32
 num_workers = 16
 
 # params for all exps
 config = {
     "exp_tags": [name],
-    "run_script": "nle_code_wrapper.agents.sample_factory.minihack.train",
+    "run_script": "nle_code_wrapper.agents.sample_factory.nethack.train",
     "train_for_env_steps": 10_000_000,
     "num_workers": num_workers,
     "num_envs_per_worker": num_envs // num_workers,
@@ -47,6 +47,10 @@ config = {
 }
 
 strategies = [
+    "loot_container",
+    "open_container_key",
+    "open_container_kick",
+    "engrave_elbereth",
     "explore_corridor",
     "explore_corridor_east",
     "explore_corridor_north",
@@ -57,6 +61,7 @@ strategies = [
     "explore_room_north",
     "explore_room_south",
     "explore_room_west",
+    "fight_monster",
     "goto_corridor",
     "goto_corridor_east",
     "goto_corridor_north",
@@ -71,23 +76,49 @@ strategies = [
     "goto_staircase_up",
     "goto_unexplored_corridor",
     "goto_unexplored_room",
+    "goto_item",
     "open_doors",
     "open_doors_kick",
+    "open_doors_key",
+    "pickup_amulet",
+    "pickup_armor",
+    "pickup_coin",
+    "pickup_compestibles",
+    "pickup_gem",
+    "pickup_potion",
+    "pickup_ring",
+    "pickup_scroll",
+    "pickup_spellbook",
+    "pickup_tool",
+    "pickup_wand",
+    "pickup_weapon",
+    "puton_ring",
+    "quaff_potion",
+    "wear_boots",
+    "wear_cloak",
+    "wear_gloves",
+    "wear_helm",
+    "wear_shield",
+    "wear_shirt",
+    "wear_suit",
     "goto_boulder",
     "push_boulder_east",
     "push_boulder_north",
     "push_boulder_south",
     "push_boulder_west",
+    "run_away",
     "search_corridor_for_hidden_doors",
+    "search_for_traps",
     "search_room_for_hidden_doors",
+    "zap_monster",
+    "approach_monster",
 ]
-
 
 # params different between exps
 params_grid = [
     {
         "seed": list(range(3)),
-        "learning_rate": [0.0001, 0.0002],
+        "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
         "strategies": [strategies],
         "restart_behavior": ["overwrite"],
@@ -96,7 +127,7 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "CustomMiniHack-Corridor-R10-v0",
+        "NetHackStaircase-v0",
     ]
 ]
 
