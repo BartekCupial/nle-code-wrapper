@@ -72,6 +72,8 @@ def cross_lava_river(bot: "Bot"):
     unvisited_rooms = get_other_features(bot, f)
 
     path = shortest_path_to_the_other_side(bot, unvisited_rooms)
+    if not path:
+        return False
     starting_pos = bot.entity.position
     if bot.pathfinder.goto(tuple(path[-1])):
         return features[starting_pos] != features[bot.entity.position]
