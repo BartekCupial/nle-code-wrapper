@@ -13,7 +13,7 @@ def add_code_wrapper_cli_args(p: ArgumentParser) -> None:
         default="nle_code_wrapper.bot.strategies",
         help="where to search for strategies implementation",
     )
-    p.add_argument("--max_strategy_steps", type=int, default=1000, help="Strategy episode horizon.")
+    p.add_argument("--max_strategy_steps", type=int, default=None, help="Strategy episode horizon.")
     p.add_argument("--add_letter_strategies", type=str2bool, default=True, help="Allow typing letters a-zA-Z.")
     p.add_argument(
         "--add_direction_strategies", type=str2bool, default=True, help="Allow basic low level skills eat, quaff etc."
