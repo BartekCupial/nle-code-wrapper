@@ -58,6 +58,8 @@ class NLECodeWrapper(gym.Wrapper):
         gamma: float = 0.99,
     ) -> None:
         super().__init__(env)
+        if max_strategy_steps is None:
+            max_strategy_steps = env.gym_env.unwrapped._max_episode_steps
         self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma)
 
         for panic_func in panics:
