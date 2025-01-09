@@ -132,6 +132,9 @@ def find_tactical_positions(bot: "Bot", nearby_monsters: List[Entity]) -> List[T
             for monster in monsters:
                 # Check if there's a path from monster to neighbor, excluding the spot itself
                 path = bot.pathfinder.get_path_from_to(monster.position, neighbor)
+                if path is None:
+                    continue
+
                 if spot not in path:
                     reachable_count += 1
                     break  # Count this neighbor and move to the next
