@@ -51,9 +51,11 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
     lava_paths = []
     for pos in positions:
         path = bot.pathfinder.get_path_to(tuple(pos))
-        if path is not None:
-            if any([bot.glyphs[tuple(point)] == SS.S_lava for point in path if point]):
-                lava_paths.append(path)
+        if path is None:
+            continue
+        if any([bot.glyphs[tuple(point)] == SS.S_lava for point in path if point]):
+            lava_paths.append(path)
+
     bot.pathfinder.movements.levitating = lev
 
     # return shortest path
