@@ -66,8 +66,12 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-WoD-Hard-Full-v0",
-        "MiniHack-WoD-Pro-Full-v0",
+        "MiniHack-MultiRoom-N10-v0",
+        "MiniHack-MultiRoom-N6-Locked-v0",
+        "MiniHack-MultiRoom-N10-Lava-v0",
+        "MiniHack-MultiRoom-N6-Monster-v0",
+        "MiniHack-MultiRoom-N6-Extreme-v0",
+        "MiniHack-MultiRoom-N6-LavaMonsters-v0",
     ]
 ]
 
