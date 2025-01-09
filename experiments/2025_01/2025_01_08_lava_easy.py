@@ -1,29 +1,10 @@
-import itertools
 import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import (
-    boulder_easy,
-    boulder_hard,
-    compositional,
-    container,
-    cross_lava_river_easy,
-    cross_lava_river_hard,
-    emergency,
-    explore,
-    fight_monster_hard,
-    goto,
-    open_doors,
-    pickup,
-    search,
-    skill_simple,
-    zap_monster_easy,
-    zap_monster_hard,
-)
+from nle_code_wrapper.utils.granularity import easy, item, navigation
 
 name = globals()["script"][:-3]
-
 num_minibatches = 1
 num_epochs = 1
 num_envs = 128
@@ -63,29 +44,13 @@ config = {
     "gamma": 0.999,
     "gae_lambda": 0.95,
     "value_loss_coeff": 0.5,
-    "lr_schedule": "linear_decay",
 }
 
-nested = [
-    # compositional,
-    container,
-    # cross_lava_river_easy,
-    # cross_lava_river_hard,
-    # emergency,
-    explore,
-    fight_monster_hard,
-    goto,
-    open_doors,
-    pickup,
-    # boulder_easy,
-    # boulder_hard,
-    search,
-    skill_simple,
-    # zap_monster_easy,
-    # zap_monster_hard,
-    ["zap"],
+strategies = [
+    *easy,
+    *navigation,
+    *item,
 ]
-flat = list(itertools.chain.from_iterable(nested))
 
 # params different between exps
 params_grid = [
@@ -93,17 +58,16 @@ params_grid = [
         "seed": list(range(1)),
         "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
-        "strategies": [flat],
+        "strategies": [strategies],
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_point": [env],
         "group": [env],
-        "add_letter_strategies": [True],
-        "add_direction_strategies": [True],
     }
     for env in [
-        "MiniHack-WoD-Hard-Full-v0",
-        "MiniHack-WoD-Pro-Full-v0",
+        "MiniHack-Freeze-Lava-Full-v0",  # cross lava freeze
+        "MiniHack-LavaCross-Levitate-Full-v0",  # cross lava levitation
+        "MiniHack-LavaCross-Full-v0",  # cross lava freeze or levitation
     ]
 ]
 

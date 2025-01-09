@@ -59,13 +59,17 @@ explore = [
     "explore_room_west",
 ]
 
+fight_monster_easy = [
+    "fight_monster",
+    "fight_multiple_monsters",
+]
+
 fight_monster_hard = [
     "fight_monster",
+    "goto_tactical_position",
     "wait_for_monster",
     "run_away",
 ]
-
-# TODO: fight_monster_easy
 
 goto = [
     "goto_corridor",
@@ -145,3 +149,29 @@ zap_monster_easy = [
 ]
 
 zap_monster_hard = ["approach_monster", "zap_monster"]
+
+easy = [
+    *cross_lava_river_easy,
+    *fight_monster_easy,
+    *boulder_easy,
+    *zap_monster_easy,
+]
+
+hard = [
+    *cross_lava_river_hard,
+    *fight_monster_hard,
+    *boulder_hard,
+    *zap_monster_hard,
+]
+
+item = [
+    *pickup,
+    *skill_simple,
+]
+
+navigation = [
+    *goto,
+    *explore,
+    *open_doors,
+    *search,
+]

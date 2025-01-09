@@ -1,26 +1,8 @@
-import itertools
 import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import (
-    boulder_easy,
-    boulder_hard,
-    compositional,
-    container,
-    cross_lava_river_easy,
-    cross_lava_river_hard,
-    emergency,
-    explore,
-    fight_monster_hard,
-    goto,
-    open_doors,
-    pickup,
-    search,
-    skill_simple,
-    zap_monster_easy,
-    zap_monster_hard,
-)
+from nle_code_wrapper.utils.granularity import hard, item, navigation
 
 name = globals()["script"][:-3]
 
@@ -63,30 +45,13 @@ config = {
     "gamma": 0.999,
     "gae_lambda": 0.95,
     "value_loss_coeff": 0.5,
-    "lr_schedule": "linear_decay",
 }
 
-nested = [
-    # compositional,
-    container,
-    # cross_lava_river_easy,
-    # cross_lava_river_hard,
-    # emergency,
-    explore,
-    fight_monster_hard,
-    goto,
-    open_doors,
-    pickup,
-    # boulder_easy,
-    # boulder_hard,
-    search,
-    skill_simple,
-    # zap_monster_easy,
-    # zap_monster_hard,
-    ["approach_lava_river"],
-    ["zap"],
+strategies = [
+    *hard,
+    *navigation,
+    *item,
 ]
-flat = list(itertools.chain.from_iterable(nested))
 
 # params different between exps
 params_grid = [
@@ -94,7 +59,7 @@ params_grid = [
         "seed": list(range(1)),
         "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
-        "strategies": [flat],
+        "strategies": [strategies],
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_point": [env],
@@ -103,9 +68,10 @@ params_grid = [
         "add_direction_strategies": [True],
     }
     for env in [
-        "MiniHack-Quest-Easy-v0",
-        "MiniHack-Quest-Medium-v0",
-        "MiniHack-Quest-Hard-v0",
+        "MiniHack-HideNSeek-Mapped-v0",
+        "MiniHack-HideNSeek-v0",
+        "MiniHack-HideNSeek-Lava-v0",
+        "MiniHack-HideNSeek-Big-v0",
     ]
 ]
 

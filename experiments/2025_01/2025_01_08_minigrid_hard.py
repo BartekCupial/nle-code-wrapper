@@ -2,7 +2,7 @@ import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import easy, item, navigation
+from nle_code_wrapper.utils.granularity import hard, item, navigation
 
 name = globals()["script"][:-3]
 
@@ -48,7 +48,7 @@ config = {
 }
 
 strategies = [
-    *easy,
+    *hard,
     *navigation,
     *item,
 ]
@@ -66,8 +66,12 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-WoD-Hard-Full-v0",
-        "MiniHack-WoD-Pro-Full-v0",
+        "MiniHack-MultiRoom-N10-v0",
+        "MiniHack-MultiRoom-N6-Locked-v0",
+        "MiniHack-MultiRoom-N10-Lava-v0",
+        "MiniHack-MultiRoom-N6-Monster-v0",
+        "MiniHack-MultiRoom-N6-Extreme-v0",
+        "MiniHack-MultiRoom-N6-LavaMonsters-v0",
     ]
 ]
 
