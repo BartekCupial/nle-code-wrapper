@@ -218,7 +218,9 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
     ):
         return False
 
-    target_pos = [pos for pos in intersections if bot.current_level.walkable[pos]][0]
+    walkable_target_pos = [pos for pos in intersections if bot.current_level.walkable[pos]]
+    if walkable_target_pos == []:  # this can happen if boulder is in the intersection
+        return False
 
     # 4) align the horizontally boulder with the furthest water position
-    return push_boulder_to_pos(bot, boulder_pos, target_pos)
+    return push_boulder_to_pos(bot, boulder_pos, walkable_target_pos[0])
