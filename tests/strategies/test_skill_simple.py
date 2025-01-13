@@ -2,7 +2,7 @@ import pytest
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_boots, pickup_potion, pickup_ring
+from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_potion, pickup_ring
 from nle_code_wrapper.bot.strategies.skill_simple import (
     puton_ring,
     quaff_potion,
@@ -33,7 +33,7 @@ class TestSkillSimple:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_boots(bot)
+        pickup_armor(bot)
         with pytest.raises(BotFinished):
             wear_boots(bot)
 

@@ -15,7 +15,22 @@ from nle_code_wrapper.bot.strategy import strategy
 def pickup_item(bot: "Bot", item_class: ItemClasses):
     item_glyphs = getattr(G, f"{item_class.name}_CLASS")
 
-    if goto_glyph(bot, item_glyphs) or goto_glyph(bot, G.ITEMS):
+    succ = False
+    if goto_glyph(bot, item_glyphs):
+        succ = True
+
+    # TODO: we could pickup single item based on message,
+    # it would require mapping message to item class
+    # for now easier to drop the item if it has wrong class
+    elif goto_glyph(bot, G.ITEMS):
+        succ = True
+
+    # TODO: implement loot corpses strategy?
+    # TODO: also eat corpses
+    elif goto_glyph(bot, G.CORPSES):
+        succ = True
+
+    if succ:
         bot.step(A.Command.PICKUP)
 
         if bot.xwaitingforspace:
@@ -23,6 +38,10 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
             mark_items = False
             while lines:
                 line = lines.pop(0)
+
+                # 0) if we reach (end) get out
+                if "(end)" in line:
+                    bot.step(A.MiscAction.MORE)
 
                 # 1) when we reach item category we are interested in start marking
                 if line.lower().startswith(item_class.name.lower()):
@@ -44,11 +63,18 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
                     else:
                         if line != "":
                             bot.step(A.MiscAction.MORE)  # confirm
-                        break
+                        return True
+        else:
+            letter = bot.message[0]
+            for item in bot.inventory.items:
+                if item.letter == ord(letter):
+                    if item.item_class == item_class:
+                        return True
+                    else:
+                        bot.step(A.Command.DROP)
+                        bot.type_text(letter)
 
-        return True
-    else:
-        return False
+    return False
 
 
 @strategy
@@ -63,120 +89,52 @@ def pickup_glyph(bot: "Bot", item_glyph):
 # PICKUP ITEM CLASS
 
 
-def create_item_pickup_function(item_class: ItemClasses) -> Callable[["Bot"], bool]:
-    """Dynamically create a function that picks up a given item class type."""
-
-    def pickup_func(bot: "Bot"):
-        return pickup_item(bot, item_class)
-
-    pickup_func.__name__ = f"pickup_{item_class.name.lower()}"
-    pickup_func.__doc__ = f"Picks up {item_class.name.lower()} from the ground."
-    return pickup_func
-
-
 def pickup_coin(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.COIN)
 
 
 def pickup_amulet(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.AMULET)
 
 
 def pickup_weapon(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.WEAPON)
 
 
 def pickup_armor(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.ARMOR)
 
 
 def pickup_compestibles(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.COMPESTIBLES)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.SCROLL)
 
 
 def pickup_spellbook(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.SPELLBOOK)
 
 
 def pickup_potion(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.POTION)
 
 
 def pickup_ring(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.RING)
 
 
 def pickup_wand(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.WAND)
 
 
 def pickup_tool(bot: "Bot") -> bool:
-    ...
+    pickup_item(bot, ItemClasses.TOOL)
 
 
 def pickup_gem(bot: "Bot") -> bool:
-    ...
-
-
-for item_class in ItemClasses:
-    func_name = f"pickup_{item_class.name.lower()}"
-    globals()[func_name] = create_item_pickup_function(item_class)
-
-
-# PICKUP ARMOR
-
-
-def pickup_suit(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_shield(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_helm(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_boots(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_gloves(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_cloak(bot: "Bot") -> bool:
-    ...
-
-
-def pickup_shirt(bot: "Bot") -> bool:
-    ...
-
-
-def create_armor_pickup_function(armor_class: ArmorType) -> Callable[["Bot"], bool]:
-    """Dynamically create a function that picks up a given armor type."""
-
-    def pickup_func(bot: "Bot") -> bool:
-        armor_glyphs = frozenset(
-            glyph
-            for glyph, obj in GLYPH_TO_OBJECT.items()
-            if obj["obj_class"] == chr(ItemClasses.ARMOR.value) and obj["obj"].oc_armcat == armor_class.value
-        )
-        return pickup_glyph(bot, armor_glyphs)
-
-    pickup_func.__name__ = f"pickup_{armor_class.name.lower()}"
-    pickup_func.__doc__ = f"Picks up {armor_class.name.lower()} from the ground."
-    return pickup_func
-
-
-for armor_class in ArmorType:
-    func_name = f"pickup_{armor_class.name.lower()}"
-    globals()[func_name] = create_armor_pickup_function(armor_class)
+    pickup_item(bot, ItemClasses.GEM)
 
 
 # PICKUP TOOLS
