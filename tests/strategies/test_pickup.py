@@ -2,7 +2,7 @@ import pytest
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_ring, pickup_tool, pickup_wand
+from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_ring, pickup_tool, pickup_wand
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -15,7 +15,7 @@ class TestPickUp(object):
             ("CustomMiniHack-ZapWand-Fixed-v0", pickup_wand, "wands"),
             ("CustomMiniHack-PutOnRing-Fixed-v0", pickup_ring, "rings"),
             ("CustomMiniHack-ApplyHorn-Fixed-v0", pickup_tool, "tools"),
-            ("CustomMiniHack-WearBoots-Fixed-v0", pickup_boots, "armor"),
+            ("CustomMiniHack-WearBoots-Fixed-v0", pickup_armor, "armor"),
         ],
     )
     @pytest.mark.parametrize("seed", [0])
@@ -49,7 +49,7 @@ class TestPickUp(object):
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_boots(bot)
+        pickup_armor(bot)
 
         def wear_boots(bot):
             items = bot.inventory["armor"]

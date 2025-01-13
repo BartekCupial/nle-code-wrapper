@@ -7,7 +7,7 @@ from scipy import ndimage
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategies.explore import explore_room
 from nle_code_wrapper.bot.strategies.goto import get_other_features, goto_closest
-from nle_code_wrapper.bot.strategies.pickup import pickup_boots, pickup_potion, pickup_ring, pickup_tool, pickup_wand
+from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_potion, pickup_ring, pickup_tool, pickup_wand
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
@@ -26,7 +26,7 @@ def lava_river_detection(bot: "Bot"):
 def acquire_levitation(bot: "Bot"):
     # 1) if we don't have levitation and there is a lava river
     # pickup potion, ring, boots
-    if pickup_potion(bot) or pickup_ring(bot) or pickup_boots(bot):
+    if pickup_potion(bot) or pickup_ring(bot) or pickup_armor(bot):
         pass
 
     # TODO: try different items until levitating
