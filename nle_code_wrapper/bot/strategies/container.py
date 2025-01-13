@@ -124,8 +124,14 @@ def loot_container(bot: "Bot"):
         # check if we are in the popup window
         if bot.xwaitingforspace:
             bot.type_text("o")  # o - take something out
-            bot.type_text("A")  # A - Auto-select every item
-            bot.step(A.MiscAction.MORE)  # confirm
-            return True
+            # container can be empty
+            if bot.xwaitingforspace:
+                lines = bot.popup_message.split("\n")
+                if "Take out what?" in lines[0]:
+                    bot.step(A.Command.PICKUP)
+                else:
+                    bot.type_text("A")  # A - Auto-select every item
+                bot.step(A.MiscAction.MORE)  # confirm
+                return True
 
     return False
