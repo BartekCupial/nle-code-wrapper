@@ -31,6 +31,20 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         "inv_oclasses",
     )
 
+    # NetHack options
+    # Copy & swap out "pickup_types".
+    options = []
+    for option in nethack.NETHACKOPTIONS:
+        if option.startswith("pickup_types"):
+            options.append("pickup_types:$")
+            continue
+        options.append(option)
+
+    if not cfg.autopickup:
+        options += ("!autopickup",)
+    if not cfg.pet:
+        options += ("pettype:none",)
+
     kwargs = dict(
         observation_keys=observation_keys,
         penalty_step=cfg.penalty_step,
@@ -39,6 +53,7 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
         actions=nethack.ACTIONS,
+        options=options,
     )
 
     param_mapping = {
@@ -51,14 +66,6 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     for param_name, param_value in param_mapping.items():
         if param_value is not None:
             kwargs[param_name] = param_value
-
-    # NetHack options
-    options: Tuple = NETHACKOPTIONS
-    if not cfg.autopickup:
-        options += ("!autopickup",)
-    if not cfg.pet:
-        options += ("pettype:none",)
-    kwargs["options"] = kwargs.pop("options", options)
 
     env = gym.make(env_name, **kwargs)
 
