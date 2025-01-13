@@ -125,6 +125,7 @@ class Bot:
         # you can have more in first row but also when you step on item pile
         if "--More--" in bytes(self.tty_chars).decode("latin-1"):
             self.step(A.MiscAction.MORE)
+            # TODO: current way skips some messages, for example we unnecessary kick the chest
         else:
             self.update()
             self.check_panics()
