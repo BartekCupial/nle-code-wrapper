@@ -123,7 +123,7 @@ def freeze_lava_wand(bot: "Bot"):
 def freeze_lava_horn(bot: "Bot"):
     items = bot.inventory["tools"]
     for item in items:
-        if "horn" in item.name:
+        if item.name is not None and "horn" in item.name:
             bot.step(A.Command.APPLY)
             bot.step(item.letter)
             if "Improvise" in bot.message:
