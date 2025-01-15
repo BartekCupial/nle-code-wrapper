@@ -195,7 +195,10 @@ class Pvp:
             # 4) if we can't zap, try to move closer
             else:
                 # 5) try to move closer
-                if len(self.bot.pathfinder.get_path_to(self.target.position)) - 1 > self.melee_range:
+                path = self.bot.pathfinder.get_path_to(self.target.position)
+                if path is None:
+                    return False
+                if len(path) - 1 > self.melee_range:
                     return self.approach_target(self.target.position)
                 # 6) we are in melee range, but we can't zap the wand (e.g. we are near a wall), abort
                 else:
