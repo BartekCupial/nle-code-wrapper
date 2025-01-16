@@ -90,51 +90,51 @@ def pickup_glyph(bot: "Bot", item_glyph):
 
 
 def pickup_coin(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.COIN)
+    return pickup_item(bot, ItemClasses.COIN)
 
 
 def pickup_amulet(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.AMULET)
+    return pickup_item(bot, ItemClasses.AMULET)
 
 
 def pickup_weapon(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.WEAPON)
+    return pickup_item(bot, ItemClasses.WEAPON)
 
 
 def pickup_armor(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.ARMOR)
+    return pickup_item(bot, ItemClasses.ARMOR)
 
 
 def pickup_compestibles(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.COMPESTIBLES)
+    return pickup_item(bot, ItemClasses.COMPESTIBLES)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.SCROLL)
+    return pickup_item(bot, ItemClasses.SCROLL)
 
 
 def pickup_spellbook(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.SPELLBOOK)
+    return pickup_item(bot, ItemClasses.SPELLBOOK)
 
 
 def pickup_potion(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.POTION)
+    return pickup_item(bot, ItemClasses.POTION)
 
 
 def pickup_ring(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.RING)
+    return pickup_item(bot, ItemClasses.RING)
 
 
 def pickup_wand(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.WAND)
+    return pickup_item(bot, ItemClasses.WAND)
 
 
 def pickup_tool(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.TOOL)
+    return pickup_item(bot, ItemClasses.TOOL)
 
 
 def pickup_gem(bot: "Bot") -> bool:
-    pickup_item(bot, ItemClasses.GEM)
+    return pickup_item(bot, ItemClasses.GEM)
 
 
 # PICKUP TOOLS
