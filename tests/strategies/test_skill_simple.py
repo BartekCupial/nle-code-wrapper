@@ -34,6 +34,7 @@ class TestSkillSimple:
         bot.reset(seed=seed)
 
         pickup_armor(bot)
+        pickup_armor(bot)
         with pytest.raises(BotFinished):
             wear_boots(bot)
 

@@ -50,6 +50,7 @@ class TestPickUp(object):
         bot.reset(seed=seed)
 
         pickup_armor(bot)
+        pickup_armor(bot)
 
         def wear_boots(bot):
             items = bot.inventory["armor"]
