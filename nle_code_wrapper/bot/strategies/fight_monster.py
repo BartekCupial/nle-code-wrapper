@@ -114,15 +114,7 @@ def find_tactical_positions(bot: "Bot", nearby_monsters: List[Entity]) -> List[T
     """
     tactical_spots = []
 
-    # TODO: move graph to bot.pathfinder
-    graph = nx.Graph()
-    count = 0
-    positions = np.argwhere(bot.current_level.walkable)
-    nodes = range(count, count + len(positions))
-    graph.add_nodes_from(nodes)
-    graph.add_edges_from(np.argwhere(cross_distance(positions, positions) == 1).tolist())
-
-    nx.set_node_attributes(graph, dict(zip(nodes, positions)), "positions")
+    graph = bot.pathfinder.create_movements_graph(bot.current_level.walkable)
 
     def count_reachable_monsters(spot, monsters):
         reachable_count = 0

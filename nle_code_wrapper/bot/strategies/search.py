@@ -1,31 +1,22 @@
+import networkx as nx
 import numpy as np
-from nle_utils.glyph import SS, G
+from nle_utils.glyph import G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategies.goto import goto_closest
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
-from nle_code_wrapper.utils.utils import coords
 
 
 @strategy
 def search_room_for_hidden_doors(bot: "Bot") -> bool:
     """
-    Searches the current room's walls for hidden doors by directing the bot to inspect suspicious spots.
-
-    Args:
-        bot (Bot): The bot instance that will perform the search.
-
-    Returns:
-        bool: True if potential hidden door spots are found and the bot is directed to one,
-              False if no suspicious spots remain in the current room.
-
-    Details:
-        - Detects and labels the current room
-        - Identifies wall tiles adjacent to walkable tiles
-        - Prioritizes walls that haven't been thoroughly inspected
-        - Directs bot to search spots multiple times (hidden doors might require multiple searches)
+    Searches the current room's walls for hidden doors by directing the bot to search walls with possible doors
+    - searches spot 5 times (hidden passages might require multiple searches)
+    - we need to be in the room to search it (`goto_room`)
+    - there is a limit for searching each spot
     """
 
     labeled_rooms, num_rooms = room_detection(bot)
@@ -80,6 +71,14 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
 
 @strategy
 def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
+    """
+    Searches the current corridor for hidden doors by directing the bot to search dead ends of the corridor
+    - searches spot 5 times (hidden passages might require multiple searches)
+    - diagonal connectivity between corridor will be classified as dead end
+    - we need to be in the corridor to search it (`goto_corridor`)
+    - there is a limit for searching each spot
+    """
+
     my_position = bot.entity.position
     level = bot.current_level
 
@@ -91,26 +90,16 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         return False
 
     # look at dead ends, i.e. positions with only one neighbor
-    searchable_positions = np.array(
-        [
-            n
-            for n in np.argwhere(current_corridor)
-            if len(bot.pathfinder.neighbors(tuple(n), cardinal_only=True)) <= 1 and level.search_count[tuple(n)] < 40
-        ]
-    )
+    graph = bot.pathfinder.create_movements_graph(current_corridor, cardinal_only=True)
+    pos = nx.get_node_attributes(graph, "positions")
+    searchable_positions = [
+        pos[node] for node, degree in nx.degree(graph) if degree <= 1 and level.search_count[pos[node]] < 40
+    ]
 
     if len(searchable_positions) == 0:
         return False
 
-    # Go to the closest unexplored position
-    distances = np.sum(np.abs(searchable_positions - my_position), axis=1)
-    search_counts = np.array([level.search_count[tuple(pos)] for pos in searchable_positions])
-    # Combine distance and search count into a score
-    # Prefer closer positions and less searched deadends
-    scores = distances + search_counts  # Weight distances more heavily
-
-    best_position = searchable_positions[np.argmin(scores)]
-    bot.pathfinder.goto(tuple(best_position))
+    goto_closest(bot, searchable_positions)
 
     # Search the spot multiple times
     labeled_corridors, num_labels = corridor_detection(bot)
