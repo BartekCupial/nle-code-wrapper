@@ -1,5 +1,6 @@
 from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Tuple, Union
 
+import networkx as nx
 import numpy as np
 from nle.nethack import actions as A
 from numpy import int64
@@ -235,6 +236,42 @@ class Pathfinder:
 
         idx = np.argmin(n_dist)
         return neighbors[idx]
+
+    def create_movements_graph(
+        self, position_matrix: np.ndarray, cardinal_only: bool = False, start_count: int = 0
+    ) -> nx.Graph:
+        """
+        Creates a networkx graph from a boolean position matrix where nodes represent True positions
+        and edges connect positions that are neighbors according to self.neighbors().
+
+        Args:
+            position_matrix (np.ndarray): Boolean matrix where True values represent valid positions
+            start_count (int, optional): Starting index for node numbering. Defaults to 0.
+
+        Returns:
+            nx.Graph: Graph with nodes representing positions and edges connecting neighboring positions
+        """
+        graph = nx.Graph()
+
+        # Get all valid positions (where position_matrix is True)
+        positions = np.argwhere(position_matrix)
+
+        # Map each valid position to a node index
+        pos_to_node = {tuple(pos): idx + start_count for idx, pos in enumerate(positions)}
+
+        # Add all valid positions as nodes
+        graph.add_nodes_from(pos_to_node.values())
+
+        # For each position, add edges to any valid neighbor
+        for pos, node_id in pos_to_node.items():
+            for nbr in self.neighbors(pos, cardinal_only=cardinal_only):
+                if nbr in pos_to_node:
+                    graph.add_edge(node_id, pos_to_node[nbr])
+
+        # Store the (row, col) positions as an attribute on each node
+        nx.set_node_attributes(graph, {node_id: pos for pos, node_id in pos_to_node.items()}, name="positions")
+
+        return graph
 
     def update(self):
         self.movements.update()
