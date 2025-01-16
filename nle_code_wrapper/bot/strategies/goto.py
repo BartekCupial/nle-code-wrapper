@@ -189,60 +189,103 @@ def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
 
 
 @strategy
-def goto_unexplored_room(bot: "Bot") -> bool:
-    return goto_unexplored_feature(bot, room_detection)
-
-
-@strategy
-def goto_unexplored_corridor(bot: "Bot") -> bool:
-    return goto_unexplored_feature(bot, corridor_detection)
-
-
-@strategy
-def goto_corridor_west(bot: "Bot") -> bool:
-    return goto_feature_direction(bot, "west", corridor_detection)
-
-
-@strategy
-def goto_corridor_east(bot: "Bot") -> bool:
-    return goto_feature_direction(bot, "east", corridor_detection)
-
-
-@strategy
-def goto_corridor_north(bot: "Bot") -> bool:
-    return goto_feature_direction(bot, "north", corridor_detection)
-
-
-@strategy
-def goto_corridor_south(bot: "Bot") -> bool:
-    return goto_feature_direction(bot, "south", corridor_detection)
-
-
-@strategy
-def goto_corridor(bot: "Bot") -> bool:
-    return goto_feature_direction(bot, "all", corridor_detection)
+def goto_room(bot: "Bot") -> bool:
+    """
+    moves the agent to the closest room (where distance is calculated as number of agent steps)
+    - if we are standing in the room it isn't taken into consideration
+    - doors are not treated as part of the room
+    - looking at each room consider only closest tile from each room
+    """
+    return goto_feature_direction(bot, "all", room_detection)
 
 
 @strategy
 def goto_room_west(bot: "Bot") -> bool:
+    """
+    Similar to `goto_room`, but filters possible rooms westward
+    """
     return goto_feature_direction(bot, "west", room_detection)
 
 
 @strategy
 def goto_room_east(bot: "Bot") -> bool:
+    """
+    Similar to `goto_room`, but filters possible rooms eastward
+    """
     return goto_feature_direction(bot, "east", room_detection)
 
 
 @strategy
 def goto_room_north(bot: "Bot") -> bool:
+    """
+    Similar to `goto_room`, but filters possible rooms northward
+    """
     return goto_feature_direction(bot, "north", room_detection)
 
 
 @strategy
 def goto_room_south(bot: "Bot") -> bool:
+    """
+    Similar to `goto_room`, but filters possible rooms southward
+    """
     return goto_feature_direction(bot, "south", room_detection)
 
 
 @strategy
-def goto_room(bot: "Bot") -> bool:
-    return goto_feature_direction(bot, "all", room_detection)
+def goto_unexplored_room(bot: "Bot") -> bool:
+    """
+    Similar to `goto_room`, but considers only unexplored rooms (not visited)
+    """
+    return goto_unexplored_feature(bot, room_detection)
+
+
+@strategy
+def goto_corridor(bot: "Bot") -> bool:
+    """
+    moves the agent to the closest corridor (where distance is calculated as number of agent steps)
+    - if we are standing in the corridor it isn't taken into consideration
+    - doors are treated as part of the corridor
+    - looking at each corridor consider only closest tile from each corridor
+    - corridors and rooms are labeled using connected components without diagonal connectivity
+    """
+    return goto_feature_direction(bot, "all", corridor_detection)
+
+
+@strategy
+def goto_corridor_west(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles westward
+    """
+    return goto_feature_direction(bot, "west", corridor_detection)
+
+
+@strategy
+def goto_corridor_east(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles eastward
+    """
+    return goto_feature_direction(bot, "east", corridor_detection)
+
+
+@strategy
+def goto_corridor_north(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles northward
+    """
+    return goto_feature_direction(bot, "north", corridor_detection)
+
+
+@strategy
+def goto_corridor_south(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles southward
+    """
+    return goto_feature_direction(bot, "south", corridor_detection)
+
+
+@strategy
+def goto_unexplored_corridor(bot: "Bot") -> bool:
+    """
+    Similar to `goto_corridor`, but considers only unexplored corridors (not visited)
+    """
+    return goto_unexplored_feature(bot, corridor_detection)
