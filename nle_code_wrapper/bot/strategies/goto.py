@@ -22,9 +22,13 @@ def goto_closest(bot: "Bot", positions):
         return False
 
     # Go to the closest position
-    distances = np.sum(np.abs(positions - bot.entity.position), axis=1)
-    closest_position = positions[np.argmin(distances)]
-    bot.pathfinder.goto(tuple(closest_position))
+    distances = bot.pathfinder.distances(bot.entity.position)
+    closest_position = min(
+        (tuple(pos) for pos in positions),
+        key=lambda pos: distances.get(tuple(pos), np.inf),
+        default=None,
+    )
+    bot.pathfinder.goto(closest_position)
 
     return True
 
@@ -86,6 +90,7 @@ def get_other_features(bot: "Bot", feature_detection):
         return np.array([])
 
     my_position = bot.entity.position
+    distances = bot.pathfinder.distances(my_position)
     level = bot.current_level
     unvisited_features = []
     # exclude 0 because this is background
@@ -95,8 +100,12 @@ def get_other_features(bot: "Bot", feature_detection):
         # consider rooms which we are not in
         if not label == labeled_features[my_position]:
             feature_positions = np.argwhere(feature)
-            distances = np.sum(np.abs(feature_positions - my_position), axis=1)
-            unvisited_features.append(tuple(feature_positions[np.argmin(distances)]))
+            closest_position = min(
+                (tuple(pos) for pos in feature_positions),
+                key=lambda pos: distances.get(tuple(pos), np.inf),
+                default=None,
+            )
+            unvisited_features.append(closest_position)
 
     return np.array(unvisited_features)
 
