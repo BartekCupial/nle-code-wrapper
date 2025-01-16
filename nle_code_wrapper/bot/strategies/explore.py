@@ -108,42 +108,80 @@ explore = explore_discovery
 
 
 def explore_room(bot: "Bot") -> bool:
+    """
+    explores undiscovered tiles of the room we are in, starting from the closest ones
+    - we will explore until something appears (monster, item, etc) or until there is nothing to explore in current room
+    - we need to be in the room to explore it (`goto_room`)
+    - doors are not treated as part of the room
+    - corridors and rooms are labeled using connected components without diagonal connectivity
+    """
     return explore(bot, room_detection, get_revelable_positions, "all")
 
 
 def explore_room_west(bot: "Bot") -> bool:
+    """
+    Similar to `explore_room`, but filters undiscovered tiles westward
+    """
     return explore(bot, room_detection, get_revelable_positions, "west")
 
 
 def explore_room_east(bot: "Bot") -> bool:
+    """
+    Similar to `explore_room`, but filters undiscovered tiles eastward
+    """
     return explore(bot, room_detection, get_revelable_positions, "east")
 
 
 def explore_room_north(bot: "Bot") -> bool:
+    """
+    Similar to `explore_room`, but filters undiscovered tiles northward
+    """
     return explore(bot, room_detection, get_revelable_positions, "north")
 
 
 def explore_room_south(bot: "Bot") -> bool:
+    """
+    Similar to `explore_room`, but filters undiscovered tiles southward
+    """
     return explore(bot, room_detection, get_revelable_positions, "south")
 
 
 def explore_corridor(bot: "Bot") -> bool:
+    """
+    explores undiscovered tiles of the corridor we are in, starting from the closest ones
+    - we will explore until something appears (monster, item, etc) or until there is nothing to explore in current corridor
+    - we need to be in the corridor to explore it (`goto_corridor`)
+    - doors are treated as part of the corridor
+    - corridors and rooms are labeled using connected components without diagonal connectivity
+    """
     return explore(bot, corridor_detection, get_revelable_positions, "all")
 
 
 def explore_corridor_west(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles westward
+    """
     return explore(bot, corridor_detection, get_revelable_positions, "west")
 
 
 def explore_corridor_east(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles eastward
+    """
     return explore(bot, corridor_detection, get_revelable_positions, "east")
 
 
 def explore_corridor_north(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles northward
+    """
     return explore(bot, corridor_detection, get_revelable_positions, "north")
 
 
 def explore_corridor_south(bot: "Bot") -> bool:
+    """
+    Similar to `explore_corridor`, but filters undiscovered tiles southward
+    """
     return explore(bot, corridor_detection, get_revelable_positions, "south")
 
 
