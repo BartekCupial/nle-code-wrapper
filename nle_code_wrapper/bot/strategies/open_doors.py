@@ -11,8 +11,8 @@ def find_nearest_door(bot: "Bot"):
     closed_doors = np.argwhere(utils.isin(bot.glyphs, G.DOOR_CLOSED))
     distances = bot.pathfinder.distances(bot.entity.position)
     return min(
-        ((tuple(pos), tuple(door)) for door in closed_doors for pos in bot.pathfinder.neighbors(tuple(door))),
-        key=lambda pos: distances.get(tuple(pos), np.inf),
+        ((pos, tuple(door)) for door in closed_doors for pos in bot.pathfinder.neighbors(tuple(door))),
+        key=lambda pair: distances.get(pair[0], np.inf),
         default=None,
     )
 
