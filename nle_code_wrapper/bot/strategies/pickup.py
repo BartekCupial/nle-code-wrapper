@@ -1,9 +1,8 @@
 import re
-from typing import Callable
 
 from nle.nethack import actions as A
 from nle_utils.glyph import G
-from nle_utils.item import ArmorType, ItemClasses
+from nle_utils.item import ItemClasses
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.inventory import GLYPH_TO_OBJECT
@@ -113,50 +112,86 @@ def pickup_glyph(bot: "Bot", item_glyph):
 
 
 def pickup_coin(bot: "Bot") -> bool:
+    """
+    Makes bot pick up coins from the floor.
+    """
     return pickup_item(bot, ItemClasses.COIN)
 
 
 def pickup_amulet(bot: "Bot") -> bool:
+    """
+    Makes bot pick up amulets from the floor.
+    """
     return pickup_item(bot, ItemClasses.AMULET)
 
 
 def pickup_weapon(bot: "Bot") -> bool:
+    """
+    Makes bot pick up weapons from the floor.
+    """
     return pickup_item(bot, ItemClasses.WEAPON)
 
 
 def pickup_armor(bot: "Bot") -> bool:
+    """
+    Makes bot pick up armor and shieds from the floor.
+    """
     return pickup_item(bot, ItemClasses.ARMOR)
 
 
 def pickup_compestibles(bot: "Bot") -> bool:
+    """
+    Makes bot pick up food from the floor.
+    """
     return pickup_item(bot, ItemClasses.COMPESTIBLES)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
+    """
+    Makes bot pick up scrolls from the floor.
+    """
     return pickup_item(bot, ItemClasses.SCROLL)
 
 
 def pickup_spellbook(bot: "Bot") -> bool:
+    """
+    Makes bot pick up spellbooks from the floor.
+    """
     return pickup_item(bot, ItemClasses.SPELLBOOK)
 
 
 def pickup_potion(bot: "Bot") -> bool:
+    """
+    Makes bot pick up potions from the floor.
+    """
     return pickup_item(bot, ItemClasses.POTION)
 
 
 def pickup_ring(bot: "Bot") -> bool:
+    """
+    Makes bot pick up rings from the floor.
+    """
     return pickup_item(bot, ItemClasses.RING)
 
 
 def pickup_wand(bot: "Bot") -> bool:
+    """
+    Makes bot pick up wands from the floor.
+    """
     return pickup_item(bot, ItemClasses.WAND)
 
 
 def pickup_tool(bot: "Bot") -> bool:
+    """
+    Makes bot pick up tools from the floor.
+    """
     return pickup_item(bot, ItemClasses.TOOL)
 
 
 def pickup_gem(bot: "Bot") -> bool:
+    """
+    Makes bot pick up gems from the floor.
+    """
     return pickup_item(bot, ItemClasses.GEM)
 
 
