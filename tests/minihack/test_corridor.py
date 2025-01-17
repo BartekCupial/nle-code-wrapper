@@ -7,7 +7,7 @@ from nle_code_wrapper.bot.strategies import (
     explore_corridor_systematically,
     explore_room,
     goto_corridor,
-    goto_staircase_down,
+    goto_downstairs,
     goto_unexplored_room,
     open_doors_kick,
     search_corridor_for_hidden_doors,
@@ -26,7 +26,7 @@ class TestMazewalkMapped(object):
         def general_solve(bot: "Bot"):
             while True:
                 for strategy in [
-                    goto_staircase_down,
+                    goto_downstairs,
                     explore_room,
                     explore_corridor_systematically,
                     goto_corridor,

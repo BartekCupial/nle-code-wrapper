@@ -67,21 +67,6 @@ def goto_glyph(bot: "Bot", object_type: frozenset[int]) -> bool:
     return goto_closest(bot, item_positions)
 
 
-@strategy
-def goto_item(bot: "Bot") -> bool:
-    return goto_glyph(bot, G.ITEMS)
-
-
-@strategy
-def goto_staircase_down(bot: "Bot") -> bool:
-    return goto_object(bot, G.STAIR_DOWN)
-
-
-@strategy
-def goto_staircase_up(bot: "Bot") -> bool:
-    return goto_object(bot, G.STAIR_UP)
-
-
 def get_other_features(bot: "Bot", feature_detection):
     labeled_features, num_labels = feature_detection(bot)
 
@@ -189,9 +174,34 @@ def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
 
 
 @strategy
+def goto_item(bot: "Bot") -> bool:
+    """
+    Moves the agent to the closest item.
+    """
+    return goto_glyph(bot, G.ITEMS)
+
+
+@strategy
+def goto_downstairs(bot: "Bot") -> bool:
+    """
+    Moves the agent to the closest downstairs.
+    """
+    return goto_object(bot, G.STAIR_DOWN)
+
+
+@strategy
+def goto_upstairs(bot: "Bot") -> bool:
+    """
+    Moves the agent to the closest upstairs.
+    """
+    return goto_object(bot, G.STAIR_UP)
+
+
+@strategy
 def goto_room(bot: "Bot") -> bool:
     """
-    moves the agent to the closest room (where distance is calculated as number of agent steps)
+    Moves the agent to the closest room (where distance is calculated as number of agent steps).
+    Tips:
     - if we are standing in the room it isn't taken into consideration
     - doors are not treated as part of the room
     - looking at each room consider only closest tile from each room
@@ -202,7 +212,7 @@ def goto_room(bot: "Bot") -> bool:
 @strategy
 def goto_room_west(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms westward
+    Similar to `goto_room`, but filters possible rooms westward.
     """
     return goto_feature_direction(bot, "west", room_detection)
 
@@ -210,7 +220,7 @@ def goto_room_west(bot: "Bot") -> bool:
 @strategy
 def goto_room_east(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms eastward
+    Similar to `goto_room`, but filters possible rooms eastward.
     """
     return goto_feature_direction(bot, "east", room_detection)
 
@@ -218,7 +228,7 @@ def goto_room_east(bot: "Bot") -> bool:
 @strategy
 def goto_room_north(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms northward
+    Similar to `goto_room`, but filters possible rooms northward.
     """
     return goto_feature_direction(bot, "north", room_detection)
 
@@ -226,7 +236,7 @@ def goto_room_north(bot: "Bot") -> bool:
 @strategy
 def goto_room_south(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms southward
+    Similar to `goto_room`, but filters possible rooms southward.
     """
     return goto_feature_direction(bot, "south", room_detection)
 
@@ -234,7 +244,7 @@ def goto_room_south(bot: "Bot") -> bool:
 @strategy
 def goto_unexplored_room(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but considers only unexplored rooms (not visited)
+    Similar to `goto_room`, but considers only unexplored rooms (not visited).
     """
     return goto_unexplored_feature(bot, room_detection)
 
@@ -242,7 +252,8 @@ def goto_unexplored_room(bot: "Bot") -> bool:
 @strategy
 def goto_corridor(bot: "Bot") -> bool:
     """
-    moves the agent to the closest corridor (where distance is calculated as number of agent steps)
+    Moves the agent to the closest corridor (where distance is calculated as number of agent steps).
+    Tips:
     - if we are standing in the corridor it isn't taken into consideration
     - doors are treated as part of the corridor
     - looking at each corridor consider only closest tile from each corridor
@@ -254,7 +265,7 @@ def goto_corridor(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_west(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles westward
+    Similar to `explore_corridor`, but filters undiscovered tiles westward.
     """
     return goto_feature_direction(bot, "west", corridor_detection)
 
@@ -262,7 +273,7 @@ def goto_corridor_west(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_east(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles eastward
+    Similar to `explore_corridor`, but filters undiscovered tiles eastward.
     """
     return goto_feature_direction(bot, "east", corridor_detection)
 
@@ -270,7 +281,7 @@ def goto_corridor_east(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_north(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles northward
+    Similar to `explore_corridor`, but filters undiscovered tiles northward.
     """
     return goto_feature_direction(bot, "north", corridor_detection)
 
@@ -278,7 +289,7 @@ def goto_corridor_north(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_south(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles southward
+    Similar to `explore_corridor`, but filters undiscovered tiles southward.
     """
     return goto_feature_direction(bot, "south", corridor_detection)
 
@@ -286,6 +297,6 @@ def goto_corridor_south(bot: "Bot") -> bool:
 @strategy
 def goto_unexplored_corridor(bot: "Bot") -> bool:
     """
-    Similar to `goto_corridor`, but considers only unexplored corridors (not visited)
+    Similar to `goto_corridor`, but considers only unexplored corridors (not visited).
     """
     return goto_unexplored_feature(bot, corridor_detection)

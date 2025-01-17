@@ -2,7 +2,7 @@ import pytest
 from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
-from nle_code_wrapper.bot.strategies import goto_staircase_down
+from nle_code_wrapper.bot.strategies import goto_downstairs
 from nle_code_wrapper.bot.strategies.pickup import pickup_potion, pickup_ring
 from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
@@ -16,9 +16,9 @@ def solve(bot: "Bot"):
             pass
 
         if quaff_potion(bot):
-            goto_staircase_down(bot)
+            goto_downstairs(bot)
         elif puton_ring(bot):
-            goto_staircase_down(bot)
+            goto_downstairs(bot)
 
 
 @pytest.mark.usefixtures("register_components")

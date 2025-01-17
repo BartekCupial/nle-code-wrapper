@@ -2,7 +2,7 @@ import numpy as np
 import pytest
 from nle_utils.glyph import G
 
-from nle_code_wrapper.bot.strategies import goto_room, goto_staircase_up, goto_unexplored_room
+from nle_code_wrapper.bot.strategies import goto_room, goto_unexplored_room, goto_upstairs
 from nle_code_wrapper.bot.strategies.goto import goto_feature_direction
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
@@ -87,5 +87,5 @@ class TestGoTo(object):
         goto_unexplored_room(bot)
         staircase = utils.isin(bot.current_level.objects, G.STAIR_UP)
         staircase_position = np.argwhere(staircase)
-        goto_staircase_up(bot)
+        goto_upstairs(bot)
         assert np.all(staircase_position == bot.entity.position)

@@ -2,6 +2,8 @@ import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
+from nle_code_wrapper.utils.granularity import easy, hard, item, navigation
+
 name = globals()["script"][:-3]
 
 num_minibatches = 1
@@ -13,7 +15,7 @@ num_workers = 16
 # params for all exps
 config = {
     "exp_tags": [name],
-    "run_script": "nle_code_wrapper.agents.sample_factory.nethack.train",
+    "run_script": "nle_code_wrapper.agents.sample_factory.minihack.random",
     "train_for_env_steps": 10_000_000,
     "num_workers": num_workers,
     "num_envs_per_worker": num_envs // num_workers,
@@ -33,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -43,92 +44,80 @@ config = {
     "gamma": 0.999,
     "gae_lambda": 0.95,
     "value_loss_coeff": 0.5,
-    "lr_schedule": "linear_decay",
+    "max_num_episodes": 100,
+    "max_strategy_steps": 100,
 }
 
 strategies = [
-    "loot_container",
-    "open_container_key",
-    "open_container_kick",
-    "engrave_elbereth",
-    "explore_corridor",
-    "explore_corridor_east",
-    "explore_corridor_north",
-    "explore_corridor_south",
-    "explore_corridor_west",
-    "explore_room",
-    "explore_room_east",
-    "explore_room_north",
-    "explore_room_south",
-    "explore_room_west",
-    "fight_monster",
-    "goto_corridor",
-    "goto_corridor_east",
-    "goto_corridor_north",
-    "goto_corridor_south",
-    "goto_corridor_west",
-    "goto_room",
-    "goto_room_east",
-    "goto_room_north",
-    "goto_room_south",
-    "goto_room_west",
-    "goto_downstairs",
-    "goto_upstairs",
-    "goto_unexplored_corridor",
-    "goto_unexplored_room",
-    "goto_item",
-    "open_doors",
-    "open_doors_kick",
-    "open_doors_key",
-    "pickup_amulet",
-    "pickup_armor",
-    "pickup_coin",
-    "pickup_compestibles",
-    "pickup_gem",
-    "pickup_potion",
-    "pickup_ring",
-    "pickup_scroll",
-    "pickup_spellbook",
-    "pickup_tool",
-    "pickup_wand",
-    "pickup_weapon",
-    "puton_ring",
-    "quaff_potion",
-    "wear_boots",
-    "wear_cloak",
-    "wear_gloves",
-    "wear_helm",
-    "wear_shield",
-    "wear_shirt",
-    "wear_suit",
-    "goto_boulder",
-    "push_boulder_east",
-    "push_boulder_north",
-    "push_boulder_south",
-    "push_boulder_west",
-    "run_away",
-    "search_corridor_for_hidden_doors",
-    "search_for_traps",
-    "search_room_for_hidden_doors",
-    "zap_monster",
-    "approach_monster",
+    *hard,
+    *navigation,
+    *item,
+]
+
+env_groups = [
+    [
+        "MiniHack-Corridor-R3-v0",
+        "MiniHack-Corridor-R5-v0",
+        "CustomMiniHack-Corridor-R8-v0",
+        "CustomMiniHack-Corridor-R10-v0",
+    ],
+    [
+        "MiniHack-CorridorBattle-v0",
+        "MiniHack-CorridorBattle-Dark-v0",
+    ],
+    [
+        "MiniHack-WoD-Hard-Full-v0",
+        "MiniHack-WoD-Pro-Full-v0",
+    ],
+    [
+        "MiniHack-River-v0",
+        "MiniHack-River-Monster-v0",
+        "MiniHack-River-Lava-v0",
+        "MiniHack-River-MonsterLava-v0",
+        "MiniHack-River-Narrow-v0",
+    ],
+    [
+        "MiniHack-Quest-Easy-v0",
+        "MiniHack-Quest-Medium-v0",
+        "MiniHack-Quest-Hard-v0",
+    ],
+    [
+        "MiniHack-MultiRoom-N10-v0",
+        "MiniHack-MultiRoom-N6-Locked-v0",
+        "MiniHack-MultiRoom-N10-Lava-v0",
+        "MiniHack-MultiRoom-N6-Monster-v0",
+        "MiniHack-MultiRoom-N6-Extreme-v0",
+        "MiniHack-MultiRoom-N6-LavaMonsters-v0",
+    ],
+    [
+        "MiniHack-Freeze-Lava-Full-v0",  # cross lava freeze
+        "MiniHack-LavaCross-Levitate-Full-v0",  # cross lava levitation
+        "MiniHack-LavaCross-Full-v0",  # cross lava freeze or levitation
+    ],
+    [
+        "MiniHack-HideNSeek-Mapped-v0",
+        "MiniHack-HideNSeek-v0",
+        "MiniHack-HideNSeek-Lava-v0",
+        "MiniHack-HideNSeek-Big-v0",
+    ],
 ]
 
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(3)),
+        "seed": list(range(1)),
         "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
-        "strategies": [strategies],
+        "strategies": [[*difficulty, *item, *navigation]],
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_point": [env],
         "group": [env],
+        "exp_tags": [f"{name}_{difficulty_name}"],
     }
-    for env in [
-        "NetHackStaircase-v0",
-    ]
+    for env_group in env_groups
+    for env in env_group
+    for difficulty_name, difficulty in [("easy", easy), ("hard", hard)]
 ]
 
 
