@@ -11,13 +11,7 @@ from nle_code_wrapper.bot.strategy import repeat, strategy
 @repeat
 def run_away(bot: "Bot") -> bool:
     """
-    Executes the run away strategy for the bot.
-    This strategy involves the bot identifying nearby monsters,
-    moving away to a safer position if possible.
-    Args:
-        bot (Bot): The bot instance executing the strategy.
-    Returns:
-        bool: True if the bot moves to an escape position, False otherwise.
+    Moves away the bot in the opposite direction of nearby monsters,
     """
 
     # Get all nearby monsters
