@@ -13,26 +13,50 @@ from nle_code_wrapper.bot.strategy import strategy
 
 @strategy
 def pickup_item(bot: "Bot", item_class: ItemClasses):
-    item_glyphs = getattr(G, f"{item_class.name}_CLASS")
+    bot.step(A.Command.PICKUP)
 
-    succ = False
-    if goto_glyph(bot, item_glyphs):
+    # Check if the game shows a single item, e.g. "a - a cloudy potion"
+    if re.match(r"[a-zA-Z]\s-\s", bot.message):
+        # If there's exactly one item below us, just select its letter.
+        letter = bot.message[0]
+        bot.type_text(letter)
         succ = True
 
-    # TODO: we could pickup single item based on message,
-    # it would require mapping message to item class
-    # for now easier to drop the item if it has wrong class
-    elif goto_glyph(bot, G.ITEMS):
+    # Check if there's a pile or multiple items
+    elif (
+        "There are several objects here" in bot.message or "Pick up what?" in bot.message or "items here" in bot.message
+    ):
+        # For a pile, just mark success and let the code below handle
         succ = True
 
-    # TODO: implement loot corpses strategy?
-    # TODO: also eat corpses
-    elif goto_glyph(bot, G.CORPSES):
-        succ = True
+    else:
+        # No obvious item under us; try moving to an appropriate glyph
+        item_glyphs = getattr(G, f"{item_class.name}_CLASS")
 
+        succ = False
+        if goto_glyph(bot, item_glyphs):
+            succ = True
+            bot.step(A.Command.PICKUP)
+
+        # If we can't find the specific item glyph, try all items
+        # TODO: we could pickup single item based on message,
+        # it would require mapping message to item class
+        # for now easier to drop the item if it has wrong class
+        elif goto_glyph(bot, G.ITEMS):
+            succ = True
+            bot.step(A.Command.PICKUP)
+
+        # Finally, try corpses if applicable
+        # TODO: implement loot corpses strategy?
+        # TODO: also eat corpses
+        elif goto_glyph(bot, G.CORPSES):
+            succ = True
+            bot.step(A.Command.PICKUP)
+
+        item_glyphs = getattr(G, f"{item_class.name}_CLASS")
+
+    # If we succeeded in initiating a pickup (single item, pile, or walking onto it):
     if succ:
-        bot.step(A.Command.PICKUP)
-
         if bot.xwaitingforspace:
             lines = bot.popup_message.split("\n")
             mark_items = False
