@@ -1,4 +1,5 @@
-from typing import TYPE_CHECKING, Any, Dict, Iterable, List, Tuple, Union
+from collections import deque
+from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
 
 import networkx as nx
 import numpy as np
@@ -6,7 +7,6 @@ from nle.nethack import actions as A
 from numpy import int64
 
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.pathfinder.chebyshev_search import ChebyshevSearch
 from nle_code_wrapper.bot.pathfinder.distance import chebyshev_distance
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 
@@ -44,7 +44,7 @@ class Pathfinder:
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
         self.movements = bot.movements
-        self.search = ChebyshevSearch(self.movements)
+        self._graph_cache = {}
 
     @property
     def direction_movements(self) -> Dict[str, Tuple[int, int]]:
@@ -62,13 +62,108 @@ class Pathfinder:
     def set_movements(self, movements: Movements):
         self.movements = movements
 
-    def astar(
-        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
-    ) -> Union[Iterable[Tuple[int64, int64]], None]:
-        return self.search.astar(start, goal)
+    def create_movements_graph(self, start_position: Tuple[int64, int64], cardinal_only: bool = False):
+        # cache the graph for the start position
+        if (start_position, cardinal_only) not in self._graph_cache:
+            self._graph_cache[(start_position, cardinal_only)] = self._create_movements_graph(
+                start_position, cardinal_only=cardinal_only
+            )
 
-    def distances(self, start: Tuple[int64, int64]) -> Dict[Tuple[int64, int64], float]:
-        return self.search.distances(start)
+        return self._graph_cache[(start_position, cardinal_only)]
+
+    def _create_movements_graph(
+        self, start_position: Tuple[int64, int64], cardinal_only: bool = False, start_count: int = 0
+    ) -> nx.Graph:
+        """
+        Creates a networkx graph from a boolean position matrix where nodes represent True positions
+        and edges connect positions that are neighbors according to self.neighbors().
+
+        Args:
+            position_matrix (np.ndarray): Boolean matrix where True values represent valid positions
+            start_count (int, optional): Starting index for node numbering. Defaults to 0.
+
+        Returns:
+            nx.Graph: Graph with nodes representing positions and edges connecting neighboring positions
+        """
+        graph = nx.Graph()
+        pos_to_node = {}
+        node_counter = start_count
+
+        # Queue for BFS: (position, steps_taken)
+        queue = deque([start_position])
+        seen = {start_position}
+
+        pos_to_node[start_position] = node_counter
+        graph.add_node(node_counter)
+        node_counter += 1
+
+        while queue:
+            current_pos = queue.popleft()
+
+            # Check all neighbors
+            for nbr in self.neighbors(current_pos, cardinal_only=cardinal_only):
+                if nbr in seen:
+                    continue
+
+                # Add new position to graph
+                pos_to_node[nbr] = node_counter
+                graph.add_node(node_counter)
+
+                # Add edge to previous position
+                graph.add_edge(pos_to_node[current_pos], node_counter)
+
+                # Add to BFS queue
+                queue.append(nbr)
+                seen.add(nbr)
+                node_counter += 1
+
+        # Store the (row, col) positions as node attributes
+        nx.set_node_attributes(graph, {node_id: pos for pos, node_id in pos_to_node.items()}, name="positions")
+
+        return graph
+
+    def distances(self, graph: nx.Graph, cardinal_only: bool = False) -> dict:
+        """
+        Returns a dictionary where the keys are graph node IDs and
+        the values are their distance from the given start_node.
+        """
+        graph = self.create_movements_graph(self.bot.entity.position, cardinal_only)
+        start_node = 0
+
+        # Use NetworkX's single_source_shortest_path_length to compute distances
+        node_distances = dict(nx.single_source_shortest_path_length(graph, start_node))
+
+        node_positions = nx.get_node_attributes(graph, "positions")
+        position_distances = {node_positions[node]: distance for node, distance in node_distances.items()}
+
+        return position_distances
+
+    def get_path_from_to(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64], cardinal_only=False
+    ) -> Union[List[Tuple[int64, int64]], None]:
+        graph = self.create_movements_graph(start, cardinal_only=cardinal_only)
+
+        # Convert positions to node IDs
+        node_positions = nx.get_node_attributes(graph, "positions")
+        node_to_pos = {tuple(pos): node for node, pos in node_positions.items()}
+
+        # Get node IDs for start and end positions
+        start_node = node_to_pos[tuple(start)]
+        if tuple(goal) in node_to_pos:
+            end_node = node_to_pos[tuple(goal)]
+        else:
+            return None  # End point not reachable
+
+        try:
+            # Find shortest path using NetworkX
+            path_nodes = nx.shortest_path(graph, start_node, end_node)
+
+            # Convert path nodes back to positions
+            path_positions = [node_positions[node] for node in path_nodes]
+            return path_positions
+
+        except nx.NetworkXNoPath:
+            return None  # No path exists between the points
 
     def get_path_to(self, goal: Tuple[int64, int64]) -> Union[List[Tuple[int64, int64]], None]:
         """
@@ -82,25 +177,6 @@ class Pathfinder:
 
         result = self.get_path_from_to(self.bot.entity.position, goal)
         return result
-
-    def get_path_from_to(
-        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
-    ) -> Union[List[Tuple[int64, int64]], None]:
-        """
-        Get path from start to goal using the A* algorithm.
-
-        Args:
-            start (Tuple[int64, int64]): Start position.
-            goal (Tuple[int64, int64]): Goal position.
-
-        Returns:
-            List[Tuple[int64, int64]]: Path from start
-        """
-        result = self.search.astar(start, goal)
-        if result is None:
-            return None
-        else:
-            return list(result)
 
     def random_move(self) -> None:
         """
@@ -200,7 +276,10 @@ class Pathfinder:
         return True
 
     def distance(self, n1: Tuple[int64, int64], n2: Tuple[int64, int64]) -> int64:
-        return chebyshev_distance(n1, n2)
+        path = self.get_path_from_to(n1, n2)
+        if path is None:
+            return np.inf
+        return len(path) - 1
 
     def neighbors(self, pos: Tuple[int64, int64], cardinal_only: bool = False) -> List[Union[Any, Tuple[int64, int64]]]:
         return self.movements.neighbors(pos, cardinal_only=cardinal_only)
@@ -237,41 +316,6 @@ class Pathfinder:
         idx = np.argmin(n_dist)
         return neighbors[idx]
 
-    def create_movements_graph(
-        self, position_matrix: np.ndarray, cardinal_only: bool = False, start_count: int = 0
-    ) -> nx.Graph:
-        """
-        Creates a networkx graph from a boolean position matrix where nodes represent True positions
-        and edges connect positions that are neighbors according to self.neighbors().
-
-        Args:
-            position_matrix (np.ndarray): Boolean matrix where True values represent valid positions
-            start_count (int, optional): Starting index for node numbering. Defaults to 0.
-
-        Returns:
-            nx.Graph: Graph with nodes representing positions and edges connecting neighboring positions
-        """
-        graph = nx.Graph()
-
-        # Get all valid positions (where position_matrix is True)
-        positions = np.argwhere(position_matrix)
-
-        # Map each valid position to a node index
-        pos_to_node = {tuple(pos): idx + start_count for idx, pos in enumerate(positions)}
-
-        # Add all valid positions as nodes
-        graph.add_nodes_from(pos_to_node.values())
-
-        # For each position, add edges to any valid neighbor
-        for pos, node_id in pos_to_node.items():
-            for nbr in self.neighbors(pos, cardinal_only=cardinal_only):
-                if nbr in pos_to_node:
-                    graph.add_edge(node_id, pos_to_node[nbr])
-
-        # Store the (row, col) positions as an attribute on each node
-        nx.set_node_attributes(graph, {node_id: pos for pos, node_id in pos_to_node.items()}, name="positions")
-
-        return graph
-
     def update(self):
         self.movements.update()
+        self._graph_cache.clear()

@@ -90,7 +90,9 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         return False
 
     # look at dead ends, i.e. positions with only one neighbor
-    graph = bot.pathfinder.create_movements_graph(current_corridor, cardinal_only=True)
+    graph = bot.pathfinder.create_movements_graph(my_position, cardinal_only=True)
+    graph = graph.subgraph([node for node in graph.nodes if current_corridor[graph._node[node]["positions"]]])
+
     pos = nx.get_node_attributes(graph, "positions")
     searchable_positions = [
         pos[node] for node, degree in nx.degree(graph) if degree <= 1 and level.search_count[pos[node]] < 40
