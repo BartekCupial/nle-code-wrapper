@@ -13,7 +13,8 @@ from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
 @strategy
 def search_room_for_hidden_doors(bot: "Bot") -> bool:
     """
-    Searches the current room's walls for hidden doors by directing the bot to search walls with possible doors
+    Searches the current room's walls for hidden doors by directing the bot to search walls with possible doors.
+    Tips:
     - searches spot 5 times (hidden passages might require multiple searches)
     - we need to be in the room to search it (`goto_room`)
     - there is a limit for searching each spot
@@ -72,7 +73,8 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
 @strategy
 def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     """
-    Searches the current corridor for hidden doors by directing the bot to search dead ends of the corridor
+    Searches the current corridor for hidden doors by directing the bot to search dead ends of the corridor.
+    Tips:
     - searches spot 5 times (hidden passages might require multiple searches)
     - diagonal connectivity between corridor will be classified as dead end
     - we need to be in the corridor to search it (`goto_corridor`)
@@ -119,9 +121,6 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
 def search_for_traps(bot: "Bot") -> bool:
     """
     Search the current position repeatedly for traps.
-
-    Returns:
-        bool: True if a trap was found
     """
     initial_traps = set(bot.current_level.object_coords(G.TRAPS))
 
