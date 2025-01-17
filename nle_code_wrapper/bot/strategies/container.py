@@ -12,7 +12,7 @@ from nle_code_wrapper.utils import utils
 @strategy
 def open_container_kick(bot: "Bot"):
     """
-    attempts to open a container by kicking it to break the lock
+    Attempts to open a container by kicking it to break the lock.
     """
     container_glyphs = frozenset(
         glyph
@@ -53,7 +53,7 @@ def open_container_kick(bot: "Bot"):
 @strategy
 def open_container_key(bot: "Bot"):
     """
-    attempts to open a container using a key from the bot's inventory
+    Attempts to open a container using a key from the bot's inventory.
     """
     container_glyphs = frozenset(
         glyph
@@ -97,7 +97,7 @@ def open_container_key(bot: "Bot"):
 @strategy
 def loot_container(bot: "Bot"):
     """
-    attempts to loot all items from an opened container
+    Attempts to loot all items from an opened container.
     """
     container_glyphs = frozenset(
         glyph

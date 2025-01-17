@@ -100,6 +100,9 @@ for a_type in ArmorType:
 
 @strategy
 def puton_ring(bot: "Bot"):
+    """
+    Puts on ring from an inventory.
+    """
     items = bot.inventory["rings"]
     for item in items:
         bot.step(A.Command.PUTON)
@@ -113,6 +116,9 @@ def puton_ring(bot: "Bot"):
 
 @strategy
 def quaff_potion(bot: "Bot"):
+    """
+    Drinks potion from inventory.
+    """
     items = bot.inventory["potions"]
     for item in items:
         bot.step(A.Command.QUAFF)

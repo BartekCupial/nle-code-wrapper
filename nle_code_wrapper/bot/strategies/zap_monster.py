@@ -4,6 +4,9 @@ from nle_code_wrapper.bot.strategy import strategy
 
 @strategy
 def approach_monster(bot: "Bot"):
+    """
+    Moves bot in the direction of closest monster until it gets whithin range of wands.
+    """
     entity = min(
         (e for e in bot.entities if bot.pathfinder.get_path_to(e.position)),
         key=lambda e: bot.pathfinder.distance(e.position, bot.entity.position),
@@ -11,7 +14,7 @@ def approach_monster(bot: "Bot"):
     )
 
     if entity:
-        bot.pvp.approach(entity, distance=3)
+        bot.pvp.approach(entity, distance=7)
         return True
     else:
         return False
@@ -19,6 +22,12 @@ def approach_monster(bot: "Bot"):
 
 @strategy
 def zap_monster(bot: "Bot") -> bool:
+    """
+    Zaps closest monster with a wand.
+    Tip:
+    - you need a wand
+    - takes into account wall reflections so you won't zap yourself
+    """
     entity = min(
         (e for e in bot.entities if bot.pathfinder.get_path_to(e.position)),
         key=lambda e: bot.pathfinder.distance(e.position, bot.entity.position),
@@ -33,6 +42,9 @@ def zap_monster(bot: "Bot") -> bool:
 
 @strategy
 def approach_and_zap_monster(bot: "Bot"):
+    """
+    Combines 'approach_monster' and 'zap_monster'.
+    """
     entity = min(
         (e for e in bot.entities if bot.pathfinder.get_path_to(e.position)),
         key=lambda e: bot.pathfinder.distance(e.position, bot.entity.position),

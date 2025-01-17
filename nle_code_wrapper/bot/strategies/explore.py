@@ -121,28 +121,28 @@ def explore_room(bot: "Bot") -> bool:
 
 def explore_room_west(bot: "Bot") -> bool:
     """
-    Similar to `explore_room`, but filters undiscovered tiles westward
+    Similar to `explore_room`, but filters undiscovered tiles westward.
     """
     return explore(bot, room_detection, get_revelable_positions, "west")
 
 
 def explore_room_east(bot: "Bot") -> bool:
     """
-    Similar to `explore_room`, but filters undiscovered tiles eastward
+    Similar to `explore_room`, but filters undiscovered tiles eastward.
     """
     return explore(bot, room_detection, get_revelable_positions, "east")
 
 
 def explore_room_north(bot: "Bot") -> bool:
     """
-    Similar to `explore_room`, but filters undiscovered tiles northward
+    Similar to `explore_room`, but filters undiscovered tiles northward.
     """
     return explore(bot, room_detection, get_revelable_positions, "north")
 
 
 def explore_room_south(bot: "Bot") -> bool:
     """
-    Similar to `explore_room`, but filters undiscovered tiles southward
+    Similar to `explore_room`, but filters undiscovered tiles southward.
     """
     return explore(bot, room_detection, get_revelable_positions, "south")
 
@@ -161,28 +161,28 @@ def explore_corridor(bot: "Bot") -> bool:
 
 def explore_corridor_west(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles westward
+    Similar to `explore_corridor`, but filters undiscovered tiles westward.
     """
     return explore(bot, corridor_detection, get_revelable_positions, "west")
 
 
 def explore_corridor_east(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles eastward
+    Similar to `explore_corridor`, but filters undiscovered tiles eastward.
     """
     return explore(bot, corridor_detection, get_revelable_positions, "east")
 
 
 def explore_corridor_north(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles northward
+    Similar to `explore_corridor`, but filters undiscovered tiles northward.
     """
     return explore(bot, corridor_detection, get_revelable_positions, "north")
 
 
 def explore_corridor_south(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles southward
+    Similar to `explore_corridor`, but filters undiscovered tiles southward.
     """
     return explore(bot, corridor_detection, get_revelable_positions, "south")
 
