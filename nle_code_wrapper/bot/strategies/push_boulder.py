@@ -125,7 +125,7 @@ def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
     # 1) imagine that we are levitating to find the path
     lev = bot.pathfinder.movements.levitating
     bot.pathfinder.movements.levitating = True
-    path = bot.pathfinder.get_path_from_to(boulder_pos, target_pos)
+    path = bot.pathfinder.get_path_from_to(boulder_pos, target_pos, no_cache=True)
     bot.pathfinder.movements.levitating = lev
     if not path:
         return False

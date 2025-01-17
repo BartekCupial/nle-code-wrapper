@@ -50,7 +50,7 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
     # select path which will cross lava (there could be other rooms)
     lava_paths = []
     for pos in positions:
-        path = bot.pathfinder.get_path_to(tuple(pos))
+        path = bot.pathfinder.get_path_to(tuple(pos), no_cache=True)
         if path is None:
             continue
         if any([bot.glyphs[tuple(point)] == SS.S_lava for point in path if point]):
@@ -178,17 +178,18 @@ def freeze_lava_river(bot: "Bot"):
     while pickup_wand(bot) or pickup_tool(bot):
         pass
 
-    # 3) break through lava with freezing
-    path = shortest_path_to_the_other_side(bot, unvisited_rooms)
-    if not path:
-        return False
-    path = path[1:]  # distard our position
-
     starting_pos = bot.entity.position
-    for point in path:
-        if bot.glyphs[tuple(point)] == SS.S_lava:
-            freeze_lava_horn(bot) or freeze_lava_wand(bot)
-        bot.pathfinder.move(point)
+    # 3) appraoch lava
+    if approach_lava_river(bot):
+        while True:
+            # if we can approach lava, we can freeze it
+            if approach_lava_river(bot):
+                # break through lava with freezing
+                freeze_lava_horn(bot) or freeze_lava_wand(bot)
+            # no lava in front of us, walk to the other side
+            else:
+                goto_closest(bot, unvisited_rooms)
+                break
 
     # 4) return True if we broke through lava
     return features[starting_pos] != features[bot.entity.position]

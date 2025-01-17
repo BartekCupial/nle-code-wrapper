@@ -99,6 +99,7 @@ class TestCrossLavaRive:
             pass
         open_doors(bot)
         open_doors(bot)
+        open_doors(bot)
         assert freeze_lava_river(bot)
 
     @pytest.mark.parametrize(
