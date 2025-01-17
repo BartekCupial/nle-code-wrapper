@@ -9,12 +9,6 @@ from nle_code_wrapper.bot.strategy import strategy
 def quaff_potion_from_inv(bot: "Bot") -> bool:
     """
     Quaff a potion from the inventory.
-
-    Args:
-        bot (Bot): The bot object.
-
-    Returns:
-        bool: True if a potion was quaffed, False otherwise.
     """
     potions = bot.inventory["potions"]
 

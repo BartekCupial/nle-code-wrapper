@@ -43,6 +43,6 @@ def engrave(bot: "Bot", text: str):
 @strategy
 def engrave_elbereth(bot: "Bot"):
     """
-    engraves Elbereth on the floor with fingers
+    Engraves Elbereth on the floor with fingers.
     """
     engrave(bot, "Elbereth")

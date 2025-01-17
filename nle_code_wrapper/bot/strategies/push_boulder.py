@@ -95,18 +95,33 @@ def push_boulder_direction(bot: "Bot", direction) -> bool:
 
 
 def push_boulder_west(bot: "Bot") -> bool:
+    """
+    Pushes a boulder one step westward.
+    Tips:
+    - will also move around the boulder if needed
+    - bot needs to stand near boulder first
+    """
     return push_boulder_direction(bot, "west")
 
 
 def push_boulder_east(bot: "Bot") -> bool:
+    """
+    Pushes a boulder one step eastward.
+    """
     return push_boulder_direction(bot, "east")
 
 
 def push_boulder_north(bot: "Bot") -> bool:
+    """
+    Pushes a boulder one step northward.
+    """
     return push_boulder_direction(bot, "north")
 
 
 def push_boulder_south(bot: "Bot") -> bool:
+    """
+    Pushes a boulder one step southward.
+    """
     return push_boulder_direction(bot, "south")
 
 
@@ -120,7 +135,7 @@ def river_detection(bot: "Bot"):
 
 def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
     """
-    Pushes a boulder to a target position
+    Pushes a boulder to a target position.
     """
     # 1) imagine that we are levitating to find the path
     lev = bot.pathfinder.movements.levitating
@@ -145,7 +160,9 @@ def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
 @strategy
 def push_boulder_into_river(bot: "Bot") -> bool:
     """
-    Executes a sequence of steps to push adjacent boulder into the river
+    Executes a sequence of steps to push adjacent boulder into the river.
+    Tips:
+    - bot needs to stand near boulder first
     """
     # 1) check if we are standing next to a boulder
     boulder_pos = get_adjacent_boulder(bot)
@@ -194,7 +211,9 @@ def find_intersections(pos1, pos2):
 def align_boulder_for_bridge(bot: "Bot") -> bool:
     """
     Moves and positions the boulder with an open spot in a river
-    where it can close the gap and contribute to forming a bridge
+    where it can close the gap and contribute to forming a bridge.
+    Tips:
+    - bot needs to stand near boulder first
     """
     # 1) check if we are standing next to a boulder
     boulder_pos = get_adjacent_boulder(bot)
