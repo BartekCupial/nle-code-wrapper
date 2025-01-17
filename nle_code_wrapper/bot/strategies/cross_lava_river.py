@@ -24,6 +24,9 @@ def lava_river_detection(bot: "Bot"):
 
 @strategy
 def acquire_levitation(bot: "Bot"):
+    """
+    attempts to acquire levitation status by collecting items and trying them
+    """
     # 1) if we don't have levitation and there is a lava river
     # pickup potion, ring, boots
     if pickup_potion(bot) or pickup_ring(bot) or pickup_armor(bot):
@@ -64,6 +67,10 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
 
 @strategy
 def cross_lava_river(bot: "Bot"):
+    """
+    attempts to cross a lava river, even if this means burning to death
+    """
+
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
     if num_features <= num_lava_features:
         return False
@@ -83,6 +90,10 @@ def cross_lava_river(bot: "Bot"):
 
 @strategy
 def levitate_over_lava_river(bot: "Bot"):
+    """
+    full lava river crossing strategy by detecting lava, collecting levitation
+    items, using them and attempting to levitate over a lava river
+    """
     # 1) detect lava river
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
     if num_features <= num_lava_features:
@@ -98,6 +109,9 @@ def levitate_over_lava_river(bot: "Bot"):
 
 @strategy
 def freeze_lava_wand(bot: "Bot"):
+    """
+    attempts to freeze lava using wands from the bot's inventory, pointing eastward
+    """
     items = bot.inventory["wands"]
 
     # First try wands of cold, then any other wands
@@ -121,6 +135,9 @@ def freeze_lava_wand(bot: "Bot"):
 
 @strategy
 def freeze_lava_horn(bot: "Bot"):
+    """
+    attempts to freeze lava using horns from the bot's inventory, pointing eastward
+    """
     items = bot.inventory["tools"]
     for item in items:
         if item.name is not None and "horn" in item.name:
@@ -138,6 +155,9 @@ def freeze_lava_horn(bot: "Bot"):
 
 @strategy
 def approach_lava_river(bot: "Bot"):
+    """
+    navigates the bot to the edge of a detected lava river.
+    """
     # 1) detect lava river
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
     if num_features <= num_lava_features:
@@ -164,6 +184,10 @@ def approach_lava_river(bot: "Bot"):
 
 @strategy
 def freeze_lava_river(bot: "Bot"):
+    """
+    full lava river crossing strategy by detecting lava, collecting freezing
+    items, approaching lava edge, and attempting to freeze it
+    """
     # 1) detect lava river
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
     if num_features <= num_lava_features:
