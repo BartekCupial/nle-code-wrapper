@@ -21,6 +21,7 @@ def find_nearest_door(bot: "Bot"):
 def open_doors(bot: "Bot") -> bool:
     """
     Attempts to open closed doors.
+    Tips:
     - prioritizes doors by distance (where distance is calculated as number of agent steps)
     - tries to open the door up to 5 times
     - stop attempts if doors are locked
@@ -49,6 +50,7 @@ def open_doors(bot: "Bot") -> bool:
 def open_doors_kick(bot: "Bot") -> bool:
     """
     Attempts to open closed doors by kicking them.
+    Tips:
     - prioritizes doors by distance (where distance is calculated as number of agent steps)
     - kicks the door up to 5 times
     """
@@ -76,6 +78,7 @@ def open_doors_kick(bot: "Bot") -> bool:
 def open_doors_key(bot: "Bot") -> bool:
     """
     Attempts to open closed doors with key.
+    Tips:
     - prioritizes doors by distance (where distance is calculated as number of agent steps)
     - needs a key to open the doors
     - if no key, nothing happens
