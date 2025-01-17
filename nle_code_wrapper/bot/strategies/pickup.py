@@ -17,9 +17,8 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
 
     # Check if the game shows a single item, e.g. "a - a cloudy potion"
     if re.match(r"[a-zA-Z]\s-\s", bot.message):
-        # If there's exactly one item below us, just select its letter.
+        # If there's exactly one item below us
         letter = bot.message[0]
-        bot.type_text(letter)
         succ = True
 
     # Check if there's a pile or multiple items
