@@ -62,7 +62,12 @@ class Pathfinder:
     def set_movements(self, movements: Movements):
         self.movements = movements
 
-    def create_movements_graph(self, start_position: Tuple[int64, int64], cardinal_only: bool = False):
+    def create_movements_graph(
+        self, start_position: Tuple[int64, int64], cardinal_only: bool = False, no_cache: bool = False
+    ):
+        if no_cache:
+            return self._create_movements_graph(start_position, cardinal_only=cardinal_only)
+
         # cache the graph for the start position
         if (start_position, cardinal_only) not in self._graph_cache:
             self._graph_cache[(start_position, cardinal_only)] = self._create_movements_graph(
@@ -139,9 +144,13 @@ class Pathfinder:
         return position_distances
 
     def get_path_from_to(
-        self, start: Tuple[int64, int64], goal: Tuple[int64, int64], cardinal_only=False
+        self,
+        start: Tuple[int64, int64],
+        goal: Tuple[int64, int64],
+        cardinal_only=False,
+        no_cache: bool = False,
     ) -> Union[List[Tuple[int64, int64]], None]:
-        graph = self.create_movements_graph(start, cardinal_only=cardinal_only)
+        graph = self.create_movements_graph(start, cardinal_only=cardinal_only, no_cache=no_cache)
 
         # Convert positions to node IDs
         node_positions = nx.get_node_attributes(graph, "positions")
@@ -165,7 +174,9 @@ class Pathfinder:
         except nx.NetworkXNoPath:
             return None  # No path exists between the points
 
-    def get_path_to(self, goal: Tuple[int64, int64]) -> Union[List[Tuple[int64, int64]], None]:
+    def get_path_to(
+        self, goal: Tuple[int64, int64], cardinal_only: bool = False, no_cache: bool = False
+    ) -> Union[List[Tuple[int64, int64]], None]:
         """
         Get path to goal using the A* algorithm.
 
@@ -175,7 +186,7 @@ class Pathfinder:
             Union[List[Tuple[int64, int64]], None]: Path to goal if exists, otherwise None.
         """
 
-        result = self.get_path_from_to(self.bot.entity.position, goal)
+        result = self.get_path_from_to(self.bot.entity.position, goal, cardinal_only=cardinal_only, no_cache=no_cache)
         return result
 
     def random_move(self) -> None:
