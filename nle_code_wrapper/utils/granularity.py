@@ -83,8 +83,8 @@ goto = [
     "goto_room_north",
     "goto_room_south",
     "goto_room_west",
-    "goto_staircase_down",
-    "goto_staircase_up",
+    "goto_downstairs",
+    "goto_upstairs",
     "goto_unexplored_corridor",
     "goto_unexplored_room",
 ]

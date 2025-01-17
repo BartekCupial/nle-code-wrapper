@@ -8,8 +8,8 @@ from nle_code_wrapper.bot.strategies import (
     explore_room,
     fight_multiple_monsters,
     goto_corridor,
+    goto_downstairs,
     goto_room,
-    goto_staircase_down,
     goto_unexplored_room,
     open_doors,
 )
@@ -34,7 +34,7 @@ class TestCrossLavaRive:
                 try:
                     if fight_multiple_monsters(bot):
                         continue
-                    elif goto_staircase_down(bot):
+                    elif goto_downstairs(bot):
                         continue
                     else:
                         goto_room(bot)
@@ -63,7 +63,7 @@ class TestCrossLavaRive:
                 try:
                     if fight_multiple_monsters(bot):
                         continue
-                    elif goto_staircase_down(bot):
+                    elif goto_downstairs(bot):
                         continue
                     else:
                         goto_room(bot)
@@ -94,7 +94,7 @@ class TestCrossLavaRive:
                         continue
                     elif open_doors(bot):
                         continue
-                    elif goto_staircase_down(bot):
+                    elif goto_downstairs(bot):
                         continue
                     else:
                         goto_unexplored_room(bot)
