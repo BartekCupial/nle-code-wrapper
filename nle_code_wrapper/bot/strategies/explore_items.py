@@ -8,13 +8,7 @@ from nle_code_wrapper.utils.utils import coords
 @strategy
 def explore_items(bot: "Bot"):
     """
-    Explore the map by going to the closest item which is reachable and unexplored.
-
-    Args:
-        bot (Bot): The bot instance.
-
-    Returns:
-        bool: True if there is an item to explore, False otherwise.
+    explore the map by going to the closest unexplored item
     """
     level = bot.current_level
     item_coords = coords(bot.glyphs, G.OBJECTS)
