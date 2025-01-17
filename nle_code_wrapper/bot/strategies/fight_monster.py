@@ -12,14 +12,7 @@ from nle_code_wrapper.bot.strategy import repeat, strategy
 @strategy
 def fight_monster(bot: "Bot") -> bool:
     """
-    Directs the bot to fight the closest monster.
-    This function finds the closest monster entity that the bot can reach using its pathfinder.
-    If a reachable monster is found, the bot will attack it and the function will return True.
-    If no reachable monster is found, the function will return False.
-    Args:
-        bot (Bot): The bot instance that will perform the action.
-    Returns:
-        bool: True if the bot attacks a monster, False otherwise.
+    Directs the bot to fight melee the closest monster.
     """
 
     entity = min(
@@ -38,6 +31,9 @@ def fight_monster(bot: "Bot") -> bool:
 @strategy
 @repeat
 def wait_for_monster(bot: "Bot") -> bool:
+    """
+    Makes the bot wait for monsters to come within attack range.
+    """
     nearby_monsters = [e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]
 
     if not nearby_monsters:
@@ -57,6 +53,11 @@ def wait_for_monster(bot: "Bot") -> bool:
 @strategy
 @repeat
 def fight_multiple_monsters(bot: "Bot") -> bool:
+    """
+    Tactical combat behavior whenwhen fighting swarms of enemies.
+    The bot will seek choke points, wait for the enemies and fight them one by one.
+    """
+
     # Find tactical positions: corridor ends and doorways
     distances = bot.pathfinder.distances(bot.entity.position)
     nearby_monsters = [e for e in bot.entities if distances.get(e.position, None)]
@@ -103,7 +104,10 @@ def fight_multiple_monsters(bot: "Bot") -> bool:
 
 
 @strategy
-def goto_tactical_position(bot: "Bot") -> bool:
+def goto_choke_point(bot: "Bot") -> bool:
+    """
+    Directs the bot to move to the nearest choke point.
+    """
     distances = bot.pathfinder.distances(bot.entity.position)
     nearby_monsters = [e for e in bot.entities if distances.get(e.position, None)]
     tactical_positions = find_tactical_positions(bot, nearby_monsters)

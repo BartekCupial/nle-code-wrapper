@@ -66,7 +66,7 @@ fight_monster_easy = [
 
 fight_monster_hard = [
     "fight_monster",
-    "goto_tactical_position",
+    "goto_choke_point",
     "wait_for_monster",
     "run_away",
 ]

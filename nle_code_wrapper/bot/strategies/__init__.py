@@ -57,7 +57,7 @@ from nle_code_wrapper.bot.strategies.explore import (
 from nle_code_wrapper.bot.strategies.fight_monster import (
     fight_monster,
     fight_multiple_monsters,
-    goto_tactical_position,
+    goto_choke_point,
     wait_for_monster,
 )
 from nle_code_wrapper.bot.strategies.goto import (
@@ -178,7 +178,7 @@ __all__ = [
     explore_room_west,
     fight_monster,
     fight_multiple_monsters,
-    goto_tactical_position,
+    goto_choke_point,
     wait_for_monster,
     goto_corridor,
     goto_corridor_east,
