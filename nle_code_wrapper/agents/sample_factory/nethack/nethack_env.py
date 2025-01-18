@@ -6,7 +6,7 @@ import nle_progress  # NOQA: F401
 from nle import nethack
 from nle.nethack import NETHACKOPTIONS
 from nle_progress import NLEProgressWrapper
-from nle_utils.wrappers import GymV21CompatibilityV0, NLETimeLimit
+from nle_utils.wrappers import FinalStatsWrapper, GymV21CompatibilityV0, NLETimeLimit, TaskRewardsInfoWrapper
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
@@ -77,6 +77,8 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
 
     env = gym.make(env_name, **kwargs)
     env = NLEProgressWrapper(env)
+    env = TaskRewardsInfoWrapper(env)
+    env = FinalStatsWrapper(env)
 
     # wrap NLE with timeout
     env = NLETimeLimit(env)
