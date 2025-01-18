@@ -5,6 +5,7 @@ import gym
 import nle  # NOQA: F401
 from nle import nethack
 from nle.nethack import NETHACKOPTIONS
+from nle_progress import NLEProgressWrapper
 from nle_utils.wrappers import GymV21CompatibilityV0, NLETimeLimit
 
 import nle_code_wrapper.bot.panics as panic_module
@@ -68,6 +69,7 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
             kwargs[param_name] = param_value
 
     env = gym.make(env_name, **kwargs)
+    env = NLEProgressWrapper(env)
 
     # wrap NLE with timeout
     env = NLETimeLimit(env)
