@@ -33,12 +33,17 @@ setup(
     license="MIT",
     keywords="reinforcement learning ai nlp llm code",
     project_urls={},
-    install_requires=["sortedcontainers", "networkx"],
+    install_requires=[
+        "sortedcontainers",
+        "networkx",
+        "nle-progress @ git+https://github.com/BartekCupial/nle-progress.git",
+        "minihack @ git+https://github.com/BartekCupial/minihack.git",
+        "gym-minigrid",
+    ],
     extras_require={
         # some tests require Atari and Mujoco so let's make sure dev environment has that
         "dev": ["black", "isort>=5.12", "pytest<8.0", "flake8", "pre-commit", "twine"] + _docs_deps,
         "mrunner": ["mrunner @ git+https://gitlab.com/awarelab/mrunner.git"],
-        "minihack": ["minihack @ git+https://github.com/BartekCupial/minihack.git", "gym-minigrid"],
     },
     package_dir={"": "./"},
     packages=setuptools.find_packages(where="./", include=["nle_code_wrapper*", "examples*"]),
