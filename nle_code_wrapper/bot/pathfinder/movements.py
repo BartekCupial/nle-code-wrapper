@@ -42,7 +42,7 @@ class Movements:
     @property
     def walkable_diagonally(self) -> bool:
         level = self.bot.current_level
-        return level.dungeon_number != DungeonLevel.SOKOBAN
+        return level.dungeon_number != DungeonLevel.SOKOBAN.value
 
     def walkable_cardinal(self, pos: Tuple[int64, int64]) -> bool:
         level = self.bot.current_level
