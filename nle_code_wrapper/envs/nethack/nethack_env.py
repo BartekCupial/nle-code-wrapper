@@ -3,6 +3,7 @@ from typing import Optional, Tuple
 
 import gym
 import nle  # NOQA: F401
+import nle_progress  # NOQA: F401
 from nle import nethack
 from nle.nethack import NETHACKOPTIONS
 from nle_progress import NLEProgressWrapper
@@ -12,6 +13,12 @@ import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers.nle_code_wrapper import NLECodeWrapper
+
+NETHACK_ENVS = []
+for env_spec in gym.envs.registry.all():
+    id = env_spec.id
+    if "NetHack" in id:
+        NETHACK_ENVS.append(id)
 
 
 def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = None):
