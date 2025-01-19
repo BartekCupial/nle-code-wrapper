@@ -24,7 +24,7 @@ class TestRaySimulator:
         bot.reset(seed=seed)
 
         bot.type_text("i")
-        popup_message = bot.popup_message
+        popup_message = bot.message
         bot.type_text(" ")
 
         assert len(popup_message.split("\n")) > 2
@@ -48,6 +48,6 @@ class TestRaySimulator:
 
         goto_item(bot)
         bot.step(A.Command.PICKUP)
-        popup_message = bot.popup_message
+        popup_message = bot.message
 
         assert len(popup_message.split("\n")) > 2
