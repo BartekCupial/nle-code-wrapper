@@ -104,9 +104,18 @@ class Pathfinder:
 
         while queue:
             current_pos = queue.popleft()
+            current_node = pos_to_node[current_pos]
 
             # Check all neighbors
             for nbr in self.neighbors(current_pos, cardinal_only=cardinal_only):
+                nbr_node = pos_to_node.get(nbr)
+
+                if nbr_node is not None:
+                    # If neighbor already exists, just add edge if not present
+                    if not graph.has_edge(current_node, nbr_node):
+                        graph.add_edge(current_node, nbr_node)
+                    continue
+
                 if nbr in seen:
                     continue
 
