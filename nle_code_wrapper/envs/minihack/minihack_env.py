@@ -4,7 +4,7 @@ from typing import Optional
 import gym
 import minihack  # NOQA: F401
 from nle.env.base import FULL_ACTIONS
-from nle_utils.wrappers import GymV21CompatibilityV0, NLETimeLimit
+from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
@@ -69,6 +69,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     # wrap NLE with timeout
     env = NLETimeLimit(env)
+    env = AutoMore(env)
 
     env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
 
