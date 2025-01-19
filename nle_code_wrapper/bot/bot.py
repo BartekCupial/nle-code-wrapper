@@ -121,14 +121,8 @@ class Bot:
         if self.terminated or self.truncated:
             raise BotFinished
 
-        # auto more, we need to look through all tty_chars
-        # you can have more in first row but also when you step on item pile
-        if "--More--" in bytes(self.tty_chars).decode("latin-1"):
-            self.step(A.MiscAction.MORE)
-            # TODO: current way skips some messages, for example we unnecessary kick the chest
-        else:
-            self.update()
-            self.check_panics()
+        self.update()
+        self.check_panics()
 
     def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         """
@@ -239,7 +233,6 @@ class Bot:
         self.entity = self.get_entity(self.current_obs)
         self.entities = self.get_entities(self.current_obs)
         self.current_level = self.get_current_level(self.current_obs)
-        self.popup_message = self.get_popup_message(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
         self.pathfinder.update()
@@ -261,7 +254,7 @@ class Bot:
         Returns:
             str with the message
         """
-        return bytes(last_obs["message"]).decode("latin-1").rstrip("\x00")
+        return last_obs["text_message"]
 
     def get_tty_chars(self, last_obs):
         return last_obs["tty_chars"]
@@ -310,57 +303,3 @@ class Bot:
         if key not in self.levels:
             self.levels[key] = Level(*key)
         return self.levels[key]
-
-    def get_popup_message(self, last_obs) -> str:
-        """
-        Emulates the logic of the C++ snippet for extracting text-based popup messages
-        from a 2D array of character codes.
-
-        :param tty_chars: A (rows x columns) NumPy array of uint8 (ASCII) codes.
-        :return: The extracted popup message as a string.
-        """
-        tty_chars = last_obs["tty_chars"]
-
-        # Helper to trim a line
-        def trim(s: str) -> str:
-            return s.strip()
-
-        rows, columns = tty_chars.shape
-        if rows == 0:
-            return ""
-
-        # Convert the first row and second row to strings
-        first_row = bytes(tty_chars[0]).decode("ascii", errors="ignore")
-        second_row = bytes(tty_chars[1]).decode("ascii", errors="ignore") if rows > 1 else ""
-
-        # Determine the left indent by finding first non-whitespace in the first row
-        indent = len(first_row) - len(first_row.lstrip())
-
-        first_row_str = trim(first_row)
-        second_row_str = trim(second_row)
-
-        # If both first and second row are empty after trimming, just return empty
-        if not first_row_str and not second_row_str:
-            return first_row_str  # i.e. ""
-
-        output_lines = []
-        for row_idx in range(rows):
-            # Convert row row_idx to string, but skip leading indent
-            row_bytes = tty_chars[row_idx, indent:columns]
-            row_str = trim(bytes(row_bytes).decode("ascii", errors="ignore"))
-
-            # Identify if this line signals a multipage message ending: --More-- | (end) | (X of N)
-            regex = re.compile(r"(--More--|\(end\)|\(\d+ of \d+\))")
-            multipage_message = len(regex.findall(row_str)) == 1
-
-            # Add this row to output (if not empty)
-            if row_str:
-                output_lines.append(row_str)
-
-            # If we detect it is a multi-page message, return what we have
-            if multipage_message:
-                return "\n".join(output_lines)
-
-        # If we finish the loop without hitting a multipage or blank-run break
-        # and we had non-empty first/second lines, return empty
-        return ""

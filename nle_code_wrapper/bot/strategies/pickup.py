@@ -56,7 +56,7 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
     # If we succeeded in initiating a pickup (single item, pile, or walking onto it):
     if succ:
         if bot.xwaitingforspace:
-            lines = bot.popup_message.split("\n")
+            lines = bot.message.split("\n")
             mark_items = False
             while lines:
                 line = lines.pop(0)
@@ -73,7 +73,7 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
                 # 2) if we ehxausted the current page go to the next one
                 if re.match("\(\d+ of \d+\)", line):  # NOQA: W605
                     bot.type_text(" ")
-                    lines = bot.popup_message.split("\n")
+                    lines = bot.message.split("\n")
                     continue
 
                 # 3) mark items for picking up

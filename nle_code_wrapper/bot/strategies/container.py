@@ -135,7 +135,7 @@ def loot_container(bot: "Bot"):
             bot.type_text("o")  # o - take something out
             # container can be empty
             if bot.xwaitingforspace:
-                lines = bot.popup_message.split("\n")
+                lines = bot.message.split("\n")
                 if "Take out what?" in lines[0]:
                     bot.step(A.Command.PICKUP)
                 else:
