@@ -2,7 +2,7 @@ import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import hard, item, navigation
+from nle_code_wrapper.utils.granularity import easy, item, navigation
 
 name = globals()["script"][:-3]
 
@@ -35,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +47,18 @@ config = {
 }
 
 strategies = [
-    *hard,
-    *navigation,
-    *item,
+    "goto_room",
+    "goto_room_east",
+    "goto_room_north",
+    "goto_room_south",
+    "goto_room_west",
+    "goto_downstairs",
+    "goto_upstairs",
+    "explore_room",
+    "open_doors",
+    "open_doors_kick",
+    "fight_monster",
+    "fight_multiple_monsters",
 ]
 
 # params different between exps
@@ -66,8 +74,12 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-WoD-Hard-Full-v0",
-        "MiniHack-WoD-Pro-Full-v0",
+        "MiniHack-MultiRoom-N10-v0",
+        "MiniHack-MultiRoom-N6-Locked-v0",
+        "MiniHack-MultiRoom-N10-Lava-v0",
+        "MiniHack-MultiRoom-N6-Monster-v0",
+        "MiniHack-MultiRoom-N6-Extreme-v0",
+        "MiniHack-MultiRoom-N6-LavaMonsters-v0",
     ]
 ]
 

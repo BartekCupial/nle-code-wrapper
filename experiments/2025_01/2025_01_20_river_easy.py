@@ -35,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +47,23 @@ config = {
 }
 
 strategies = [
-    *easy,
-    *navigation,
-    *item,
+    "goto_downstairs",
+    "goto_upstairs",
+    "explore_room",
+    "explore_room_east",
+    "explore_room_north",
+    "explore_room_south",
+    "explore_room_west",
+    "fight_monster",
+    "fight_multiple_monsters",
+    "goto_boulder",
+    "push_boulder_east",
+    "push_boulder_north",
+    "push_boulder_south",
+    "push_boulder_west",
+    "align_boulder_for_bridge",
+    "goto_boulder_closest_to_river",
+    "push_boulder_into_river",
 ]
 
 # params different between exps
@@ -64,14 +77,13 @@ params_grid = [
         "env": [env],
         "exp_point": [env],
         "group": [env],
-        "add_letter_strategies": [True],
-        "add_direction_strategies": [True],
     }
     for env in [
-        "MiniHack-HideNSeek-Mapped-v0",
-        "MiniHack-HideNSeek-v0",
-        "MiniHack-HideNSeek-Lava-v0",
-        "MiniHack-HideNSeek-Big-v0",
+        "MiniHack-River-v0",
+        "MiniHack-River-Monster-v0",
+        "MiniHack-River-Lava-v0",
+        "MiniHack-River-MonsterLava-v0",
+        "MiniHack-River-Narrow-v0",
     ]
 ]
 

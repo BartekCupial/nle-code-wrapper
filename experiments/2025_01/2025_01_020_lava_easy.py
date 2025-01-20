@@ -5,7 +5,6 @@ from mrunner.helpers.specification_helper import create_experiments_helper
 from nle_code_wrapper.utils.granularity import easy, item, navigation
 
 name = globals()["script"][:-3]
-
 num_minibatches = 1
 num_epochs = 1
 num_envs = 128
@@ -35,7 +34,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +46,28 @@ config = {
 }
 
 strategies = [
-    *easy,
-    *navigation,
-    *item,
+    "goto_room",
+    "goto_room_east",
+    "goto_room_north",
+    "goto_room_south",
+    "goto_room_west",
+    "goto_downstairs",
+    "goto_upstairs",
+    "pickup_amulet",
+    "pickup_armor",
+    "pickup_coin",
+    "pickup_compestibles",
+    "pickup_gem",
+    "pickup_potion",
+    "pickup_ring",
+    "pickup_scroll",
+    "pickup_spellbook",
+    "pickup_tool",
+    "pickup_wand",
+    "pickup_weapon",
+    "acquire_levitation",
+    "cross_lava_river",
+    "freeze_lava_river",
 ]
 
 # params different between exps
@@ -66,11 +83,9 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-River-v0",
-        "MiniHack-River-Monster-v0",
-        "MiniHack-River-Lava-v0",
-        "MiniHack-River-MonsterLava-v0",
-        "MiniHack-River-Narrow-v0",
+        "MiniHack-Freeze-Lava-Full-v0",  # cross lava freeze
+        "MiniHack-LavaCross-Levitate-Full-v0",  # cross lava levitation
+        "MiniHack-LavaCross-Full-v0",  # cross lava freeze or levitation
     ]
 ]
 
