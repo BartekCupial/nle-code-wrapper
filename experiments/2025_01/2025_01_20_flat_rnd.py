@@ -29,7 +29,7 @@ config = {
     "wandb_user": "bartekcupial",
     "wandb_project": "nle_code_wrapper",
     "wandb_group": "ideas-ncbr",
-    "with_wandb": False,
+    "with_wandb": True,
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": False,
     "max_grad_norm": 40.0,
@@ -69,6 +69,7 @@ params_grid = [
         "exp_point": [env],
         "group": [env],
         "rnd_int_coef": [0.01, 0.05, 0.1, 0.2, 0.5, 1.0],
+        "rnd_update_proportion": [0.1, 0.25],
     }
     for env_group in env_groups
     for env in env_group
