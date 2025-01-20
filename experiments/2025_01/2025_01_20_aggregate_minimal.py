@@ -71,6 +71,7 @@ env_groups = [
             "CustomMiniHack-Corridor-R8-v0",
             "CustomMiniHack-Corridor-R10-v0",
         ],
+        None,
     ),
     (
         corridor,
@@ -81,6 +82,7 @@ env_groups = [
             "CustomMiniHack-Corridor-R8-v0",
             "CustomMiniHack-Corridor-R10-v0",
         ],
+        None,
     ),
     (
         corridor_battle_easy,
@@ -89,6 +91,7 @@ env_groups = [
             "MiniHack-CorridorBattle-v0",
             "MiniHack-CorridorBattle-Dark-v0",
         ],
+        None,
     ),
     (
         corridor_battle_hard,
@@ -97,6 +100,7 @@ env_groups = [
             "MiniHack-CorridorBattle-v0",
             "MiniHack-CorridorBattle-Dark-v0",
         ],
+        None,
     ),
     (
         wod_easy,
@@ -105,6 +109,7 @@ env_groups = [
             "MiniHack-WoD-Hard-Full-v0",
             "MiniHack-WoD-Pro-Full-v0",
         ],
+        None,
     ),
     (
         wod_hard,
@@ -113,6 +118,7 @@ env_groups = [
             "MiniHack-WoD-Hard-Full-v0",
             "MiniHack-WoD-Pro-Full-v0",
         ],
+        None,
     ),
     (
         river_easy,
@@ -124,6 +130,7 @@ env_groups = [
             "MiniHack-River-MonsterLava-v0",
             "MiniHack-River-Narrow-v0",
         ],
+        None,
     ),
     (
         river_hard,
@@ -135,6 +142,7 @@ env_groups = [
             "MiniHack-River-MonsterLava-v0",
             "MiniHack-River-Narrow-v0",
         ],
+        None,
     ),
     (
         quest_easy,
@@ -144,6 +152,7 @@ env_groups = [
             "MiniHack-Quest-Medium-v0",
             "MiniHack-Quest-Hard-v0",
         ],
+        None,
     ),
     (
         quest_hard,
@@ -153,6 +162,7 @@ env_groups = [
             "MiniHack-Quest-Medium-v0",
             "MiniHack-Quest-Hard-v0",
         ],
+        None,
     ),
     (
         minigrid_easy,
@@ -165,6 +175,7 @@ env_groups = [
             "MiniHack-MultiRoom-N6-Extreme-v0",
             "MiniHack-MultiRoom-N6-LavaMonsters-v0",
         ],
+        False,
     ),
     (
         minigrid_hard,
@@ -177,6 +188,7 @@ env_groups = [
             "MiniHack-MultiRoom-N6-Extreme-v0",
             "MiniHack-MultiRoom-N6-LavaMonsters-v0",
         ],
+        False,
     ),
     (
         lava_easy,
@@ -186,6 +198,7 @@ env_groups = [
             "MiniHack-LavaCross-Levitate-Full-v0",
             "MiniHack-LavaCross-Full-v0",
         ],
+        None,
     ),
     (
         lava_hard,
@@ -195,6 +208,7 @@ env_groups = [
             "MiniHack-LavaCross-Levitate-Full-v0",
             "MiniHack-LavaCross-Full-v0",
         ],
+        None,
     ),
     (
         hideNseek,
@@ -205,6 +219,7 @@ env_groups = [
             "MiniHack-HideNSeek-Lava-v0",
             "MiniHack-HideNSeek-Big-v0",
         ],
+        None,
     ),
     (
         hideNseek,
@@ -215,6 +230,7 @@ env_groups = [
             "MiniHack-HideNSeek-Lava-v0",
             "MiniHack-HideNSeek-Big-v0",
         ],
+        None,
     ),
 ]
 
@@ -229,6 +245,7 @@ params_grid = [
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_tags": [f"{name}_{env_group[1]}"],
+        "autopickup": [env_group[3]],
     }
     for env_group in env_groups
     for env in env_group[2]
