@@ -1,6 +1,6 @@
 import ast
 
-from sample_factory.utils.utils import str2bool
+from nle_utils.utils.utils import str2bool
 
 
 def add_extra_params_model(parser):
