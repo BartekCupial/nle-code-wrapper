@@ -2,7 +2,7 @@ import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import hard, item, navigation
+from nle_code_wrapper.utils.granularity import easy, item, navigation
 
 name = globals()["script"][:-3]
 
@@ -35,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +47,48 @@ config = {
 }
 
 strategies = [
-    *hard,
-    *navigation,
-    *item,
+    "goto_corridor",
+    "goto_corridor_east",
+    "goto_corridor_north",
+    "goto_corridor_south",
+    "goto_corridor_west",
+    "goto_room",
+    "goto_room_east",
+    "goto_room_north",
+    "goto_room_south",
+    "goto_room_west",
+    "goto_downstairs",
+    "goto_upstairs",
+    "explore_corridor",
+    "explore_corridor_east",
+    "explore_corridor_north",
+    "explore_corridor_south",
+    "explore_corridor_west",
+    "explore_room",
+    "explore_room_east",
+    "explore_room_north",
+    "explore_room_south",
+    "explore_room_west",
+    "open_doors",
+    "open_doors_kick",
+    "pickup_amulet",
+    "pickup_armor",
+    "pickup_coin",
+    "pickup_compestibles",
+    "pickup_gem",
+    "pickup_potion",
+    "pickup_ring",
+    "pickup_scroll",
+    "pickup_spellbook",
+    "pickup_tool",
+    "pickup_wand",
+    "pickup_weapon",
+    "acquire_levitation",
+    "cross_lava_river",
+    "freeze_lava_river",
+    "fight_monster",
+    "fight_multiple_monsters",
+    "approach_and_zap_monster",
 ]
 
 # params different between exps
@@ -66,9 +104,9 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-Freeze-Lava-Full-v0",  # cross lava freeze
-        "MiniHack-LavaCross-Levitate-Full-v0",  # cross lava levitation
-        "MiniHack-LavaCross-Full-v0",  # cross lava freeze or levitation
+        "MiniHack-Quest-Easy-v0",
+        "MiniHack-Quest-Medium-v0",
+        "MiniHack-Quest-Hard-v0",
     ]
 ]
 

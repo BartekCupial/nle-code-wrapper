@@ -35,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +47,24 @@ config = {
 }
 
 strategies = [
-    *easy,
-    *navigation,
-    *item,
+    "explore_room",
+    "explore_room_east",
+    "explore_room_north",
+    "explore_room_south",
+    "explore_room_west",
+    "pickup_amulet",
+    "pickup_armor",
+    "pickup_coin",
+    "pickup_compestibles",
+    "pickup_gem",
+    "pickup_potion",
+    "pickup_ring",
+    "pickup_scroll",
+    "pickup_spellbook",
+    "pickup_tool",
+    "pickup_wand",
+    "pickup_weapon",
+    "approach_and_zap_monster",
 ]
 
 # params different between exps
@@ -66,9 +80,8 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-Quest-Easy-v0",
-        "MiniHack-Quest-Medium-v0",
-        "MiniHack-Quest-Hard-v0",
+        "MiniHack-WoD-Hard-Full-v0",
+        "MiniHack-WoD-Pro-Full-v0",
     ]
 ]
 

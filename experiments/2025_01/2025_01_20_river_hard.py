@@ -2,7 +2,7 @@ import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import easy, item, navigation
+from nle_code_wrapper.utils.granularity import hard, item, navigation
 
 name = globals()["script"][:-3]
 
@@ -35,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +47,22 @@ config = {
 }
 
 strategies = [
-    *easy,
-    *navigation,
-    *item,
+    "goto_downstairs",
+    "goto_upstairs",
+    "explore_room",
+    "explore_room_east",
+    "explore_room_north",
+    "explore_room_south",
+    "explore_room_west",
+    "fight_monster",
+    "goto_choke_point",
+    "wait_for_monster",
+    "run_away",
+    "goto_boulder",
+    "push_boulder_east",
+    "push_boulder_north",
+    "push_boulder_south",
+    "push_boulder_west",
 ]
 
 # params different between exps
@@ -66,8 +78,11 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-WoD-Hard-Full-v0",
-        "MiniHack-WoD-Pro-Full-v0",
+        "MiniHack-River-v0",
+        "MiniHack-River-Monster-v0",
+        "MiniHack-River-Lava-v0",
+        "MiniHack-River-MonsterLava-v0",
+        "MiniHack-River-Narrow-v0",
     ]
 ]
 

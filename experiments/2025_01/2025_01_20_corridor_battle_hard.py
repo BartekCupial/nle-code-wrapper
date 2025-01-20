@@ -35,7 +35,6 @@ config = {
     "decorrelate_envs_on_one_worker": True,
     "code_wrapper": True,
     "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "max_strategy_steps": 100,
     "add_letter_strategies": False,
     "add_direction_strategies": False,
     "add_more_strategy": False,
@@ -48,9 +47,32 @@ config = {
 }
 
 strategies = [
-    *hard,
-    *navigation,
-    *item,
+    "goto_corridor",
+    "goto_corridor_east",
+    "goto_corridor_north",
+    "goto_corridor_south",
+    "goto_corridor_west",
+    "goto_room",
+    "goto_room_east",
+    "goto_room_north",
+    "goto_room_south",
+    "goto_room_west",
+    "goto_downstairs",
+    "goto_upstairs",
+    "explore_corridor",
+    "explore_corridor_east",
+    "explore_corridor_north",
+    "explore_corridor_south",
+    "explore_corridor_west",
+    "explore_room",
+    "explore_room_east",
+    "explore_room_north",
+    "explore_room_south",
+    "explore_room_west",
+    "fight_monster",
+    "goto_choke_point",
+    "wait_for_monster",
+    "run_away",
 ]
 
 # params different between exps
@@ -66,12 +88,8 @@ params_grid = [
         "group": [env],
     }
     for env in [
-        "MiniHack-MultiRoom-N10-v0",
-        "MiniHack-MultiRoom-N6-Locked-v0",
-        "MiniHack-MultiRoom-N10-Lava-v0",
-        "MiniHack-MultiRoom-N6-Monster-v0",
-        "MiniHack-MultiRoom-N6-Extreme-v0",
-        "MiniHack-MultiRoom-N6-LavaMonsters-v0",
+        "MiniHack-CorridorBattle-v0",
+        "MiniHack-CorridorBattle-Dark-v0",
     ]
 ]
 
