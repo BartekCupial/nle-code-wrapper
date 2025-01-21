@@ -34,22 +34,35 @@ class Movements:
     The player can only move diagonally if his or her total inventory weight is 600 or less.  Otherwise, the player will receive the message "You are carrying too much to get through."
     """
 
-    def __init__(self, bot: "Bot", allow_walking_through_traps: bool = True, levitating: bool = False) -> None:
+    def __init__(
+        self,
+        bot: "Bot",
+        allow_walking_through_traps: bool = True,
+        levitating: bool = False,
+        monster_collision: bool = True,
+        cardinal_only: bool = False,
+    ) -> None:
         self.bot: "Bot" = bot
-        self.allow_walking_through_traps = allow_walking_through_traps
+        self.allow_walking_through_traps = allow_walking_through_traps  # TODO: handle traps
         self.levitating = levitating
+        self.monster_collision = monster_collision
+        self.cardinal_only = cardinal_only
 
     @property
     def walkable_diagonally(self) -> bool:
         level = self.bot.current_level
         return level.dungeon_number != DungeonLevel.SOKOBAN.value
 
-    def walkable_cardinal(self, pos: Tuple[int64, int64]) -> bool:
+    def walkable_cardinal(self, new_pos: Tuple[int64, int64]) -> bool:
         level = self.bot.current_level
-        glyph_walkable = level.walkable[pos]
-        if self.levitating and level.objects[pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
+        glyph_walkable = level.walkable[new_pos]
+        if self.levitating and level.objects[new_pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
             glyph_walkable = True
-        walkable = glyph_walkable and not (level.objects[pos] in G.BOULDER)
+
+        if self.monster_collision:
+            glyph_walkable = glyph_walkable and new_pos not in [e.position for e in self.bot.entities]
+
+        walkable = glyph_walkable and not (level.objects[new_pos] in G.BOULDER)
         return walkable
 
     def get_move_cardinal(
@@ -92,6 +105,10 @@ class Movements:
         glyph_walkable = level.walkable[new_pos]
         if self.levitating and level.objects[new_pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
             glyph_walkable = True
+
+        if self.monster_collision:
+            glyph_walkable = glyph_walkable and new_pos not in [e.position for e in self.bot.entities]
+
         walkable = (
             # can we walk there
             glyph_walkable
@@ -124,9 +141,7 @@ class Movements:
         if self.walkable_intermediate(pos, new_pos):
             neighbors.append(new_pos)
 
-    def neighbors(
-        self, node: Tuple[int64, int64], cardinal_only: bool = False
-    ) -> List[Union[Any, Tuple[int64, int64]]]:
+    def neighbors(self, node: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         """
         This method calculates the possible moves for the player.
 
@@ -140,7 +155,7 @@ class Movements:
         for dir in cardinal_directions:
             self.get_move_cardinal(node, dir, neighbors)
 
-        if not cardinal_only:
+        if not self.cardinal_only:
             if self.walkable_diagonally:
                 for dir in intermediate_directions:
                     self.get_move_intermediate(node, dir, neighbors)

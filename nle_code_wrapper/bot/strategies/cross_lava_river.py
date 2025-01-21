@@ -47,8 +47,8 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
         return False
 
     # imagine that we are levitating to compute path to cross lava
-    lev = bot.pathfinder.movements.levitating
-    bot.pathfinder.movements.levitating = True
+    lev = bot.movements.levitating
+    bot.movements.levitating = True
 
     # select path which will cross lava (there could be other rooms)
     lava_paths = []
@@ -59,7 +59,7 @@ def shortest_path_to_the_other_side(bot: "Bot", positions):
         if any([bot.glyphs[tuple(point)] == SS.S_lava for point in path if point]):
             lava_paths.append(path)
 
-    bot.pathfinder.movements.levitating = lev
+    bot.movements.levitating = lev
 
     # return shortest path
     return min(lava_paths, key=len, default=None)

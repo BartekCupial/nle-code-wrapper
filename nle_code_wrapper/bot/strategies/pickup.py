@@ -10,6 +10,9 @@ from nle_code_wrapper.bot.strategies.goto import goto_glyph
 from nle_code_wrapper.bot.strategy import strategy
 
 
+# TODO: track items on the floor and use them for pickup
+# TODO: currently there can be a loop, pickup_armor, we are standing on ring
+# we will pickup ring drop it and return
 @strategy
 def pickup_item(bot: "Bot", item_class: ItemClasses):
     bot.step(A.Command.PICKUP)

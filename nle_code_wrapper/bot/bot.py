@@ -6,6 +6,7 @@ from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 import numpy as np
+from nle import nethack
 from nle.env.base import NLE
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
@@ -34,14 +35,24 @@ class Bot:
         self.env = env
         self.gamma = gamma
 
-        # plugins # TODO: find a better way for adding plugins
-        self.movements: Movements = Movements(self)
+        self._movements: Movements = None
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
 
         self.strategies: list[Callable] = []
         self.panics: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
+
+    @property
+    def movements(self):
+        if self._movements is None:
+            self._movements = Movements(self, levitating=self.blstats.prop_mask & nethack.BL_MASK_LEV)
+
+        return self._movements
+
+    @movements.setter
+    def movements(self, new_movements) -> None:
+        self._movements = new_movements
 
     def strategy(self, func: Callable) -> None:
         """
@@ -91,6 +102,7 @@ class Bot:
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         self.update()
+        self.movements = None
 
         return self.current_obs, self.last_info
 
@@ -235,6 +247,7 @@ class Bot:
         self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
+        self.movements.update()
         self.pathfinder.update()
         self.pvp.update()
 

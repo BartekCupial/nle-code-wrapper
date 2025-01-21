@@ -19,7 +19,6 @@ class Pvp:
         # The current target entity
         self.target: Entity = None
 
-        self.movements = bot.movements
         self.ray_simulator = RaySimulator(bot)
 
         # How close the bot must be to the target entity to attack it.

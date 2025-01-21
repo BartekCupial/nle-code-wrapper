@@ -5,7 +5,8 @@ from nle_utils.glyph import G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
+from nle_code_wrapper.bot.exceptions import BotFinished
+from nle_code_wrapper.bot.pathfinder.movements import Movements
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features, save_boolean_array_pillow
 
@@ -29,7 +30,10 @@ def strategy(func):
             bot.truncated = True
             raise BotFinished
 
-        return func(bot, *args, **kwargs)
+        ret = func(bot, *args, **kwargs)
+        bot.movements = None
+
+        return ret
 
     return wrapper
 
@@ -87,14 +91,16 @@ def repeat_until_discovery(func):
             dead end is a position which has on or less cardinal neighbors
             to confirm dead end we check if bot was on this position
             """
+            prev_movements = bot.movements
+            bot.movements = Movements(bot, cardinal_only=True)
             dead_ends = np.array(
                 [
                     n
                     for n in np.argwhere(features)
-                    if bot.current_level.was_on[tuple(n)]
-                    and len(bot.pathfinder.neighbors(tuple(n), cardinal_only=True)) <= 1
+                    if bot.current_level.was_on[tuple(n)] and len(bot.pathfinder.neighbors(tuple(n))) <= 1
                 ]
             )
+            bot.movements = prev_movements
             return set(map(tuple, dead_ends))
 
         def get_items():

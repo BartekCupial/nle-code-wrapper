@@ -7,7 +7,6 @@ from nle.nethack import actions as A
 from numpy import int64
 
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.pathfinder.distance import chebyshev_distance
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 
 if TYPE_CHECKING:
@@ -43,7 +42,6 @@ class Pathfinder:
 
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
-        self.movements = bot.movements
         self._graph_cache = {}
 
     @property
@@ -59,26 +57,25 @@ class Pathfinder:
             "southeast": (1, 1),
         }
 
-    def set_movements(self, movements: Movements):
-        self.movements = movements
-
-    def create_movements_graph(
-        self, start_position: Tuple[int64, int64], cardinal_only: bool = False, no_cache: bool = False
-    ):
+    def create_movements_graph(self, start_position: Tuple[int64, int64], no_cache: bool = False):
         if no_cache:
-            return self._create_movements_graph(start_position, cardinal_only=cardinal_only)
+            return self._create_movements_graph(start_position)
+
+        key = (
+            start_position,
+            self.bot.movements.allow_walking_through_traps,
+            self.bot.movements.levitating,
+            self.bot.movements.cardinal_only,
+            self.bot.movements.monster_collision,
+        )
 
         # cache the graph for the start position
-        if (start_position, cardinal_only) not in self._graph_cache:
-            self._graph_cache[(start_position, cardinal_only)] = self._create_movements_graph(
-                start_position, cardinal_only=cardinal_only
-            )
+        if key not in self._graph_cache:
+            self._graph_cache[key] = self._create_movements_graph(start_position)
 
-        return self._graph_cache[(start_position, cardinal_only)]
+        return self._graph_cache[key]
 
-    def _create_movements_graph(
-        self, start_position: Tuple[int64, int64], cardinal_only: bool = False, start_count: int = 0
-    ) -> nx.Graph:
+    def _create_movements_graph(self, start_position: Tuple[int64, int64], start_count: int = 0) -> nx.Graph:
         """
         Creates a networkx graph from a boolean position matrix where nodes represent True positions
         and edges connect positions that are neighbors according to self.neighbors().
@@ -107,7 +104,7 @@ class Pathfinder:
             current_node = pos_to_node[current_pos]
 
             # Check all neighbors
-            for nbr in self.neighbors(current_pos, cardinal_only=cardinal_only):
+            for nbr in self.neighbors(current_pos):
                 nbr_node = pos_to_node.get(nbr)
 
                 if nbr_node is not None:
@@ -136,12 +133,12 @@ class Pathfinder:
 
         return graph
 
-    def distances(self, graph: nx.Graph, cardinal_only: bool = False) -> dict:
+    def distances(self, graph: nx.Graph) -> dict:
         """
         Returns a dictionary where the keys are graph node IDs and
         the values are their distance from the given start_node.
         """
-        graph = self.create_movements_graph(self.bot.entity.position, cardinal_only)
+        graph = self.create_movements_graph(self.bot.entity.position)
         start_node = 0
 
         # Use NetworkX's single_source_shortest_path_length to compute distances
@@ -156,10 +153,9 @@ class Pathfinder:
         self,
         start: Tuple[int64, int64],
         goal: Tuple[int64, int64],
-        cardinal_only=False,
         no_cache: bool = False,
     ) -> Union[List[Tuple[int64, int64]], None]:
-        graph = self.create_movements_graph(start, cardinal_only=cardinal_only, no_cache=no_cache)
+        graph = self.create_movements_graph(start, no_cache=no_cache)
 
         # Convert positions to node IDs
         node_positions = nx.get_node_attributes(graph, "positions")
@@ -183,9 +179,7 @@ class Pathfinder:
         except nx.NetworkXNoPath:
             return None  # No path exists between the points
 
-    def get_path_to(
-        self, goal: Tuple[int64, int64], cardinal_only: bool = False, no_cache: bool = False
-    ) -> Union[List[Tuple[int64, int64]], None]:
+    def get_path_to(self, goal: Tuple[int64, int64], no_cache: bool = False) -> Union[List[Tuple[int64, int64]], None]:
         """
         Get path to goal using the A* algorithm.
 
@@ -195,7 +189,7 @@ class Pathfinder:
             Union[List[Tuple[int64, int64]], None]: Path to goal if exists, otherwise None.
         """
 
-        result = self.get_path_from_to(self.bot.entity.position, goal, cardinal_only=cardinal_only, no_cache=no_cache)
+        result = self.get_path_from_to(self.bot.entity.position, goal, no_cache=no_cache)
         return result
 
     def random_move(self) -> None:
@@ -283,9 +277,9 @@ class Pathfinder:
                 # TODO: check if there is peaceful monster
                 cardinal = np.abs(np.array(self.bot.entity.position) - point).sum() == 1
                 if cardinal:
-                    walkable = self.movements.walkable_cardinal(point)
+                    walkable = self.bot.movements.walkable_cardinal(point)
                 else:
-                    walkable = self.movements.walkable_intermediate(self.bot.entity.position, point)
+                    walkable = self.bot.movements.walkable_intermediate(self.bot.entity.position, point)
                 if not walkable:
                     cont = True
                     break
@@ -301,8 +295,8 @@ class Pathfinder:
             return np.inf
         return len(path) - 1
 
-    def neighbors(self, pos: Tuple[int64, int64], cardinal_only: bool = False) -> List[Union[Any, Tuple[int64, int64]]]:
-        return self.movements.neighbors(pos, cardinal_only=cardinal_only)
+    def neighbors(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
+        return self.bot.movements.neighbors(pos)
 
     def reachable_adjacent(
         self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
@@ -337,5 +331,4 @@ class Pathfinder:
         return neighbors[idx]
 
     def update(self):
-        self.movements.update()
         self._graph_cache.clear()

@@ -6,12 +6,6 @@ from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
-from nle_code_wrapper.utils.utils import coords
-
-
-def goto(bot: "Bot", y: int, x: int) -> bool:
-    position = (y, x)
-    return bot.pathfinder.goto(position)
 
 
 def goto_closest(bot: "Bot", positions):
@@ -24,12 +18,14 @@ def goto_closest(bot: "Bot", positions):
     # Go to the closest position
     distances = bot.pathfinder.distances(bot.entity.position)
     closest_position = min(
-        (tuple(pos) for pos in positions),
-        key=lambda pos: distances.get(tuple(pos), np.inf),
+        (tuple(pos) for pos in positions if distances.get(tuple(pos), np.inf) < np.inf),
+        key=lambda pos: distances[pos],
         default=None,
     )
-    bot.pathfinder.goto(closest_position)
+    if closest_position is None:
+        return False
 
+    bot.pathfinder.goto(closest_position)
     return True
 
 
