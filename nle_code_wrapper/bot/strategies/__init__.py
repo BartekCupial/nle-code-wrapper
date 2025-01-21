@@ -55,6 +55,7 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_west,
 )
 from nle_code_wrapper.bot.strategies.fight_monster import (
+    fight_engulfed,
     fight_monster,
     fight_multiple_monsters,
     goto_choke_point,
@@ -176,6 +177,7 @@ __all__ = [
     explore_room_systematically_south,
     explore_room_systematically_west,
     explore_room_west,
+    fight_engulfed,
     fight_monster,
     fight_multiple_monsters,
     goto_choke_point,

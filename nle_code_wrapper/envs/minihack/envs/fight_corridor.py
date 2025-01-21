@@ -37,10 +37,10 @@ class CustomMiniHackFightCorridorDark(CustomMiniHackFightCorridor):
 
 register(
     id="CustomMiniHack-CorridorBattle-v0",
-    entry_point="nle_code_wrapper.envs.minihack.envs.fightcorridor:CustomMiniHackFightCorridor",
+    entry_point="nle_code_wrapper.envs.minihack.envs.fight_corridor:CustomMiniHackFightCorridor",
 )
 
 register(
     id="CustomMiniHack-CorridorBattle-Dark-v0",
-    entry_point="nle_code_wrapper.envs.minihack.envs.fightcorridor:CustomMiniHackFightCorridorDark",
+    entry_point="nle_code_wrapper.envs.minihack.envs.fight_corridor:CustomMiniHackFightCorridorDark",
 )

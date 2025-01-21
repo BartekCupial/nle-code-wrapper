@@ -2,6 +2,7 @@ from typing import List, Tuple
 
 import networkx as nx
 import numpy as np
+from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.entity import Entity
@@ -26,6 +27,18 @@ def fight_monster(bot: "Bot") -> bool:
         return True
     else:
         return False
+
+
+@strategy
+def fight_engulfed(bot: "Bot") -> bool:
+    ret = False
+    while bot.engulfed:
+        # TODO: zap wand of digging if we have it
+        # guaranteed attack
+        bot.step(A.CompassCardinalDirection.W)
+        ret = True
+
+    return ret
 
 
 @strategy

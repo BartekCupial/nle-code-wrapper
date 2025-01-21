@@ -303,3 +303,7 @@ class Bot:
         if key not in self.levels:
             self.levels[key] = Level(*key)
         return self.levels[key]
+
+    @property
+    def engulfed(self):
+        return utils.isin(self.glyphs, G.SWALLOW).any()
