@@ -87,14 +87,17 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
                             bot.step(A.MiscAction.MORE)  # confirm
                         return True
         else:
-            letter = bot.message[0]
-            for item in bot.inventory.items:
-                if item.letter == ord(letter):
-                    if item.item_class == item_class:
-                        return True
-                    else:
-                        bot.step(A.Command.DROP)
-                        bot.type_text(letter)
+            # if there is no message we picked nothing
+            # this can happen in some minihack environments
+            if bot.message:
+                letter = bot.message[0]
+                for item in bot.inventory.items:
+                    if item.letter == ord(letter):
+                        if item.item_class == item_class:
+                            return True
+                        else:
+                            bot.step(A.Command.DROP)
+                            bot.type_text(letter)
 
     return False
 
