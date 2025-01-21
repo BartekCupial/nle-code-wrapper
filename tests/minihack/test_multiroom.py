@@ -6,18 +6,13 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_room,
     fight_monster,
+    fight_multiple_monsters,
     goto_downstairs,
     goto_unexplored_corridor,
     goto_unexplored_room,
     open_doors,
-    run_away,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
-
-
-def multiple_monsters_adjacent(bot: "Bot") -> bool:
-    if len([e for e in bot.entities if bot.pathfinder.distance(e.position, bot.entity.position) == 1]) > 1:
-        run_away(bot)
 
 
 @pytest.mark.usefixtures("register_components")
@@ -41,7 +36,7 @@ class TestMazewalkMapped(object):
         def solve(bot: "Bot"):
             while True:
                 try:
-                    if multiple_monsters_adjacent(bot):
+                    if fight_multiple_monsters(bot):
                         pass
                     elif fight_monster(bot):
                         pass
@@ -87,7 +82,7 @@ class TestMazewalkMapped(object):
         def general_solve(bot: "Bot"):
             while True:
                 for strategy in [
-                    multiple_monsters_adjacent,
+                    fight_multiple_monsters,
                     fight_monster,
                     goto_downstairs,
                     open_doors,

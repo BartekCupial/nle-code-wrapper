@@ -4,13 +4,12 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
-    explore_corridor_systematically,
+    explore_corridor,
     explore_room,
-    fight_monster,
+    fight_multiple_monsters,
     goto_corridor,
     goto_downstairs,
     goto_room,
-    run_away,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
@@ -25,37 +24,66 @@ class TestMazewalkMapped(object):
         "env",
         [
             "MiniHack-CorridorBattle-v0",
-            "MiniHack-CorridorBattle-Dark-v0",
         ],
     )
-    @pytest.mark.parametrize("seed", [2])
-    def test_solve_fight_corridor(self, env, seed):
+    @pytest.mark.parametrize("seed", [1])
+    def test_fight_multiple_monsters(self, env, seed):
         cfg = parse_minihack_args(
             argv=[
                 f"--env={env}",
                 "--no-render",
                 f"--seed={seed}",
+                "--autopickup=False",
             ]
         )
 
         def solve(bot: "Bot"):
+            goto_corridor(bot)
             while True:
                 try:
-                    if multiple_monsters_adjacent(bot):
-                        if run_away(bot):
-                            pass
-                    elif fight_monster(bot):
-                        pass
+                    if fight_multiple_monsters(bot):
+                        continue
                     elif goto_downstairs(bot):
-                        pass
-                    elif explore_room(bot):
-                        pass
-                    elif explore_corridor_systematically(bot):
-                        pass
-                    elif goto_room(bot):
-                        pass
-                    elif goto_corridor(bot):
-                        pass
+                        continue
+                    else:
+                        goto_room(bot)
+                except BotPanic:
+                    pass
+
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
+        assert status["end_status"].name == "TASK_SUCCESSFUL"
+
+    @pytest.mark.parametrize(
+        "env",
+        [
+            "MiniHack-CorridorBattle-Dark-v0",
+        ],
+    )
+    @pytest.mark.parametrize("seed", [1])
+    def test_fight_multiple_monsters_dark(self, env, seed):
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--autopickup=False",
+            ]
+        )
+
+        def solve(bot: "Bot"):
+            explore_room(bot)
+            goto_corridor(bot)
+            explore_corridor(bot)
+            while True:
+                try:
+                    if fight_multiple_monsters(bot):
+                        continue
+                    elif goto_downstairs(bot):
+                        continue
+                    else:
+                        goto_room(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 

@@ -1,6 +1,4 @@
-import numpy as np
 import pytest
-from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.exceptions import BotFinished
 from nle_code_wrapper.bot.strategies import (
