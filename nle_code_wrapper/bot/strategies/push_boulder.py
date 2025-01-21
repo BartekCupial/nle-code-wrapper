@@ -58,7 +58,12 @@ def goto_boulder_closest_to_river(bot: "Bot") -> bool:
         key=lambda boulder_pos: np.min(np.sum(np.abs(boulder_pos - water_positions), axis=1)),
         default=None,
     )
+    if boulder_pos is None:
+        return False
+
     adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, tuple(boulder_pos))
+    if adjacent is None:
+        return False
 
     return bot.pathfinder.goto(adjacent)
 

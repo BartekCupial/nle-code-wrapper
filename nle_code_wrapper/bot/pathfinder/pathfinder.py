@@ -328,10 +328,10 @@ class Pathfinder:
                 n_dist.append(np.inf)
 
         if len(n_dist) == 0:
-            return False
+            return None
 
         if min(n_dist) == np.inf:
-            return False
+            return None
 
         idx = np.argmin(n_dist)
         return neighbors[idx]
