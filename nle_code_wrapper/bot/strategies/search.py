@@ -47,12 +47,13 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
         return False
 
     # Calculate scores based on distance and search count
-    distances = np.sum(np.abs(search_positions - my_position), axis=1)
+    distances = bot.pathfinder.distances(bot.entity.position)
+    search_distances = [distances[tuple(pos)] for pos in search_positions]
     search_counts = np.array([level.search_count[tuple(pos)] for pos in search_positions])
 
     # Combine distance and search count into a score
     # Prefer closer positions and less searched walls
-    scores = distances + search_counts  # Weight distances more heavily
+    scores = search_distances + search_counts  # Weight distances more heavily
 
     # Select the position with the best score
     best_position = search_positions[np.argmin(scores)]
