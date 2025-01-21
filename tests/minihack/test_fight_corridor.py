@@ -30,7 +30,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", [2])
     def test_solve_fight_corridor(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:
