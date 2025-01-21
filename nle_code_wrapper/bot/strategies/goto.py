@@ -157,6 +157,8 @@ def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
     if (labeled_features == labeled_features[0][0]).all():
         return False
 
+    my_position = bot.entity.position
+    distances = bot.pathfinder.distances(my_position)
     level = bot.current_level
     unvisited_features = []
     # exclude 0 because this is background
@@ -166,8 +168,12 @@ def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
         # consider only unexplored features
         if not np.any(np.logical_and(feature, level.was_on)):
             feature_positions = np.argwhere(feature)
-            distances = np.sum(np.abs(feature_positions - bot.entity.position), axis=1)
-            unvisited_features.append(tuple(feature_positions[np.argmin(distances)]))
+            closest_position = min(
+                (tuple(pos) for pos in feature_positions),
+                key=lambda pos: distances.get(tuple(pos), np.inf),
+                default=None,
+            )
+            unvisited_features.append(closest_position)
     unvisited_features = np.array(unvisited_features)
 
     return goto_closest(bot, unvisited_features)
