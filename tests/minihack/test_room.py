@@ -26,7 +26,12 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_room_explore(self, env):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:
@@ -51,7 +56,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", [4])
     def test_solve_room_fight_easy(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_fight(bot: "Bot"):
             while True:
@@ -77,7 +88,13 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_room_teleport_traps(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_traps(bot: "Bot"):
             while True:
@@ -101,7 +118,13 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_room_fight_hard(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_smart_fight(bot: "Bot"):
             while True:

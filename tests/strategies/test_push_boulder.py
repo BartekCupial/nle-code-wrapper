@@ -22,7 +22,14 @@ class TestRiver:
     )
     @pytest.mark.parametrize("seed", [0])
     def test_push_boulder(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -40,7 +47,14 @@ class TestRiver:
     )
     @pytest.mark.parametrize("seed", [0])
     def test_push_boulder_into_river(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -57,7 +71,14 @@ class TestRiver:
     )
     @pytest.mark.parametrize("seed", [0])
     def test_goto_boulder_closest_to_river(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -74,7 +95,14 @@ class TestRiver:
     )
     @pytest.mark.parametrize("seed", [3])
     def test_align_boulder_for_bridge(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 

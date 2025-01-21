@@ -12,7 +12,7 @@
 #     @pytest.mark.parametrize("env", ["MiniHack-Room-5x5-v0"])
 #     @pytest.mark.parametrize("seed", [0])
 #     def test_pass_argument_strategy(self, env, seed):
-#         cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=True", "--no-render"])
+#         cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=True", "--no-render",])
 
 #         def get_action(env, mode, obs, var=[0]):
 #             cur_pos = env.bot.entity.position

@@ -98,7 +98,13 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("env", ["MiniHack-LockedDoor-Fixed-v0"])
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_mini_locked(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:
@@ -116,7 +122,13 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("env", ["MiniHack-LockedDoor-v0"])
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_mini_locked_dynamic(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:
@@ -152,7 +164,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_mini(self, env, where, action, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
         cfg.strategies = [partial(general_mini, where=where, action=action)]
         status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
@@ -176,7 +194,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", list(range(1)))
     def test_mini_distract(self, env, where, action, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
         cfg.strategies = [partial(general_mini, where=where, action=action)]
         status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

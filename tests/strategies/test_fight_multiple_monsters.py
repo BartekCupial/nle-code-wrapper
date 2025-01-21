@@ -26,7 +26,13 @@ class TestCrossLavaRive:
     )
     @pytest.mark.parametrize("seed", list(range(3)))
     def test_fight_multiple_monsters(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def solve(bot: "Bot"):
             goto_corridor(bot)
@@ -53,7 +59,14 @@ class TestCrossLavaRive:
     )
     @pytest.mark.parametrize("seed", list(range(3)))
     def test_fight_multiple_monsters_dark(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--autopickup=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--autopickup=False",
+            ]
+        )
 
         def solve(bot: "Bot"):
             explore_room(bot)
@@ -85,7 +98,14 @@ class TestCrossLavaRive:
     )
     @pytest.mark.parametrize("seed", list(range(3)))
     def test_fight_multiple_monsters_multiroom(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--autopickup=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--autopickup=False",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:

@@ -29,7 +29,14 @@ class TestCrossLavaRive:
         """
         This tests checks if we were able to pick cross lava river
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -52,7 +59,14 @@ class TestCrossLavaRive:
         """
         This test checks if we were able to make ourselves levitate
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -70,7 +84,14 @@ class TestCrossLavaRive:
         """
         This test checks if we can levitate over the river in quest hard
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -91,7 +112,14 @@ class TestCrossLavaRive:
         """
         This test checks if we can freeze the river in quest hard
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -114,7 +142,13 @@ class TestCrossLavaRive:
         This test checks if we can freeze the river in quest medium
         """
         cfg = parse_minihack_args(
-            argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+                "--autopickup=True",
+            ]
         )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
@@ -138,7 +172,13 @@ class TestCrossLavaRive:
         This test checks if we can freeze the river in quest easy
         """
         cfg = parse_minihack_args(
-            argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+                "--autopickup=True",
+            ]
         )
         bot = create_bot(cfg)
         bot.reset(seed=seed)

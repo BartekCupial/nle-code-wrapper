@@ -25,7 +25,14 @@ class TestGoTo(object):
         we delibrately stard with Premapped Environment so we can be sure that the room labeling will be the same
         and that multiple rooms will be visible from the start
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--code_wrapper=False",
+                "--no-render",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -41,7 +48,14 @@ class TestGoTo(object):
         """
         check if we can go to the closest room in a specific direction
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--code_wrapper=False",
+                "--no-render",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -64,7 +78,14 @@ class TestGoTo(object):
         check if we can go to the closest unexplored room,
         also check if we stop exploring when we visited all rooms
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--code_wrapper=False",
+                "--no-render",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -80,7 +101,14 @@ class TestGoTo(object):
         """
         check if we can go to the closest staircase up
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--code_wrapper=False", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--code_wrapper=False",
+                "--no-render",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 

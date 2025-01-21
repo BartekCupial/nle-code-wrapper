@@ -19,7 +19,14 @@ class TestRaySimulator:
         """
         This tests checks if we were able to pick up the closest item of type
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
@@ -42,7 +49,14 @@ class TestRaySimulator:
         """
         This tests checks if we were able to pick up the closest item of type
         """
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+            ]
+        )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 

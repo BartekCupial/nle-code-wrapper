@@ -30,7 +30,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", list(range(3)))
     def test_solve_multiroom_monster(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:
@@ -70,7 +76,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", list(range(3)))
     def test_solve_multiroom(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", f"--seed={seed}", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+            ]
+        )
 
         def general_solve(bot: "Bot"):
             while True:

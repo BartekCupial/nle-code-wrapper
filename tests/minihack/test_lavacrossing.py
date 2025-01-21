@@ -17,7 +17,13 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_solve_lava_crossing(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:

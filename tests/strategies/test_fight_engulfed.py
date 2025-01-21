@@ -27,7 +27,13 @@ class TestFightEngulfed:
     )
     @pytest.mark.parametrize("seed", list(range(3)))
     def test_fight_multiple_monsters(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def solve(bot: "Bot"):
             goto_corridor(bot)

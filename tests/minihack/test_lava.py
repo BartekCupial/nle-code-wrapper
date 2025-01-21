@@ -35,7 +35,13 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("seed", list(range(5)))
     def test_lava(self, env, seed):
         # TODO: for some of the variants there are monsters which have to be dealt with
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
         cfg.strategies = [solve]
         status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

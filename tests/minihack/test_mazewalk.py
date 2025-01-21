@@ -21,7 +21,12 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_mazewalk(self, env):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+            ]
+        )
 
         def solve(bot: "Bot"):
             while True:

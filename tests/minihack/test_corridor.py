@@ -21,7 +21,13 @@ class TestMazewalkMapped(object):
     @pytest.mark.parametrize("env", ["MiniHack-Corridor-R2-v0", "MiniHack-Corridor-R3-v0", "MiniHack-Corridor-R5-v0"])
     @pytest.mark.parametrize("seed", list(range(10)))
     def test_corridor_open_doors(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_solve(bot: "Bot"):
             while True:

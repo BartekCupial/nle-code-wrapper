@@ -10,7 +10,13 @@ class TestRaySimulator:
     @pytest.mark.parametrize("seed", [0])
     def test_ray_straight(self, env, seed):
         cfg = parse_minihack_args(
-            argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+                "--autopickup=True",
+            ]
         )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
@@ -23,7 +29,13 @@ class TestRaySimulator:
     @pytest.mark.parametrize("seed", [0])
     def test_ray_angled(self, env, seed):
         cfg = parse_minihack_args(
-            argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+                "--autopickup=True",
+            ]
         )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
@@ -35,7 +47,13 @@ class TestRaySimulator:
     @pytest.mark.parametrize("seed", [0])
     def test_ray_concave_corner(self, env, seed):
         cfg = parse_minihack_args(
-            argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+                "--autopickup=True",
+            ]
         )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
@@ -48,7 +66,13 @@ class TestRaySimulator:
     @pytest.mark.parametrize("seed", [0])
     def test_ray_convex_corner(self, env, seed):
         cfg = parse_minihack_args(
-            argv=[f"--env={env}", f"--seed={seed}", "--no-render", "--code_wrapper=False", "--autopickup=True"]
+            argv=[
+                f"--env={env}",
+                f"--seed={seed}",
+                "--no-render",
+                "--code_wrapper=False",
+                "--autopickup=True",
+            ]
         )
         bot = create_bot(cfg)
         bot.reset(seed=seed)
