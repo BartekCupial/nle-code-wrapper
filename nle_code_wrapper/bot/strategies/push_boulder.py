@@ -11,23 +11,28 @@ from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features
 
 
+def find_nearest_boulder(bot: "Bot"):
+    boulders = np.argwhere(utils.isin(bot.glyphs, G.BOULDER))
+    distances = bot.pathfinder.distances(bot.entity.position)
+    return min(
+        ((pos, tuple(boulder)) for boulder in boulders for pos in bot.pathfinder.neighbors(tuple(boulder))),
+        key=lambda pair: distances.get(pair[0], np.inf),
+        default=None,
+    )
+
+
 @strategy
 def goto_boulder(bot: "Bot") -> bool:
     """
     Moves the agent adjacent to the closest boulder.
     """
-    # 1) check if we are standing next to a boulder
-    boulder = utils.isin(bot.glyphs, G.BOULDER)
-    positions = np.argwhere(boulder)
-    if len(positions) == 0:
-        return False  # no boulders
+    adjacent_boulder = find_nearest_boulder(bot)
+    if adjacent_boulder:
+        bot.pathfinder.goto(adjacent_boulder[0])
 
-    # 2) find the position adjacent to a boulder closest to the agent
-    distances = np.sum(np.abs(positions - bot.entity.position), axis=1)
-    closest_position = positions[np.argmin(distances)]
-    adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, tuple(closest_position))
-
-    return bot.pathfinder.goto(adjacent)
+        return True
+    else:
+        return False
 
 
 @strategy
