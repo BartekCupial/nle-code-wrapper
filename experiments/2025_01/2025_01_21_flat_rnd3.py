@@ -2,8 +2,6 @@ import os
 
 from mrunner.helpers.specification_helper import create_experiments_helper
 
-from nle_code_wrapper.utils.granularity import easy, hard, item, navigation
-
 name = globals()["script"][:-3]
 
 num_minibatches = 1
@@ -16,7 +14,7 @@ num_workers = 16
 config = {
     "exp_tags": [name],
     "run_script": "nle_code_wrapper.agents.sample_factory.minihack.train",
-    "train_for_env_steps": 50_000_000,
+    "train_for_env_steps": 100_000_000,
     "num_workers": num_workers,
     "num_envs_per_worker": num_envs // num_workers,
     "worker_num_splits": 2,
@@ -33,33 +31,21 @@ config = {
     "wandb_group": "ideas-ncbr",
     "with_wandb": True,
     "decorrelate_envs_on_one_worker": True,
-    "code_wrapper": True,
-    "hierarchical_gamma": True,  # should be the same as code_wrapper
-    "add_letter_strategies": False,
-    "add_direction_strategies": False,
-    "add_more_strategy": False,
+    "code_wrapper": False,
     "max_grad_norm": 40.0,
     "learning_rate": 2e-4,
     "exploration_loss_coeff": 0.001,
     "gamma": 0.999,
     "gae_lambda": 0.95,
     "value_loss_coeff": 0.5,
+    "normalize_obs": True,
 }
 
-strategies = [
-    *hard,
-    *navigation,
-    *item,
-]
 
 env_groups = [
     [
-        "MiniHack-CorridorBattle-v0",
-        "MiniHack-CorridorBattle-Dark-v0",
-    ],
-    [
-        "MiniHack-WoD-Hard-Full-v0",
-        "MiniHack-WoD-Pro-Full-v0",
+        "MiniHack-Corridor-R5-v0",
+        "CustomMiniHack-Corridor-R10-v0",
     ],
     [
         "MiniHack-Quest-Easy-v0",
@@ -71,10 +57,9 @@ env_groups = [
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(1)),
+        "seed": list(range(3)),
         "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
-        "strategies": [[*difficulty, *item, *navigation]],
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_point": [env],
@@ -83,27 +68,22 @@ params_grid = [
         "rnd_forward_coef": [0.01],
         "rnd_int_episodic": [True, False],
         "rnd": [True],
-        "exp_tags": [[f"{name}_{difficulty_name}"]],
     }
     for env_group in env_groups
     for env in env_group
-    for difficulty_name, difficulty in [("easy", easy)]
 ] + [
     {
-        "seed": list(range(1)),
+        "seed": list(range(3)),
         "learning_rate": [0.0001],
         "model": ["ChaoticDwarvenGPT5"],
-        "strategies": [[*difficulty, *item, *navigation]],
         "restart_behavior": ["overwrite"],
         "env": [env],
         "exp_point": [env],
         "group": [env],
         "rnd": [False],
-        "exp_tags": [[f"{name}_{difficulty_name}"]],
     }
     for env_group in env_groups
     for env in env_group
-    for difficulty_name, difficulty in [("easy", easy)]
 ]
 
 experiments_list = create_experiments_helper(
