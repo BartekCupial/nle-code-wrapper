@@ -3,6 +3,7 @@ from nle_code_wrapper.envs.minihack.envs import (
     chest,
     corridor,
     fight_corridor,
+    fight_diagonally,
     fight_engulfed,
     key_room_items,
     oracle,

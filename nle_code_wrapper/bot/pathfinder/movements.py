@@ -53,17 +53,17 @@ class Movements:
         level = self.bot.current_level
         return level.dungeon_number != DungeonLevel.SOKOBAN.value
 
-    def walkable_cardinal(self, new_pos: Tuple[int64, int64]) -> bool:
+    def walkable_cardinal(self, pos: Tuple[int64, int64], new_pos: Tuple[int64, int64]) -> bool:
         level = self.bot.current_level
         glyph_walkable = level.walkable[new_pos]
+
         if self.levitating and level.objects[new_pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
             glyph_walkable = True
 
         if self.monster_collision:
             glyph_walkable = glyph_walkable and new_pos not in [e.position for e in self.bot.entities]
 
-        walkable = glyph_walkable and not (level.objects[new_pos] in G.BOULDER)
-        return walkable
+        return glyph_walkable
 
     def get_move_cardinal(
         self, pos: Tuple[int64, int64], dir: Tuple[int, int], neighbors: List[Union[Any, Tuple[int64, int64]]]
@@ -83,7 +83,7 @@ class Movements:
             return
 
         # check if not walkable
-        if self.walkable_cardinal(new_pos):
+        if self.walkable_cardinal(pos, new_pos):
             neighbors.append(new_pos)
 
     def walkable_intermediate(self, pos: Tuple[int64, int64], new_pos: Tuple[int64, int64]) -> bool:
@@ -103,6 +103,7 @@ class Movements:
         # the character can only move diagonally if his or her total inventory weight is 600 or less.
         # Otherwise, "You are carrying too much to get through."
         glyph_walkable = level.walkable[new_pos]
+
         if self.levitating and level.objects[new_pos] in frozenset.union(frozenset({SS.S_lava, SS.S_water}), G.BOULDER):
             glyph_walkable = True
 
@@ -161,6 +162,26 @@ class Movements:
                     self.get_move_intermediate(node, dir, neighbors)
 
         return neighbors
+
+    def adjacents(self, node: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
+        adjacents = []
+
+        for dir in cardinal_directions:
+            adj = (node[0] + dir[0], node[1] + dir[1])
+            if not (0 <= adj[0] < C.SIZE_Y and 0 <= adj[1] < C.SIZE_X):
+                continue
+            if self.bot.current_level.walkable[adj]:
+                adjacents.append(adj)
+
+        if not self.cardinal_only:
+            for dir in intermediate_directions:
+                adj = (node[0] + dir[0], node[1] + dir[1])
+                if not (0 <= adj[0] < C.SIZE_Y and 0 <= adj[1] < C.SIZE_X):
+                    continue
+                if self.bot.current_level.walkable[adj]:
+                    adjacents.append(adj)
+
+        return adjacents
 
     def update(self):
         if self.bot.blstats.prop_mask & nethack.BL_MASK_LEV:

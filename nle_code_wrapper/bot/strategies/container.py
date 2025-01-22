@@ -39,7 +39,7 @@ def open_container_kick(bot: "Bot"):
     )
 
     if reachable_container:
-        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_container)
+        adjacent = bot.pathfinder.reachable(bot.entity.position, reachable_container, adjacent=True)
         bot.pathfinder.goto(adjacent)
         for _ in range(5):
             bot.step(A.Command.KICK)

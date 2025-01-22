@@ -34,7 +34,7 @@ def position_of_reachable_adjacent_object(bot: "Bot", obj):
     coords = utils.coords(bot.glyphs, obj)
 
     reachable = min(
-        (e for e in coords if bot.pathfinder.reachable_adjacent(bot.entity.position, e)),
+        (e for e in coords if bot.pathfinder.reachable(bot.entity.position, e, adjacent=True)),
         key=lambda e: bot.pathfinder.distance(bot.entity.position, e),
         default=None,
     )

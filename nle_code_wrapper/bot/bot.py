@@ -46,7 +46,8 @@ class Bot:
     @property
     def movements(self):
         if self._movements is None:
-            self._movements = Movements(self, levitating=self.blstats.prop_mask & nethack.BL_MASK_LEV)
+            levitating = True if self.blstats.prop_mask & nethack.BL_MASK_LEV else False
+            self._movements = Movements(self, levitating=levitating)
 
         return self._movements
 

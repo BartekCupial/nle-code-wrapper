@@ -57,12 +57,11 @@ class Pathfinder:
             "southeast": (1, 1),
         }
 
-    def create_movements_graph(self, start_position: Tuple[int64, int64], no_cache: bool = False):
+    def create_movements_graph(self, no_cache: bool = False):
         if no_cache:
-            return self._create_movements_graph(start_position)
+            return self._create_movements_graph()
 
         key = (
-            start_position,
             self.bot.movements.allow_walking_through_traps,
             self.bot.movements.levitating,
             self.bot.movements.cardinal_only,
@@ -71,11 +70,11 @@ class Pathfinder:
 
         # cache the graph for the start position
         if key not in self._graph_cache:
-            self._graph_cache[key] = self._create_movements_graph(start_position)
+            self._graph_cache[key] = self._create_movements_graph()
 
         return self._graph_cache[key]
 
-    def _create_movements_graph(self, start_position: Tuple[int64, int64], start_count: int = 0) -> nx.Graph:
+    def _create_movements_graph(self, start_count: int = 0) -> nx.Graph:
         """
         Creates a networkx graph from a boolean position matrix where nodes represent True positions
         and edges connect positions that are neighbors according to self.neighbors().
@@ -92,6 +91,7 @@ class Pathfinder:
         node_counter = start_count
 
         # Queue for BFS: (position, steps_taken)
+        start_position = self.bot.entity.position
         queue = deque([start_position])
         seen = {start_position}
 
@@ -133,13 +133,17 @@ class Pathfinder:
 
         return graph
 
-    def distances(self, graph: nx.Graph) -> dict:
+    def distances(self, start_pos: Tuple[int64, int64]) -> dict:
         """
         Returns a dictionary where the keys are graph node IDs and
         the values are their distance from the given start_node.
         """
-        graph = self.create_movements_graph(self.bot.entity.position)
-        start_node = 0
+        graph = self.create_movements_graph()
+        start_node = [node for node in graph.nodes if graph._node[node]["positions"] == start_pos]
+        if start_node:
+            start_node = start_node[0]
+        else:
+            return {}
 
         # Use NetworkX's single_source_shortest_path_length to compute distances
         node_distances = dict(nx.single_source_shortest_path_length(graph, start_node))
@@ -149,13 +153,17 @@ class Pathfinder:
 
         return position_distances
 
+    def distance(self, n1: Tuple[int64, int64], n2: Tuple[int64, int64]) -> int64:
+        distances = self.distances(n1)
+        return distances.get(n2, np.inf)
+
     def get_path_from_to(
         self,
         start: Tuple[int64, int64],
         goal: Tuple[int64, int64],
         no_cache: bool = False,
     ) -> Union[List[Tuple[int64, int64]], None]:
-        graph = self.create_movements_graph(start, no_cache=no_cache)
+        graph = self.create_movements_graph(no_cache=no_cache)
 
         # Convert positions to node IDs
         node_positions = nx.get_node_attributes(graph, "positions")
@@ -277,7 +285,7 @@ class Pathfinder:
                 # TODO: check if there is peaceful monster
                 cardinal = np.abs(np.array(self.bot.entity.position) - point).sum() == 1
                 if cardinal:
-                    walkable = self.bot.movements.walkable_cardinal(point)
+                    walkable = self.bot.movements.walkable_cardinal(self.bot.entity.position, point)
                 else:
                     walkable = self.bot.movements.walkable_intermediate(self.bot.entity.position, point)
                 if not walkable:
@@ -289,17 +297,14 @@ class Pathfinder:
 
         return True
 
-    def distance(self, n1: Tuple[int64, int64], n2: Tuple[int64, int64]) -> int64:
-        path = self.get_path_from_to(n1, n2)
-        if path is None:
-            return np.inf
-        return len(path) - 1
-
     def neighbors(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         return self.bot.movements.neighbors(pos)
 
-    def reachable_adjacent(
-        self, start: Tuple[int64, int64], goal: Tuple[int64, int64]
+    def adjacents(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
+        return self.bot.movements.adjacents(pos)
+
+    def reachable(
+        self, start: Tuple[int64, int64], goal: Tuple[int64, int64], adjacent: bool = False
     ) -> Union[Tuple[int64, int64], bool]:
         """
         Check if the goal is reachable from the start position.
@@ -312,10 +317,10 @@ class Pathfinder:
         """
 
         distances = self.distances(start)
-        neighbors = self.neighbors(goal)
+        positions = self.adjacents(goal) if adjacent else self.neighbors(goal)
 
         n_dist = []
-        for n in neighbors:
+        for n in positions:
             if n in distances:
                 n_dist.append(distances[n])
             else:
@@ -328,7 +333,7 @@ class Pathfinder:
             return None
 
         idx = np.argmin(n_dist)
-        return neighbors[idx]
+        return positions[idx]
 
     def update(self):
         self._graph_cache.clear()

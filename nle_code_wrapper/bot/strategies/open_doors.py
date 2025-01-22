@@ -9,9 +9,10 @@ from nle_code_wrapper.utils import utils
 
 def find_nearest_door(bot: "Bot"):
     closed_doors = np.argwhere(utils.isin(bot.glyphs, G.DOOR_CLOSED))
+    neigbors = [bot.pathfinder.reachable(bot.entity.position, tuple(door), adjacent=True) for door in closed_doors]
     distances = bot.pathfinder.distances(bot.entity.position)
     return min(
-        ((pos, tuple(door)) for door in closed_doors for pos in bot.pathfinder.neighbors(tuple(door))),
+        ((neighbor, tuple(door)) for neighbor, door in zip(neigbors, closed_doors) if neighbor is not None),
         key=lambda pair: distances.get(pair[0], np.inf),
         default=None,
     )

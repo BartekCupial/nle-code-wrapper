@@ -129,7 +129,7 @@ def repeat_until_discovery(func):
             # 2) if we have new door break
             new_doors = get_doors()
             for door in new_doors.difference(doors).intersection(new_seen):
-                if bot.pathfinder.reachable_adjacent(bot.entity.position, door):
+                if bot.pathfinder.reachable(bot.entity.position, door, adjacent=True):
                     return True
 
             # 3) if we have dead new end break

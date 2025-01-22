@@ -14,10 +14,6 @@ from nle_code_wrapper.bot.strategies import (
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
-def multiple_monsters_adjacent(bot: "Bot") -> bool:
-    return len([e for e in bot.entities if bot.pathfinder.distance(e.position, bot.entity.position) == 1]) > 1
-
-
 @pytest.mark.usefixtures("register_components")
 class TestMazewalkMapped(object):
     @pytest.mark.parametrize(

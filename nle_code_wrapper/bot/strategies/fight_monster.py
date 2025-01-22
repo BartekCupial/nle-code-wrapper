@@ -16,13 +16,14 @@ def fight_monster(bot: "Bot") -> bool:
     """
     Directs the bot to fight melee the closest monster.
     """
-    bot.movements = Movements(bot, monster_collision=False)
+    bot.movements = Movements(bot, monster_collision=True)
 
+    neigbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
     distances = bot.pathfinder.distances(bot.entity.position)
-    entity = min(
-        (e for e in bot.entities if distances.get(tuple(e.position), np.inf) < np.inf),
-        key=lambda e: distances[tuple(e.position)],
-        default=None,
+    adjacent, entity = min(
+        ((neighbor, e) for neighbor, e in zip(neigbors, bot.entities) if neighbor is not None),
+        key=lambda pair: distances.get(pair[0], np.inf),
+        default=(None, None),
     )
 
     if entity:
@@ -37,8 +38,7 @@ def fight_engulfed(bot: "Bot") -> bool:
     """
     Fight while being inside the monster until you're out.
     """
-
-    bot.movements = Movements(bot, monster_collision=False)
+    bot.movements = Movements(bot, monster_collision=True)
 
     ret = False
     while bot.engulfed:
@@ -54,19 +54,19 @@ def fight_engulfed(bot: "Bot") -> bool:
 @repeat
 def wait_for_monster(bot: "Bot") -> bool:
     """
-    Makes the bot wait for monsters to come within attack range.
+    Makes the bot wait for monsters to come within an attack range.
     """
+    bot.movements = Movements(bot, monster_collision=True)
 
-    bot.movements = Movements(bot, monster_collision=False)
-
-    nearby_monsters = [e for e in bot.entities if bot.pathfinder.get_path_to(e.position)]
-
+    nearby_monsters = [
+        e for e in bot.entities if bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) is not None
+    ]
     if not nearby_monsters:
         return False
 
     # check if monsters are in attack range
     for monster in nearby_monsters:
-        if bot.pathfinder.distance(monster.position, bot.entity.position) == 1:
+        if bot.entity.position in bot.pathfinder.adjacents(monster.position):
             return False
 
     # Wait for monsters to come to us
@@ -82,52 +82,40 @@ def fight_multiple_monsters(bot: "Bot") -> bool:
     Tactical combat behavior whenwhen fighting swarms of enemies.
     The bot will seek choke points, wait for the enemies and fight them one by one.
     """
-
-    bot.movements = Movements(bot, monster_collision=False)
+    bot.movements = Movements(bot, monster_collision=True)
 
     # Find tactical positions: corridor ends and doorways
-    distances = bot.pathfinder.distances(bot.entity.position)
-    nearby_monsters = [e for e in bot.entities if distances.get(e.position, None)]
+    nearby_monsters = [
+        e for e in bot.entities if bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) is not None
+    ]
     if not nearby_monsters:
         return False
-    tactical_positions = find_tactical_positions(bot, nearby_monsters)
+    tactical_positions = find_tactical_positions(bot, bot.entities)
 
-    # if only one monster fight it
-    if len(nearby_monsters) == 1:
-        bot.pvp.attack_melee(nearby_monsters[0])
-        return True
+    # if there is more monsters go to a tacical position if there are any
+    if len(tactical_positions) > 0:
+        # goto a tactical position if you are not in one
+        if bot.entity.position not in tactical_positions:
+            goto_closest(bot, tactical_positions)
+
+        # when you are in tactical positions and there are multiple monsters wait for them to come to you
+        while True:
+            # Update distances and nearby monsters
+            adjacent_monsters = [e for e in bot.entities if bot.entity.position in bot.pathfinder.adjacents(e.position)]
+
+            if len(adjacent_monsters) == 0:
+                # Wait for monsters to approach
+                bot.wait()
+            elif len(adjacent_monsters) == 1:
+                # Attack the adjacent monster
+                bot.pvp.attack_melee(adjacent_monsters[0])
+                return True
+            else:
+                # we are surrounded, give control back to the high lecel policy
+                return False
     else:
-        # if there is more monsters go to a tacical position if there are any
-        if len(tactical_positions) > 0:
-            # goto a tactical position if you are not in one
-            if bot.entity.position not in tactical_positions:
-                goto_closest(bot, tactical_positions)
-
-            # when you are in tactical positions and there are multiple monsters wait for them to come to you
-            while True:
-                # Update distances and nearby monsters
-                distances = bot.pathfinder.distances(bot.entity.position)
-                adjacent_monsters = [e for e in bot.entities if distances.get(e.position, np.inf) == 1]
-
-                if len(adjacent_monsters) == 0:
-                    # Wait for monsters to approach
-                    bot.wait()
-                elif len(adjacent_monsters) == 1:
-                    # Attack the adjacent monster
-                    bot.pvp.attack_melee(adjacent_monsters[0])
-                    return True
-                else:
-                    # we are surrounded, give control back to the high lecel policy
-                    return False
-        else:
-            # If no tactical positions are found, attack the closest monster
-            distances = bot.pathfinder.distances(bot.entity.position)
-            entity = min(
-                nearby_monsters,
-                key=lambda e: distances[e.position],
-            )
-            bot.pvp.attack_melee(entity)
-            return True
+        # If no tactical positions are found, attack the closest monster
+        return fight_monster(bot)
 
 
 @strategy
@@ -135,11 +123,9 @@ def goto_choke_point(bot: "Bot") -> bool:
     """
     Directs the bot to move to the nearest choke point.
     """
-    bot.movements = Movements(bot, monster_collision=False)
+    bot.movements = Movements(bot, monster_collision=True)
 
-    distances = bot.pathfinder.distances(bot.entity.position)
-    nearby_monsters = [e for e in bot.entities if distances.get(e.position, None)]
-    tactical_positions = find_tactical_positions(bot, nearby_monsters)
+    tactical_positions = find_tactical_positions(bot, bot.entities)
 
     if len(tactical_positions) > 0:
         # Move to nearest tactical position
@@ -153,32 +139,35 @@ def find_tactical_positions(bot: "Bot", nearby_monsters: List[Entity]) -> List[T
     """
     Finds positions which allows the bot to fight multiple monsters one at a time.
     """
-    tactical_spots = []
 
-    # TODO we can fight diagonally through doors even when we cannot move there
-    # use separate movements
+    def is_good_tactical_spot(tactical_spot):
+        # count number of monster that can hit
+        number_of_tiles_reachable = 0
+        for adjacent in bot.pathfinder.adjacents(tactical_spot):
+            for monster in nearby_monsters:
+                reachable = bot.pathfinder.reachable(adjacent, monster.position, adjacent=True)
+                if reachable is None:
+                    continue
+
+                path = bot.pathfinder.get_path_from_to(adjacent, reachable)
+                if path is None:
+                    continue
+
+                if tactical_spot not in path:
+                    number_of_tiles_reachable += 1
+                    break
+
+        return number_of_tiles_reachable == 1
+
     graph = bot.pathfinder.create_movements_graph(bot.entity.position)
 
-    def is_good_tactical_spot(tactical_spot, choke_pos, monsters):
-        for monster in monsters:
-            # Check if there's a path from monster to neighbor
-            path = bot.pathfinder.get_path_from_to(tactical_spot, monster.position)
-            if path is None:
-                continue
-
-            # if choke point is not in the path, tactical spot is on the wrong side of the choke
-            # or we can be surrounded by monsters coming from both sides
-            if choke_pos not in path:
-                return False
-
-        return True
-
+    tactical_spots = []
     # Find articulation points (potential corridor/chokepoint positions)
     for choke in nx.articulation_points(graph):
         choke_pos = tuple(graph._node[choke]["positions"])
         # Check neighbors of articulation points
-        for neighbor in bot.pathfinder.neighbors(choke_pos):
-            if is_good_tactical_spot(neighbor, choke_pos, nearby_monsters):
+        for neighbor in bot.pathfinder.adjacents(choke_pos):
+            if is_good_tactical_spot(neighbor):
                 tactical_spots.append(neighbor)
 
     return tactical_spots

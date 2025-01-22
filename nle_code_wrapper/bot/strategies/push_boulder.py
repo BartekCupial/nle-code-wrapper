@@ -61,7 +61,7 @@ def goto_boulder_closest_to_river(bot: "Bot") -> bool:
     if boulder_pos is None:
         return False
 
-    adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, tuple(boulder_pos))
+    adjacent = bot.pathfinder.reachable(bot.entity.position, tuple(boulder_pos), adjacent=True)
     if adjacent is None:
         return False
 
@@ -150,7 +150,7 @@ def push_boulder_to_pos(bot: "Bot", boulder_pos, target_pos):
     # 1) imagine that we are levitating to find the path
     lev = bot.movements.levitating
     bot.movements.levitating = True
-    path = bot.pathfinder.get_path_from_to(boulder_pos, target_pos, no_cache=True)
+    path = bot.pathfinder.get_path_from_to(boulder_pos, target_pos)
     bot.movements.levitating = lev
     if not path:
         return False
@@ -199,8 +199,8 @@ def push_boulder_into_river(bot: "Bot") -> bool:
     return push_boulder_to_pos(bot, boulder_pos, tuple(target_pos))
 
 
-def find_furthest_reachable_position(bot: "Bot", start_pos, dir):
-    positions, distances = zip(*bot.pathfinder.distances(start_pos).items())
+def find_furthest_reachable_position(bot: "Bot", dir):
+    positions, distances = zip(*bot.pathfinder.distances(bot.entity.position).items())
     positions, distances = np.array(positions), np.array(distances)
 
     # Calculate projections along the direction
@@ -238,7 +238,7 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
 
     # 3) find vertical position which aligns horizontally with furthest water position
     dir = bot.pathfinder.direction_movements["east"]
-    river_bridge_pos = find_furthest_reachable_position(bot, boulder_pos, dir)
+    river_bridge_pos = find_furthest_reachable_position(bot, dir)
     intersections = find_intersections(boulder_pos, river_bridge_pos)
 
     # boulder is already aligned
