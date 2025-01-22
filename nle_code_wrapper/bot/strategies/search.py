@@ -49,7 +49,7 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
 
     # Calculate scores based on distance and search count
     distances = bot.pathfinder.distances(bot.entity.position)
-    search_distances = [distances[tuple(pos)] for pos in search_positions]
+    search_distances = [distances.get(tuple(pos), np.inf) for pos in search_positions]
     search_counts = np.array([level.search_count[tuple(pos)] for pos in search_positions])
 
     # Combine distance and search count into a score
