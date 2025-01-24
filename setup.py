@@ -47,6 +47,7 @@ setup(
     },
     package_dir={"": "./"},
     packages=setuptools.find_packages(where="./", include=["nle_code_wrapper*", "examples*"]),
+    package_data={"nle_code_wrapper": ["envs/minihack/dat/**"]},
     include_package_data=True,
     python_requires=">=3.8",
 )
