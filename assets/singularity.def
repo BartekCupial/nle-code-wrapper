@@ -53,6 +53,7 @@ From: nvidia/cuda:11.8.0-cudnn8-devel-ubuntu22.04
     pip install -e external/nle_utils
     pip install -e external/sample_factory
     pip install -e .[dev,mrunner]
+    pip install einops
 
     chmod a+rw -R /opt/conda/bin/python
 
