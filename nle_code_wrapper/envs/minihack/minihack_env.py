@@ -10,7 +10,7 @@ import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
 import nle_code_wrapper.envs.minihack.envs  # noqa: E402
 from nle_code_wrapper.utils.utils import get_function_by_name
-from nle_code_wrapper.wrappers.nle_code_wrapper import NLECodeWrapper
+from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback
 
 MINIHACK_ENVS = []
 for env_spec in gym.envs.registry.all():
@@ -105,5 +105,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
             add_more_strategy=cfg.add_more_strategy,
             gamma=gamma,
         )
+        env = NoProgressFeedback(env)
 
     return env
