@@ -100,6 +100,14 @@ class NLECodeWrapper(gym.Wrapper):
             # add more strategy
             self.bot.strategy(more)
 
+        def noop(bot):
+            """
+            Wastes move
+            """
+            return
+
+        self.bot.strategy(noop)
+
         self.action_space = gym.spaces.Discrete(len(self.bot.strategies))
         self.observation_space = gym.spaces.Dict(
             {"env_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
