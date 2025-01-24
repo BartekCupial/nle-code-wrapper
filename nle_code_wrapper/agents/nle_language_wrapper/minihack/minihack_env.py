@@ -8,7 +8,7 @@ from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, No
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
-from nle_code_wrapper.agents.sample_factory.minihack.wrappers.add_channel_dim import AddChanngelDim
+from nle_code_wrapper.agents.nle_language_wrapper.minihack.wrappers import NLETokenizer
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback
 
@@ -97,7 +97,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         )
         env = NoProgressFeedback(env)
 
-    if cfg.model == "default_make_encoder_func":
-        env = AddChanngelDim(env)
+    env = NLETokenizer(env, max_token_length=cfg.max_token_length)
 
     return env

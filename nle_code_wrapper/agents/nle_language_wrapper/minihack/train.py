@@ -8,13 +8,17 @@ from sample_factory.model.encoder import Encoder
 from sample_factory.train import run_rl
 from sample_factory.utils.typing import Config, ObsSpace
 
-from nle_code_wrapper.agents.sample_factory.minihack.minihack_env import CUSTOM_ENVS, MINIHACK_ENVS, make_minihack_env
-from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
+from nle_code_wrapper.agents.nle_language_wrapper.minihack.minihack_env import (
+    CUSTOM_ENVS,
+    MINIHACK_ENVS,
+    make_minihack_env,
+)
+from nle_code_wrapper.agents.nle_language_wrapper.minihack.minihack_params import (
     add_extra_params_general,
-    add_extra_params_model,
+    add_extra_params_language_encoder,
     minihack_override_defaults,
 )
-from nle_code_wrapper.agents.sample_factory.minihack.models import MODELS_LOOKUP
+from nle_code_wrapper.agents.nle_language_wrapper.minihack.models import NLELanguageTransformerEncoder
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 
 
@@ -23,25 +27,20 @@ def register_minihack_envs():
         register_env(env_name, make_minihack_env)
 
 
-def make_minihack_encoder(cfg: Config, obs_space: ObsSpace) -> Encoder:
+def make_language_encoder(cfg: Config, obs_space: ObsSpace) -> Encoder:
     """Factory function as required by the API."""
-    try:
-        model_cls = MODELS_LOOKUP[cfg.model]
-    except KeyError:
-        raise NotImplementedError("model=%s" % cfg.model) from None
-
-    return model_cls(cfg, obs_space)
+    return NLELanguageTransformerEncoder(cfg, obs_space)
 
 
 def register_minihack_components():
     register_minihack_envs()
-    global_model_factory().register_encoder_factory(make_minihack_encoder)
+    global_model_factory().register_encoder_factory(make_language_encoder)
 
 
 def parse_minihack_args(argv=None, evaluation=False):
     parser, partial_cfg = parse_sf_args(argv=argv, evaluation=evaluation)
     add_extra_params_minihack_env(parser)
-    add_extra_params_model(parser)
+    add_extra_params_language_encoder(parser)
     add_extra_params_general(parser)
     add_code_wrapper_cli_args(parser)
     minihack_override_defaults(partial_cfg.env, parser)

@@ -1,0 +1,3 @@
+from nle_code_wrapper.agents.nle_language_wrapper.minihack.models.language_encoder import NLELanguageTransformerEncoder
+
+__all__ = [NLELanguageTransformerEncoder]
