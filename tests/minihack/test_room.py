@@ -3,7 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore_room, fight_monster, goto_downstairs, run_away
+from nle_code_wrapper.bot.strategies import explore_room, fight_monster, goto_stairs_down, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -31,7 +31,7 @@ class TestMazewalkMapped(object):
         def solve(bot: "Bot"):
             while True:
                 try:
-                    if goto_downstairs(bot):
+                    if goto_stairs_down(bot):
                         pass
                     else:
                         explore_room(bot)
@@ -64,7 +64,7 @@ class TestMazewalkMapped(object):
                 try:
                     if fight_monster(bot):
                         pass
-                    elif goto_downstairs(bot):
+                    elif goto_stairs_down(bot):
                         pass
                     else:
                         explore_room(bot)
@@ -94,7 +94,7 @@ class TestMazewalkMapped(object):
         def general_traps(bot: "Bot"):
             while True:
                 try:
-                    if goto_downstairs(bot):
+                    if goto_stairs_down(bot):
                         pass
                     else:
                         explore_room(bot)
@@ -126,7 +126,7 @@ class TestMazewalkMapped(object):
                 try:
                     if fight_monster(bot):
                         pass
-                    elif goto_downstairs(bot):
+                    elif goto_stairs_down(bot):
                         pass
                     else:
                         explore_room(bot)

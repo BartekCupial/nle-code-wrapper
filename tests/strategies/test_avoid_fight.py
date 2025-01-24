@@ -5,8 +5,8 @@ from nle_code_wrapper.bot.strategies import (
     approach_monster,
     explore_corridor,
     goto_corridor,
-    goto_downstairs,
     goto_room,
+    goto_stairs_down,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
@@ -34,7 +34,7 @@ class TestAvoidFight(object):
             explore_corridor(bot)
             goto_room(bot)
             approach_monster(bot)
-            goto_downstairs(bot)
+            goto_stairs_down(bot)
         except BotFinished:
             pass
 
@@ -57,6 +57,6 @@ class TestAvoidFight(object):
             explore_corridor(bot)
             goto_room(bot)
             approach_monster(bot)
-            goto_downstairs(bot)
+            goto_stairs_down(bot)
         except BotFinished:
             pass

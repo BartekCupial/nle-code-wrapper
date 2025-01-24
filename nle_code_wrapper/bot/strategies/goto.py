@@ -184,17 +184,17 @@ def goto_item(bot: "Bot") -> bool:
 
 
 @strategy
-def goto_downstairs(bot: "Bot") -> bool:
+def goto_stairs_down(bot: "Bot") -> bool:
     """
-    Moves the agent to the closest downstairs.
+    Moves the agent to the closest stairs down.
     """
     return goto_object(bot, G.STAIR_DOWN)
 
 
 @strategy
-def goto_upstairs(bot: "Bot") -> bool:
+def goto_stairs_up(bot: "Bot") -> bool:
     """
-    Moves the agent to the closest upstairs.
+    Moves the agent to the closest stairs up.
     """
     return goto_object(bot, G.STAIR_UP)
 

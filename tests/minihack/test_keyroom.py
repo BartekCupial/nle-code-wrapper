@@ -8,7 +8,7 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     explore_corridor_systematically,
     explore_room,
-    goto_downstairs,
+    goto_stairs_down,
     goto_unexplored_corridor,
     goto_unexplored_room,
     open_doors_key,
@@ -59,7 +59,7 @@ def solve(bot: "Bot"):
         try:
             closed_doors = position_of_reachable_adjacent_object(bot, G.DOOR_CLOSED)
 
-            if goto_downstairs(bot):
+            if goto_stairs_down(bot):
                 pass
             elif has_key and closed_doors:
                 open_doors_key(bot)
