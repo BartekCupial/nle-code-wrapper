@@ -12,7 +12,7 @@ from nle_utils.wrappers import (
     FinalStatsWrapper,
     GymV21CompatibilityV0,
     NLETimeLimit,
-    NoProgressTimeout,
+    NoProgressAbort,
     TaskRewardsInfoWrapper,
 )
 
@@ -83,7 +83,7 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
             kwargs[param_name] = param_value
 
     env = gym.make(env_name, **kwargs)
-    env = NoProgressTimeout(env)
+    env = NoProgressAbort(env)
     env = NLEProgressWrapper(env)
     env = TaskRewardsInfoWrapper(env)
     env = FinalStatsWrapper(env)
