@@ -15,6 +15,22 @@
             ],
         },
         {
+            "name": "train nethack language encoder",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.agents.nle_language_wrapper.minihack.train",
+            "justMyCode": false,
+            "args": [
+                "--env", "MiniHack-Corridor-R5-v0",
+                "--transformer_hidden_size", "64",
+                "--transformer_hidden_layers", "2",
+                "--transformer_attention_heads", "2",
+                "--max_token_length", "256",
+                "--batch_size", "1024",
+                // "--code_wrapper", "False",
+            ],
+        },
+        {
             "name": "play minihack",
             "type": "debugpy",
             "request": "launch",
