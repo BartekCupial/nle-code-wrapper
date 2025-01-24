@@ -41,6 +41,7 @@ def completer(text, state, commands=[]):
 
 
 def setup_autocomplete(completer_fn):
+    os.system("stty sane")  # forces the terminal back to “cooked” mode
     readline.parse_and_bind("tab: complete")
     print("Type commands and use TAB to autocomplete.")
     print("To see strategies use command: `help`")
