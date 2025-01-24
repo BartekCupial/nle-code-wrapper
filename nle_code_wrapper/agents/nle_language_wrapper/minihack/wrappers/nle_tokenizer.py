@@ -18,14 +18,15 @@ class NLETokenizer(gym.Wrapper):
         super().__init__(env)
         self.max_token_length = max_token_length
 
-        self.observation_space = gym.spaces.Dict()
-        self.observation_space.spaces["obs"] = gym.spaces.Box(0, 1000000, shape=(1,), dtype=np.int32)
-        self.observation_space.spaces["input_ids"] = gym.spaces.Box(
-            0, 1000000, shape=(self.max_token_length,), dtype=np.int32
-        )
-        self.observation_space.spaces["attention_mask"] = gym.spaces.Box(
-            0, 1, shape=(self.max_token_length,), dtype=np.int32
-        )
+        obs_space = {
+            "obs": gym.spaces.Box(0, 1000000, shape=(1,), dtype=np.int32),
+            "input_ids": gym.spaces.Box(0, 1000000, shape=(self.max_token_length,), dtype=np.int32),
+            "attention_mask": gym.spaces.Box(0, 1, shape=(self.max_token_length,), dtype=np.int32),
+        }
+        if "env_steps" in self.env.observation_space.keys():
+            obs_space["env_steps"] = self.env.observation_space.spaces["env_steps"]
+
+        self.observation_space = gym.spaces.Dict(obs_space)
         self.action_space = self.env.action_space
         self.tokenizer = RobertaTokenizerFast.from_pretrained("distilroberta-base", truncation_side="left")
         self.nle_language = nle_language_obsv.NLELanguageObsv()
@@ -70,23 +71,49 @@ class NLETokenizer(gym.Wrapper):
             "text_cursor": self.nle_language.text_cursor(glyphs, blstats, tty_cursor).decode("latin-1"),
         }
 
-    def _convert_obs_to_str(self, obsv):
-        text_obsv = ""
-        text_obsv += f"Inventory:\n{obsv['text_inventory']}\n\n"
-        text_obsv += f"Stats:\n{obsv['text_blstats']}\n\n"
-        text_obsv += f"Cursor:\n{obsv['text_cursor']}\n\n"
-        text_obsv += f"Stats:\n{obsv['text_glyphs']}\n\n"
-        text_obsv += f"Message:\n{obsv['text_message']}"
-        return text_obsv
+    def _process_obs(self, obs):
+        lang_obs = self._nle_obs_to_language(obs)
+        text = f"""
+Inventory:
+{lang_obs['text_inventory']}
+
+Stats:
+{lang_obs['text_blstats']}
+
+Cursor:
+{lang_obs['text_cursor']}
+
+Observation:
+{lang_obs['text_glyphs']}
+
+Message:
+{lang_obs['text_message']}
+        """
+        text_obs = self._tokenize(text)
+
+        if "env_steps" in obs:
+            text_obs["env_steps"] = obs["env_steps"]
+
+        return text_obs
 
     def reset(self, **kwargs):
         obs, info = super().reset(**kwargs)
-        tokenized_obs = self._tokenize(self._convert_obs_to_str(self._nle_obs_to_language(obs)))
 
-        return tokenized_obs, info
+        return self._process_obs(obs), info
 
     def step(self, action):
         obs, reward, terminated, truncated, info = super().step(action)
-        tokenized_obs = self._tokenize(self._convert_obs_to_str(self._nle_obs_to_language(obs)))
 
-        return tokenized_obs, reward, terminated, truncated, info
+        return self._process_obs(obs), reward, terminated, truncated, info
+
+
+if __name__ == "__main__":
+    import gym
+    import nle
+    from nle_utils.wrappers import GymV21CompatibilityV0
+
+    env = gym.make("NetHackScore-v0")
+    env = GymV21CompatibilityV0(env=env)
+    env = NLETokenizer(env, max_token_length=256)
+
+    obs = env.reset()
