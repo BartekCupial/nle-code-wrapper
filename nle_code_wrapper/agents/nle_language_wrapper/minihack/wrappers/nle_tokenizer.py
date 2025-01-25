@@ -114,6 +114,6 @@ if __name__ == "__main__":
 
     env = gym.make("NetHackScore-v0")
     env = GymV21CompatibilityV0(env=env)
-    env = NLETokenizer(env, max_token_length=256)
+    env = NLETokenizer(env, max_token_length=512)
 
     obs = env.reset()

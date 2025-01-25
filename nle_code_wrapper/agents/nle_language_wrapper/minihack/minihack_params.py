@@ -40,7 +40,7 @@ def add_extra_params_language_encoder(parser):
     p.add_argument(
         "--max_token_length",
         type=int,
-        default=256,
+        default=512,
         help="Maximum token input length before truncation",
     )
 
