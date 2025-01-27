@@ -15,7 +15,7 @@ num_workers = 16
 config = {
     "exp_tag": name,
     "env": "NetHackScore-v0",
-    "run_script": "nle_code_wrapper.agents.sample_factory.nethack.train",
+    "run_script": "nle_code_wrapper.agents.sample_factory.minihack.train",
     "train_for_env_steps": 100_000_000,
     "num_workers": num_workers,
     "num_envs_per_worker": num_envs // num_workers,
