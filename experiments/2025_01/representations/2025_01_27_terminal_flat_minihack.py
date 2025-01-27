@@ -53,13 +53,65 @@ config = {
     "obs_keys": ["screen_image", "tty_chars", "tty_colors", "env_steps", "prev_actions"],
 }
 
+env_groups = [
+    [
+        "MiniHack-Corridor-R3-v0",
+        "MiniHack-Corridor-R5-v0",
+        "CustomMiniHack-Corridor-R8-v0",
+        "CustomMiniHack-Corridor-R10-v0",
+    ],
+    [
+        "MiniHack-CorridorBattle-v0",
+        "MiniHack-CorridorBattle-Dark-v0",
+    ],
+    [
+        "MiniHack-WoD-Hard-Full-v0",
+        "MiniHack-WoD-Pro-Full-v0",
+    ],
+    [
+        "MiniHack-River-v0",
+        "MiniHack-River-Monster-v0",
+        "MiniHack-River-Lava-v0",
+        "MiniHack-River-MonsterLava-v0",
+        "MiniHack-River-Narrow-v0",
+    ],
+    [
+        "MiniHack-Quest-Easy-v0",
+        "MiniHack-Quest-Medium-v0",
+        "MiniHack-Quest-Hard-v0",
+    ],
+    [
+        "MiniHack-MultiRoom-N10-v0",
+        "MiniHack-MultiRoom-N6-Locked-v0",
+        "MiniHack-MultiRoom-N10-Lava-v0",
+        "MiniHack-MultiRoom-N6-Monster-v0",
+        "MiniHack-MultiRoom-N6-Extreme-v0",
+        "MiniHack-MultiRoom-N6-LavaMonsters-v0",
+    ],
+    [
+        "MiniHack-Freeze-Lava-Full-v0",
+        "MiniHack-LavaCross-Levitate-Full-v0",
+        "MiniHack-LavaCross-Full-v0",
+    ],
+    [
+        "MiniHack-HideNSeek-Mapped-v0",
+        "MiniHack-HideNSeek-v0",
+        "MiniHack-HideNSeek-Lava-v0",
+        "MiniHack-HideNSeek-Big-v0",
+    ],
+]
+
+
 # params different between exps
 params_grid = [
     {
-        "seed": list(range(3)),
+        "seed": list(range(1)),
         "depth": [3],
         "hidden_dim": [512],
+        "env": [env],
     }
+    for env_group in env_groups
+    for env in env_group
 ]
 
 experiments_list = create_experiments_helper(

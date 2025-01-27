@@ -45,6 +45,7 @@
             "options": [
                 "pc_gpu",
                 "lumi_gpu",
+                "athena_gpu",
             ],
         },
     ]

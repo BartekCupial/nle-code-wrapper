@@ -46,23 +46,23 @@ config = {
     "add_direction_strategies": False,
     "add_more_strategy": False,
     # specific to this representation
-    "model": "NLEHybridEncoder",
-    "add_image_observation": True,
-    "use_prev_action": True,
-    "tokenize_keys": ["text_message", "text_inventory"],
-    "obs_keys": ["screen_image", "blstats", "env_steps", "prev_actions", "input_ids", "attention_mask"],
+    "model": "NLELanguageTransformerEncoder",
+    "add_image_observation": False,
+    "use_prev_action": False,
+    "tokenize_keys": ["text_glyphs", "text_message", "text_blstats", "text_inventory", "text_cursor"],
+    "obs_keys": ["input_ids", "attention_mask", "env_steps"],
+    "autopickup": True,
 }
 
 # params different between exps
 params_grid = [
     {
         "seed": list(range(3)),
-        "depth": [3],
-        "hidden_dim": [512],
+        "restart_behavior": ["overwrite"],
         "transformer_hidden_size": [64],
         "transformer_hidden_layers": [2],
         "transformer_attention_heads": [2],
-        "max_token_length": [128],
+        "max_token_length": [256],
     }
 ]
 
