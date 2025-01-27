@@ -6,7 +6,8 @@ from sample_factory.random import enjoy
 
 from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
     add_extra_params_general,
-    add_extra_params_model,
+    add_extra_params_language_encoder,
+    add_extra_params_terminal_encoder,
     minihack_override_defaults,
 )
 from nle_code_wrapper.agents.sample_factory.nethack.train import register_nethack_components
@@ -19,7 +20,8 @@ def main():  # pragma: no cover
 
     parser, cfg = parse_sf_args(evaluation=True)
     add_extra_params_nethack_env(parser)
-    add_extra_params_model(parser)
+    add_extra_params_terminal_encoder(parser)
+    add_extra_params_language_encoder(parser)
     add_extra_params_general(parser)
     add_code_wrapper_cli_args(parser)
     minihack_override_defaults(cfg.env, parser)

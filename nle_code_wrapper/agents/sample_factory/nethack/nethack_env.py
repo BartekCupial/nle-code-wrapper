@@ -1,4 +1,4 @@
-from typing import Optional, Tuple
+from typing import Optional
 
 import gym
 import nle  # NOQA: F401
@@ -11,6 +11,7 @@ from nle_utils.wrappers import (
     FinalStatsWrapper,
     GymV21CompatibilityV0,
     NLETimeLimit,
+    NLETokenizer,
     NoProgressAbort,
     ObservationFilterWrapper,
     PrevActionsWrapper,
@@ -18,9 +19,6 @@ from nle_utils.wrappers import (
     TileTTY,
 )
 
-import nle_code_wrapper.bot.panics as panic_module
-import nle_code_wrapper.bot.strategies as strategy_module
-from nle_code_wrapper.agents.sample_factory.minihack.wrappers.add_channel_dim import AddChanngelDim
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback
 
@@ -130,8 +128,8 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         )
         env = NoProgressFeedback(env)
 
-    if cfg.model == "default_make_encoder_func":
-        env = AddChanngelDim(env)
+    if cfg.tokenize_keys:
+        env = NLETokenizer(env, max_token_length=cfg.max_token_length, tokenize_keys=cfg.tokenize_keys)
 
     if cfg.obs_keys:
         env = ObservationFilterWrapper(env, cfg.obs_keys)

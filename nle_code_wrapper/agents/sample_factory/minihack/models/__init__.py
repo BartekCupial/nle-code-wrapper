@@ -1,16 +1,10 @@
-from sample_factory.model.encoder import default_make_encoder_func
-
-from nle_code_wrapper.agents.sample_factory.minihack.models.chaotic_dwarf import ChaoticDwarvenGPT5
-from nle_code_wrapper.agents.sample_factory.minihack.models.clean import CleanNet
-from nle_code_wrapper.agents.sample_factory.minihack.models.scaled import ScaledNet
-from nle_code_wrapper.agents.sample_factory.minihack.models.simba import SimBaActorEncoder, SimBaCriticEncoder
+from nle_code_wrapper.agents.sample_factory.minihack.models.hybrid_encoder import NLEHybridEncoder
+from nle_code_wrapper.agents.sample_factory.minihack.models.language_encoder import NLELanguageTransformerEncoder
+from nle_code_wrapper.agents.sample_factory.minihack.models.terminal_encoder import NLETerminalCNNEncoder
 
 MODELS = [
-    default_make_encoder_func,
-    CleanNet,
-    ScaledNet,
-    ChaoticDwarvenGPT5,
-    SimBaActorEncoder,
-    SimBaCriticEncoder,
+    NLETerminalCNNEncoder,
+    NLEHybridEncoder,
+    NLELanguageTransformerEncoder,
 ]
 MODELS_LOOKUP = {c.__name__: c for c in MODELS}
