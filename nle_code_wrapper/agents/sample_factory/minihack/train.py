@@ -12,6 +12,7 @@ from nle_code_wrapper.agents.sample_factory.minihack.minihack_env import CUSTOM_
 from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
     add_extra_params_general,
     add_extra_params_model,
+    add_extra_params_simba_model,
     minihack_override_defaults,
 )
 from nle_code_wrapper.agents.sample_factory.minihack.models import MODELS_LOOKUP
@@ -42,6 +43,7 @@ def parse_minihack_args(argv=None, evaluation=False):
     parser, partial_cfg = parse_sf_args(argv=argv, evaluation=evaluation)
     add_extra_params_minihack_env(parser)
     add_extra_params_model(parser)
+    add_extra_params_simba_model(parser)
     add_extra_params_general(parser)
     add_code_wrapper_cli_args(parser)
     minihack_override_defaults(partial_cfg.env, parser)

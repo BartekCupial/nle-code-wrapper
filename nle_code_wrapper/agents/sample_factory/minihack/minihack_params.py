@@ -10,7 +10,6 @@ def add_extra_params_model(parser):
     # TODO: add help
     p = parser
     p.add_argument("--use_tty_only", type=str2bool, default=True)
-    p.add_argument("--use_prev_action", type=str2bool, default=False)
     p.add_argument("--h_dim", type=int, default=1738)
     p.add_argument("--msg_hdim", type=int, default=64)
     p.add_argument("--color_edim", type=int, default=16)
@@ -23,6 +22,49 @@ def add_extra_params_model(parser):
     p.add_argument("--blstats_hdim", type=int, default=512)
     p.add_argument("--fc_after_cnn_hdim", type=int, default=512)
     p.add_argument("--use_resnet", type=str2bool, default=False)
+
+
+def add_extra_params_simba_model(parser):
+    p = parser
+    p.add_argument("--actor_char_edim", type=int, default=16, help="Char Embedding Dim. Defaults to `16`")
+    p.add_argument("--actor_color_edim", type=int, default=16, help="Color Embedding Dim. Defaults to `16`")
+    p.add_argument("--actor_hidden_dim", type=int, default=128)
+    p.add_argument("--actor_depth", type=int, default=1)
+    p.add_argument("--actor_heads", type=int, default=4)
+    p.add_argument("--actor_mlp_dim", type=int, default=128)
+
+    p.add_argument("--critic_char_edim", type=int, default=16, help="Char Embedding Dim. Defaults to `16`")
+    p.add_argument("--critic_color_edim", type=int, default=16, help="Color Embedding Dim. Defaults to `16`")
+    p.add_argument("--critic_hidden_dim", type=int, default=512)
+    p.add_argument("--critic_depth", type=int, default=2)
+    p.add_argument("--critic_heads", type=int, default=4)
+    p.add_argument("--critic_mlp_dim", type=int, default=512)
+
+    p.add_argument(
+        "--use_learned_embeddings",
+        type=str2bool,
+        default=False,
+        help="Do we want to learn the embeddings for chars and colors",
+    )
+    p.add_argument(
+        "--use_max_pool",
+        type=str2bool,
+        default=True,
+        help="Do we want to use max pool in conv net",
+    )
+    p.add_argument(
+        "--expansion",
+        type=int,
+        default=2,
+        help="how much bigger hidden dimention in conv block",
+    )
+    p.add_argument(
+        "--pooling_method",
+        default="mean",
+        type=str,
+        choices=["mean", "projection"],
+        help="Do we want to use mean pooling or project features in screen encoder",
+    )
 
 
 def add_extra_params_general(parser):

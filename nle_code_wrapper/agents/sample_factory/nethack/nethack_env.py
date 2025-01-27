@@ -12,7 +12,10 @@ from nle_utils.wrappers import (
     GymV21CompatibilityV0,
     NLETimeLimit,
     NoProgressAbort,
+    ObservationFilterWrapper,
+    PrevActionsWrapper,
     TaskRewardsInfoWrapper,
+    TileTTY,
 )
 
 import nle_code_wrapper.bot.panics as panic_module
@@ -89,6 +92,16 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     env = FinalStatsWrapper(env)
     env = AutoMore(env)
 
+    if cfg.add_image_observation:
+        env = TileTTY(
+            env,
+            crop_size=cfg.crop_dim,
+            rescale_font_size=(cfg.pixel_size, cfg.pixel_size),
+        )
+
+    if cfg.use_prev_action:
+        env = PrevActionsWrapper(env)
+
     # wrap NLE with timeout
     env = NLETimeLimit(env)
 
@@ -119,5 +132,8 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
 
     if cfg.model == "default_make_encoder_func":
         env = AddChanngelDim(env)
+
+    if cfg.obs_keys:
+        env = ObservationFilterWrapper(env, cfg.obs_keys)
 
     return env

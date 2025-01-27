@@ -11,6 +11,7 @@ from sample_factory.utils.typing import Config, ObsSpace
 from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
     add_extra_params_general,
     add_extra_params_model,
+    add_extra_params_simba_model,
     minihack_override_defaults,
 )
 from nle_code_wrapper.agents.sample_factory.minihack.train import make_minihack_encoder
@@ -37,6 +38,7 @@ def parse_nethack_args(argv=None, evaluation=False):
     parser, partial_cfg = parse_sf_args(argv=argv, evaluation=evaluation)
     add_extra_params_nethack_env(parser)
     add_extra_params_model(parser)
+    add_extra_params_simba_model(parser)
     add_extra_params_general(parser)
     add_code_wrapper_cli_args(parser)
     minihack_override_defaults(partial_cfg.env, parser)
