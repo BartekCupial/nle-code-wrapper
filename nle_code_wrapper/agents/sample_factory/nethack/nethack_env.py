@@ -48,16 +48,13 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     )
 
     # NetHack options
-    # Copy & swap out "pickup_types".
     options = []
     for option in nethack.NETHACKOPTIONS:
-        if option.startswith("pickup_types"):
-            options.append("pickup_types:$")
+        if option == "autopickup" and not cfg.autopickup:
+            options.append("!autopickup")
             continue
         options.append(option)
 
-    if not cfg.autopickup:
-        options += ("!autopickup",)
     if not cfg.pet:
         options += ("pettype:none",)
 
