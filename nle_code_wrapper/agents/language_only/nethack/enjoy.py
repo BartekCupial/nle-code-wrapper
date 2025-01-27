@@ -4,12 +4,12 @@ from nle_utils.envs.minihack.minihack_params import add_extra_params_minihack_en
 from sample_factory.cfg.arguments import parse_full_cfg, parse_sf_args
 from sample_factory.enjoy import enjoy
 
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.minihack_params import (
+from nle_code_wrapper.agents.language_only.minihack.minihack_params import (
     add_extra_params_general,
     add_extra_params_language_encoder,
     minihack_override_defaults,
 )
-from nle_code_wrapper.agents.nle_language_wrapper.nethack.train import register_nethack_components
+from nle_code_wrapper.agents.language_only.nethack.train import register_nethack_components
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 
 

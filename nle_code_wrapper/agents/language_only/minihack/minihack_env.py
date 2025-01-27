@@ -8,7 +8,7 @@ from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, No
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.wrappers import NLETokenizer
+from nle_code_wrapper.agents.language_only.minihack.wrappers import NLETokenizer
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback
 

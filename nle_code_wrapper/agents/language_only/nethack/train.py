@@ -6,13 +6,13 @@ from sample_factory.cfg.arguments import parse_full_cfg, parse_sf_args
 from sample_factory.envs.env_utils import register_env
 from sample_factory.train import run_rl
 
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.minihack_params import (
+from nle_code_wrapper.agents.language_only.minihack.minihack_params import (
     add_extra_params_general,
     add_extra_params_language_encoder,
     minihack_override_defaults,
 )
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.train import make_language_encoder
-from nle_code_wrapper.agents.nle_language_wrapper.nethack.nethack_env import NETHACK_ENVS, make_nethack_env
+from nle_code_wrapper.agents.language_only.minihack.train import make_language_encoder
+from nle_code_wrapper.agents.language_only.nethack.nethack_env import NETHACK_ENVS, make_nethack_env
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 
 

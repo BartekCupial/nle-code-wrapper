@@ -8,17 +8,13 @@ from sample_factory.model.encoder import Encoder
 from sample_factory.train import run_rl
 from sample_factory.utils.typing import Config, ObsSpace
 
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.minihack_env import (
-    CUSTOM_ENVS,
-    MINIHACK_ENVS,
-    make_minihack_env,
-)
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.minihack_params import (
+from nle_code_wrapper.agents.language_only.minihack.minihack_env import CUSTOM_ENVS, MINIHACK_ENVS, make_minihack_env
+from nle_code_wrapper.agents.language_only.minihack.minihack_params import (
     add_extra_params_general,
     add_extra_params_language_encoder,
     minihack_override_defaults,
 )
-from nle_code_wrapper.agents.nle_language_wrapper.minihack.models import NLELanguageTransformerEncoder
+from nle_code_wrapper.agents.language_only.minihack.models import NLELanguageTransformerEncoder
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 
 
