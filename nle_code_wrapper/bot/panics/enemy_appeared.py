@@ -10,12 +10,12 @@ def enemy_appeared(bot: "Bot"):
 
     # Count entities from current observation
     for entity in bot.entities:
-        if bot.pathfinder.get_path_to(entity.position):
+        if bot.pathfinder.reachable(bot.entity.position, entity.position, adjacent=True):
             current_entities[entity.glyph] += 1
 
     # Count entities from previous observation
     for entity in bot.get_entities(bot.last_obs):
-        if bot.pathfinder.get_path_to(entity.position):
+        if bot.pathfinder.reachable(bot.entity.position, entity.position, adjacent=True):
             last_entities[entity.glyph] += 1
 
     # Check for new enemies by comparing counts
