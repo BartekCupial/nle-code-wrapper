@@ -234,7 +234,7 @@ class Inventory:
             "amulets": [ItemClasses.AMULET],
             "weapons": [ItemClasses.WEAPON],
             "armor": [ItemClasses.ARMOR],
-            "compestibles": [ItemClasses.COMPESTIBLES],
+            "comestibles": [ItemClasses.COMESTIBLES],
             "scrolls": [ItemClasses.SCROLL],
             "spellbooks": [ItemClasses.SPELLBOOK],
             "potions": [ItemClasses.POTION],

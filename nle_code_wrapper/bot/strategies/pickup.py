@@ -145,11 +145,11 @@ def pickup_armor(bot: "Bot") -> bool:
     return pickup_item(bot, ItemClasses.ARMOR)
 
 
-def pickup_compestibles(bot: "Bot") -> bool:
+def pickup_comestibles(bot: "Bot") -> bool:
     """
     Makes bot pick up food from the floor.
     """
-    return pickup_item(bot, ItemClasses.COMPESTIBLES)
+    return pickup_item(bot, ItemClasses.COMESTIBLES)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
