@@ -75,7 +75,9 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     env = gym.make(env_name, **kwargs)
     env = NoProgressAbort(env)
-    env = AutoMore(env)
+
+    if cfg.code_wrapper:
+        env = AutoMore(env)
 
     if cfg.add_image_observation:
         env = TileTTY(

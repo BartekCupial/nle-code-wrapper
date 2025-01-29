@@ -86,7 +86,9 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     env = NLEProgressWrapper(env)
     env = TaskRewardsInfoWrapper(env)
     env = FinalStatsWrapper(env)
-    env = AutoMore(env)
+
+    if cfg.code_wrapper:
+        env = AutoMore(env)
 
     if cfg.add_image_observation:
         env = TileTTY(
