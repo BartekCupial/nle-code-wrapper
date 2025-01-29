@@ -1,6 +1,7 @@
 from nle_code_wrapper.envs.minihack.envs import (
     avoid_fight,
     chest,
+    corpse,
     corridor,
     fight_corridor,
     fight_diagonally,

@@ -83,7 +83,7 @@ strategies = [
     "pickup_amulet",
     "pickup_armor",
     "pickup_coin",
-    "pickup_comestibles",
+    "pickup_food",
     "pickup_gem",
     "pickup_potion",
     "pickup_ring",

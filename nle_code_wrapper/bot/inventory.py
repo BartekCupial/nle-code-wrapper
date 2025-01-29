@@ -205,6 +205,18 @@ class Item:
         return "(being worn)" in self.full_name
 
     """
+    COMESTIBLES
+    """
+
+    @property
+    def is_corpse(self):
+        return self.item_class == ItemClasses.COMESTIBLES and nethack.OBJ_NAME(self.object) == "corpse"
+
+    @property
+    def is_food(self):
+        return self.item_class == ItemClasses.COMESTIBLES and nethack.OBJ_NAME(self.object) != "corpse"
+
+    """
     TOOLS
     """
 

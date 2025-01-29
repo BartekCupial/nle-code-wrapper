@@ -1,4 +1,5 @@
 import re
+from typing import List, Union
 
 from nle.nethack import actions as A
 from nle_utils.glyph import G
@@ -14,7 +15,7 @@ from nle_code_wrapper.bot.strategy import strategy
 # TODO: currently there can be a loop, pickup_armor, we are standing on ring
 # we will pickup ring drop it and return
 @strategy
-def pickup_item(bot: "Bot", item_class: ItemClasses):
+def pickup_item(bot: "Bot", item_class: ItemClasses, include_corpses: bool = False):
     bot.step(A.Command.PICKUP)
 
     # Check if the game shows a single item, e.g. "a - a cloudy potion"
@@ -83,8 +84,9 @@ def pickup_item(bot: "Bot", item_class: ItemClasses):
                 if mark_items:
                     # example: e - a cloudy potion
                     if re.match("[a-zA-Z] -", line):
-                        # first character in line is an item letter
-                        bot.type_text(line[0])
+                        if include_corpses and "corpse" in line or not include_corpses and "corpse" not in line:
+                            # first character in line is an item letter
+                            bot.type_text(line[0])
                     else:
                         if line != "":
                             bot.step(A.MiscAction.MORE)  # confirm
@@ -145,11 +147,19 @@ def pickup_armor(bot: "Bot") -> bool:
     return pickup_item(bot, ItemClasses.ARMOR)
 
 
-def pickup_comestibles(bot: "Bot") -> bool:
+def pickup_food(bot: "Bot") -> bool:
     """
     Makes bot pick up food from the floor.
     """
-    return pickup_item(bot, ItemClasses.COMESTIBLES)
+    return pickup_item(bot, ItemClasses.COMESTIBLES, include_corpses=False)
+
+
+@strategy
+def pickup_corpse(bot: "Bot") -> bool:
+    """
+    Makes bot pick up corpse from the floor.
+    """
+    return pickup_item(bot, ItemClasses.COMESTIBLES, include_corpses=True)
 
 
 def pickup_scroll(bot: "Bot") -> bool:

@@ -185,6 +185,14 @@ def goto_item(bot: "Bot") -> bool:
 
 
 @strategy
+def goto_corpse(bot: "Bot"):
+    """
+    Moves the agent to the closest corpse
+    """
+    return goto_glyph(bot, G.CORPSES)
+
+
+@strategy
 def descend_stairs(bot: "Bot") -> bool:
     """
     Navigates to and descends the nearest downward staircase.
