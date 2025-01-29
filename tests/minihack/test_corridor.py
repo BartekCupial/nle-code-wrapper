@@ -4,10 +4,10 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
+    descend_stairs,
     explore_corridor_systematically,
     explore_room,
     goto_corridor,
-    goto_stairs_down,
     goto_unexplored_room,
     open_doors_kick,
     search_corridor_for_hidden_doors,
@@ -32,7 +32,7 @@ class TestMazewalkMapped(object):
         def general_solve(bot: "Bot"):
             while True:
                 for strategy in [
-                    goto_stairs_down,
+                    descend_stairs,
                     explore_room,
                     explore_corridor_systematically,
                     goto_corridor,

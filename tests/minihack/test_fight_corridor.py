@@ -4,12 +4,12 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
+    descend_stairs,
     explore_corridor,
     explore_room,
     fight_multiple_monsters,
     goto_corridor,
     goto_room,
-    goto_stairs_down,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
@@ -39,7 +39,7 @@ class TestMazewalkMapped(object):
                 try:
                     if fight_multiple_monsters(bot):
                         continue
-                    elif goto_stairs_down(bot):
+                    elif descend_stairs(bot):
                         continue
                     else:
                         goto_room(bot)
@@ -75,7 +75,7 @@ class TestMazewalkMapped(object):
                 try:
                     if fight_multiple_monsters(bot):
                         continue
-                    elif goto_stairs_down(bot):
+                    elif descend_stairs(bot):
                         continue
                     else:
                         goto_room(bot)

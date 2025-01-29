@@ -62,6 +62,8 @@ from nle_code_wrapper.bot.strategies.fight_monster import (
     wait_for_monster,
 )
 from nle_code_wrapper.bot.strategies.goto import (
+    ascend_stairs,
+    descend_stairs,
     goto_corridor,
     goto_corridor_east,
     goto_corridor_north,
@@ -73,8 +75,6 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_room_north,
     goto_room_south,
     goto_room_west,
-    goto_stairs_down,
-    goto_stairs_up,
     goto_unexplored_corridor,
     goto_unexplored_room,
 )
@@ -192,8 +192,8 @@ __all__ = [
     goto_room_north,
     goto_room_south,
     goto_room_west,
-    goto_stairs_down,
-    goto_stairs_up,
+    descend_stairs,
+    ascend_stairs,
     goto_unexplored_corridor,
     goto_unexplored_room,
     goto_item,

@@ -5,9 +5,9 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     align_boulder_for_bridge,
+    descend_stairs,
     explore_room,
     goto_boulder_closest_to_river,
-    goto_stairs_down,
     push_boulder_into_river,
     push_boulder_south,
 )
@@ -21,7 +21,7 @@ def solve(bot: "Bot"):
             goto_boulder_closest_to_river(bot)
             align_boulder_for_bridge(bot)
             push_boulder_into_river(bot)
-            goto_stairs_down(bot)
+            descend_stairs(bot)
         except BotPanic:
             push_boulder_south(bot)
             push_boulder_south(bot)

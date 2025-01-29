@@ -4,13 +4,13 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.strategies import (
+    descend_stairs,
     explore_corridor,
     explore_room,
     fight_engulfed,
     fight_monster,
     goto_corridor,
     goto_room,
-    goto_stairs_down,
     goto_unexplored_room,
     open_doors,
 )
@@ -40,7 +40,7 @@ class TestFightNeutral:
             fight_monster(bot)
             bot.type_text("y")
             fight_monster(bot)
-            goto_stairs_down(bot)
+            descend_stairs(bot)
 
         cfg.strategies = [solve]
         status = play(cfg, get_action=lambda *_: 0)

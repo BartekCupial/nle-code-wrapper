@@ -1,4 +1,5 @@
 import numpy as np
+from nle.nethack import actions as A
 from nle_utils.glyph import SS, G
 from scipy import ndimage
 
@@ -184,19 +185,23 @@ def goto_item(bot: "Bot") -> bool:
 
 
 @strategy
-def goto_stairs_down(bot: "Bot") -> bool:
+def descend_stairs(bot: "Bot") -> bool:
     """
-    Moves the agent to the closest stairs down.
+    Navigates to and descends the nearest downward staircase.
     """
-    return goto_object(bot, G.STAIR_DOWN)
+    if goto_object(bot, G.STAIR_DOWN):
+        bot.step(A.MiscDirection.DOWN)
+    return True
 
 
 @strategy
-def goto_stairs_up(bot: "Bot") -> bool:
+def ascend_stairs(bot: "Bot") -> bool:
     """
-    Moves the agent to the closest stairs up.
+    Navigates to and ascends the nearest upward staircase.
     """
-    return goto_object(bot, G.STAIR_UP)
+    if goto_object(bot, G.STAIR_UP):
+        bot.step(A.MiscDirection.UP)
+    return True
 
 
 @strategy

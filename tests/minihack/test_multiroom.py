@@ -4,10 +4,10 @@ from nle_utils.play import play
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
+    descend_stairs,
     explore_room,
     fight_monster,
     fight_multiple_monsters,
-    goto_stairs_down,
     goto_unexplored_corridor,
     goto_unexplored_room,
     open_doors,
@@ -40,7 +40,7 @@ class TestMazewalkMapped(object):
                         pass
                     elif fight_monster(bot):
                         pass
-                    elif goto_stairs_down(bot):
+                    elif descend_stairs(bot):
                         pass
                     elif open_doors(bot):
                         pass
@@ -84,7 +84,7 @@ class TestMazewalkMapped(object):
                 for strategy in [
                     fight_multiple_monsters,
                     fight_monster,
-                    goto_stairs_down,
+                    descend_stairs,
                     open_doors,
                     goto_unexplored_corridor,
                     explore_room,

@@ -1,13 +1,7 @@
 import pytest
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies import (
-    approach_monster,
-    explore_corridor,
-    goto_corridor,
-    goto_room,
-    goto_stairs_down,
-)
+from nle_code_wrapper.bot.strategies import approach_monster, descend_stairs, explore_corridor, goto_corridor, goto_room
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.tests import create_bot
@@ -34,7 +28,7 @@ class TestAvoidFight(object):
             explore_corridor(bot)
             goto_room(bot)
             approach_monster(bot)
-            goto_stairs_down(bot)
+            descend_stairs(bot)
         except BotFinished:
             pass
 
@@ -57,6 +51,6 @@ class TestAvoidFight(object):
             explore_corridor(bot)
             goto_room(bot)
             approach_monster(bot)
-            goto_stairs_down(bot)
+            descend_stairs(bot)
         except BotFinished:
             pass
