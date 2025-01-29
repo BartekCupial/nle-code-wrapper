@@ -68,9 +68,10 @@ def pickup_item(bot: "Bot", item_class: ItemClasses, include_corpses: bool = Fal
                 # 0) if we reach (end) get out
                 if "(end)" in line:
                     bot.step(A.MiscAction.MORE)
+                    break
 
                 # 1) when we reach item category we are interested in start marking
-                if line.lower().startswith(item_class.name.lower()):
+                if item_class.name.lower() in line.lower():
                     mark_items = True
                     continue
 
