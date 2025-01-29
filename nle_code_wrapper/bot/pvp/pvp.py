@@ -74,6 +74,9 @@ class Pvp:
                 if not action_func():
                     self.target = None
 
+                if self.bot.in_yn_function or self.bot.in_getlin:
+                    self.target = None
+
         except EnemyAppeared:
             pass
         except Exception as e:
@@ -94,7 +97,6 @@ class Pvp:
             if self.approach_target(self.target.position, self.melee_range):
                 return True
 
-            # TODO: what about neutral monsters? we need to confirm attack
             self.bot.pathfinder.direction(self.target.position)
             return True
 

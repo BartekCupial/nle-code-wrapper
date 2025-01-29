@@ -5,6 +5,7 @@ from nle_code_wrapper.envs.minihack.envs import (
     fight_corridor,
     fight_diagonally,
     fight_engulfed,
+    fight_neutral,
     key_room_items,
     oracle,
     premapped_corridor,
