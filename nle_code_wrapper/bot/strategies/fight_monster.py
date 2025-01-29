@@ -16,7 +16,7 @@ def fight_monster(bot: "Bot") -> bool:
     """
     Directs the bot to fight melee the closest monster.
     """
-    bot.movements = Movements(bot, monster_collision=True)
+    bot.movements = Movements(bot, monster_collision=False)
 
     neigbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
     distances = bot.pathfinder.distances(bot.entity.position)
@@ -38,7 +38,7 @@ def fight_engulfed(bot: "Bot") -> bool:
     """
     Fight while being inside the monster until you're out.
     """
-    bot.movements = Movements(bot, monster_collision=True)
+    bot.movements = Movements(bot, monster_collision=False)
 
     ret = False
     while bot.engulfed:
@@ -56,7 +56,7 @@ def wait_for_monster(bot: "Bot") -> bool:
     """
     Makes the bot wait for monsters to come within an attack range.
     """
-    bot.movements = Movements(bot, monster_collision=True)
+    bot.movements = Movements(bot, monster_collision=False)
 
     nearby_monsters = [
         e for e in bot.entities if bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) is not None
@@ -82,7 +82,7 @@ def fight_multiple_monsters(bot: "Bot") -> bool:
     Tactical combat behavior whenwhen fighting swarms of enemies.
     The bot will seek choke points, wait for the enemies and fight them one by one.
     """
-    bot.movements = Movements(bot, monster_collision=True)
+    bot.movements = Movements(bot, monster_collision=False)
 
     # Find tactical positions: corridor ends and doorways
     nearby_monsters = [
@@ -123,7 +123,7 @@ def goto_choke_point(bot: "Bot") -> bool:
     """
     Directs the bot to move to the nearest choke point.
     """
-    bot.movements = Movements(bot, monster_collision=True)
+    bot.movements = Movements(bot, monster_collision=False)
 
     tactical_positions = find_tactical_positions(bot, bot.entities)
 

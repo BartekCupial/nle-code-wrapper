@@ -2,9 +2,12 @@ from collections import defaultdict
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import EnemyAppeared
+from nle_code_wrapper.bot.pathfinder.movements import Movements
 
 
 def enemy_appeared(bot: "Bot"):
+    bot.movements = Movements(bot, monster_collision=False)
+
     last_entities = defaultdict(int)
     current_entities = defaultdict(int)
 
