@@ -15,6 +15,7 @@ from nle_utils.wrappers import (
     NoProgressAbort,
     ObservationFilterWrapper,
     PrevActionsWrapper,
+    SingleSeed,
     TaskRewardsInfoWrapper,
     TileTTY,
 )
@@ -101,6 +102,9 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     env = NLETimeLimit(env)
 
     env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
+
+    if cfg.single_seed is not None:
+        env = SingleSeed(env, cfg.single_seed)
 
     strategies = []
     for strategy_name in cfg.strategies:

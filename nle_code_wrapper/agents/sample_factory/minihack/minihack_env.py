@@ -11,6 +11,7 @@ from nle_utils.wrappers import (
     NoProgressAbort,
     ObservationFilterWrapper,
     PrevActionsWrapper,
+    SingleSeed,
     TileTTY,
 )
 
@@ -55,7 +56,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         penalty_mode=cfg.fn_penalty_step,
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
-        actions=FULL_ACTIONS,
     )
 
     param_mapping = {
@@ -69,6 +69,9 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
     for param_name, param_value in param_mapping.items():
         if param_value is not None:
             kwargs[param_name] = param_value
+
+    if cfg.code_wrapper:
+        kwargs["actions"] = FULL_ACTIONS
 
     env = gym.make(env_name, **kwargs)
     env = NoProgressAbort(env)
@@ -88,6 +91,9 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
     env = NLETimeLimit(env)
 
     env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
+
+    if cfg.single_seed:
+        env = SingleSeed(env, cfg.single_seed)
 
     strategies = []
     for strategy_name in cfg.strategies:

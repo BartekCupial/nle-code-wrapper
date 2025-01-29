@@ -13,6 +13,7 @@ from nle_utils.wrappers import (
     GymV21CompatibilityV0,
     NLETimeLimit,
     NoProgressAbort,
+    SingleSeed,
     TaskRewardsInfoWrapper,
 )
 
@@ -90,6 +91,9 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
     env = NLETimeLimit(env)
 
     env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
+
+    if cfg.single_seed:
+        env = SingleSeed(env, cfg.single_seed)
 
     if len(cfg.strategies) > 0:
         if isinstance(cfg.strategies[0], str):

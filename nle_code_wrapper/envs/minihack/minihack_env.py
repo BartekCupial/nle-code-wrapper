@@ -4,7 +4,7 @@ from typing import Optional
 import gym
 import minihack  # NOQA: F401
 from nle.env.base import FULL_ACTIONS
-from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, NoProgressAbort
+from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, NoProgressAbort, SingleSeed
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
@@ -72,6 +72,9 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
     env = NLETimeLimit(env)
 
     env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
+
+    if cfg.single_seed:
+        env = SingleSeed(env, cfg.single_seed)
 
     if len(cfg.strategies) > 0:
         if isinstance(cfg.strategies[0], str):
