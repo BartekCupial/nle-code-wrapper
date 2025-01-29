@@ -1,10 +1,11 @@
 from __future__ import annotations
 
+import re
 from typing import Dict, List
 
 import numpy as np
 from nle import nethack
-from nle_utils.item import ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
+from nle_utils.item import ArmorType, ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
 
 GLYPH_TO_OBJECT = {}
 item_range = list(range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS))
@@ -136,6 +137,14 @@ class Item:
     @property
     def is_weapon(self):
         return self.item_class == ItemClasses.WEAPON
+
+    @property
+    def main_hand(self):
+        return re.search(r"\(weapon in (?:hands|(?:left|right) hand)\)", self.full_name)
+
+    @property
+    def off_hand(self):
+        return "(alternate weapon; not wielded)" in self.full_name
 
     @property
     def is_launcher(self):
@@ -279,6 +288,53 @@ class Inventory:
             for key, category in self.inventory.items()
             if category
         )
+
+    @property
+    def main_hand(self):
+        wielded_weapon = [weapon for weapon in self["weapons"] if weapon.main_hand]
+        return wielded_weapon[0] if wielded_weapon else None
+
+    @property
+    def off_hand(self):
+        wielded_weapon = [weapon for weapon in self["weapons"] if weapon.off_hand]
+        return wielded_weapon[0] if wielded_weapon else None
+
+    @property
+    def worn_armor_by_type(self):
+        """Returns a dictionary of worn armor items indexed by their ArmorType."""
+        worn_armor = [armor for armor in self["armor"] if armor.is_worn]
+        return {
+            armor_type: next((armor for armor in worn_armor if armor.object.oc_armcat == armor_type.value), None)
+            for armor_type in ArmorType
+        }
+
+    @property
+    def suit(self):
+        return self.worn_armor_by_type[ArmorType.SUIT]
+
+    @property
+    def shield(self):
+        return self.worn_armor_by_type[ArmorType.SHIELD]
+
+    @property
+    def helm(self):
+        return self.worn_armor_by_type[ArmorType.HELM]
+
+    @property
+    def gloves(self):
+        return self.worn_armor_by_type[ArmorType.GLOVES]
+
+    @property
+    def boots(self):
+        return self.worn_armor_by_type[ArmorType.BOOTS]
+
+    @property
+    def cloak(self):
+        return self.worn_armor_by_type[ArmorType.CLOAK]
+
+    @property
+    def shirt(self):
+        return self.worn_armor_by_type[ArmorType.SHIRT]
 
 
 if __name__ == "__main__":
