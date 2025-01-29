@@ -58,7 +58,14 @@ config = {
 }
 
 # params different between exps
-params_grid = [{"seed": list(range(1)), "depth": [3], "hidden_dim": [512], "strategies": [nethack]}]
+params_grid = [
+    {
+        "seed": list(range(1)),
+        "depth": [3],
+        "hidden_dim": [512],
+        "strategies": [nethack],
+    },
+]
 
 experiments_list = create_experiments_helper(
     experiment_name=name,
