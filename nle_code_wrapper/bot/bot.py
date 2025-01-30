@@ -14,6 +14,7 @@ from nle_utils.glyph import G
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
+from nle_code_wrapper.bot.character import Character
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.inventory import Inventory
@@ -36,6 +37,7 @@ class Bot:
         self.gamma = gamma
 
         self._movements: Movements = None
+        self.character: Character = Character(self)
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
 
@@ -248,6 +250,7 @@ class Bot:
         self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
+        self.character.update()
         self.movements.update()
         self.pathfinder.update()
         self.pvp.update()
