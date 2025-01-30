@@ -56,9 +56,12 @@ class Pvp:
             else:
                 self.target = None
 
-    def approach_target(self, target_position, desired_range: int = 1):
+    def approach_target(self, target: Entity, desired_range: int = 1):
         """Common logic for approaching a target"""
-        adjacent = self.bot.pathfinder.reachable(self.bot.entity.position, target_position, adjacent=True)
+        if target is None:
+            return True
+
+        adjacent = self.bot.pathfinder.reachable(self.bot.entity.position, target.position, adjacent=True)
         if adjacent is None:
             return False
 
@@ -89,7 +92,7 @@ class Pvp:
 
     def approach(self, entity: Entity, distance: int = 1):
         def approach_action():
-            return self.approach_target(self.target.position, distance)
+            return self.approach_target(self.target, distance)
 
         self.handle_combat(entity, approach_action)
 
@@ -97,7 +100,7 @@ class Pvp:
         def melee_action():
             self.wield_best_melee_weapon()
 
-            if self.approach_target(self.target.position, self.melee_range):
+            if self.approach_target(self.target, self.melee_range):
                 return True
 
             self.bot.pathfinder.direction(self.target.position)
@@ -168,7 +171,7 @@ class Pvp:
                 return False
 
             # 2) Get into range
-            if self.approach_target(self.target.position, self.ranged_range):
+            if self.approach_target(self.target, self.ranged_range):
                 return True
 
             # 3) Positions from we can attack
@@ -326,7 +329,7 @@ class Pvp:
                 return False
 
             # 2) come in range of the target
-            if self.approach_target(self.target.position, self.ray_simulator.min_range):
+            if self.approach_target(self.target, self.ray_simulator.min_range):
                 return True
 
             best_ray, target_hit, self_hit = self._get_best_ray()
@@ -343,7 +346,7 @@ class Pvp:
 
                 path = self.bot.pathfinder.get_path_to(adjacent)
                 if len(path) > self.melee_range:
-                    return self.approach_target(self.target.position)
+                    return self.approach_target(self.target)
                 # 6) we are in melee range, but we can't zap the wand (e.g. we are near a wall), abort
                 else:
                     return False

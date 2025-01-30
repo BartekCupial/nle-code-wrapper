@@ -2,6 +2,7 @@ from typing import TYPE_CHECKING, Optional
 
 import nle.nethack as nh
 import numpy as np
+from nle.nethack import actions as A
 from nle_utils.alignment import Alignment
 from nle_utils.gender import Gender
 from nle_utils.race import Race
@@ -107,12 +108,20 @@ class Character:
         self.upgradable_skills = dict()
 
         self.is_lycanthrope = False
+        self.init = False
 
     def update(self):
         if "welcome to NetHack!" in self.bot.message:
-            self.parse_welcome()
+            self.parse_welcome(self.bot.message)
         if "welcome back to NetHack!" in self.bot.message:
             assert False, "game was loaded from save"
+
+        if not self.init:
+            # TODO: fix nle so it doesn't skip at the reset
+            obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.ATTRIBUTES))
+            message = "\n".join([bytes(line).decode("latin-1") for line in obs["tty_chars"]])
+            self.parse_welcome(message)
+            obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.ESC))
 
         if "You feel feverish." in self.bot.message:
             self.is_lycanthrope = True
@@ -124,16 +133,17 @@ class Character:
         # TODO: levitation, etc
         return min(1000, (self.bot.blstats.strength_percentage + self.bot.blstats.constitution) * 25 + 50)
 
-    def parse_welcome(self):
+    def parse_welcome(self, message):
         """
         parse agent gender, race, role, alignment form starting message
         """
-        self.race = Race.parse(self.bot.message)
-        self.gender = Gender.parse(self.bot.message)
-        self.role = Role.parse(self.bot.message)
-        self.alignment = Alignment.parse(self.bot.message)
+        self.race = Race.parse(message)
+        self.gender = Gender.parse(message)
+        self.role = Role.parse(message)
+        self.alignment = Alignment.parse(message)
         self.skill = Skill.from_role(self.role)
         self.self_glyph = self.bot.entity.glyph
+        self.init = True
 
     def get_melee_bonus(self, weapon: Optional[Item] = None):
         """Returns a pair (to_hit, damage) representing combat bonuses
