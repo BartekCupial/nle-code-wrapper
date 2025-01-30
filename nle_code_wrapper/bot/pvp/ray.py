@@ -34,6 +34,10 @@ class RaySimulator:
             x += dx
             y += dy
 
+            # Add bounds check
+            if not self._is_in_bounds(x, y):
+                return
+
             if self.bot.current_level.walkable[x, y]:
                 for entity in self.bot.entities + [self.bot.entity]:
                     if entity.position == (x, y):
@@ -96,6 +100,10 @@ class RaySimulator:
         # Ray heading
         # up-left
 
+        # Check if all accessed positions are in bounds
+        if not all(self._is_in_bounds(px, py) for px, py in [(x, y), (x + dx, y), (x, y + dy), (x + dx, y + dy)]):
+            return False
+
         return (
             self.bot.current_level.walkable[x, y]
             and self.bot.current_level.walkable[x + dx, y]
@@ -110,6 +118,10 @@ class RaySimulator:
         # |..@.
         # Ray heading
         # up-left
+
+        # Check if all accessed positions are in bounds
+        if not all(self._is_in_bounds(px, py) for px, py in [(x, y), (x + dx, y), (x, y + dy), (x + dx, y + dy)]):
+            return False
 
         return (
             self.bot.current_level.walkable[x, y]
@@ -156,3 +168,6 @@ class RaySimulator:
             return -dx, dy
 
         raise ValueError()
+
+    def _is_in_bounds(self, x: int, y: int) -> bool:
+        return 0 <= x < self.bot.current_level.walkable.shape[0] and 0 <= y < self.bot.current_level.walkable.shape[1]
