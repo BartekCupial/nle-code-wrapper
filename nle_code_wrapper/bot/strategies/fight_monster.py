@@ -12,7 +12,7 @@ from nle_code_wrapper.bot.strategy import repeat, strategy
 
 
 @strategy
-def fight_monster(bot: "Bot") -> bool:
+def fight_melee(bot: "Bot") -> bool:
     """
     Directs the bot to fight melee the closest monster.
     """
@@ -28,6 +28,28 @@ def fight_monster(bot: "Bot") -> bool:
 
     if entity:
         bot.pvp.attack_melee(entity)
+        return True
+    else:
+        return False
+
+
+@strategy
+def fight_ranged(bot: "Bot") -> bool:
+    """
+    Directs the bot to fight ranged the closest monster.
+    """
+    bot.movements = Movements(bot, monster_collision=False)
+
+    neigbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
+    distances = bot.pathfinder.distances(bot.entity.position)
+    adjacent, entity = min(
+        ((neighbor, e) for neighbor, e in zip(neigbors, bot.entities) if neighbor is not None),
+        key=lambda pair: distances.get(pair[0], np.inf),
+        default=(None, None),
+    )
+
+    if entity:
+        bot.pvp.attack_ranged(entity)
         return True
     else:
         return False
@@ -115,7 +137,7 @@ def fight_multiple_monsters(bot: "Bot") -> bool:
                 return False
     else:
         # If no tactical positions are found, attack the closest monster
-        return fight_monster(bot)
+        return fight_melee(bot)
 
 
 @strategy

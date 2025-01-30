@@ -67,18 +67,18 @@ def pickup_item(bot: "Bot", item_class: ItemClasses, include_corpses: bool = Fal
 
                 # 0) if we reach (end) get out
                 if "(end)" in line:
-                    bot.step(A.MiscAction.MORE)
+                    bot.step(A.Command.ESC)
                     break
 
-                # 1) when we reach item category we are interested in start marking
-                if item_class.name.lower() in line.lower():
-                    mark_items = True
-                    continue
-
-                # 2) if we ehxausted the current page go to the next one
+                # 1) if we ehxausted the current page go to the next one
                 if re.match("\(\d+ of \d+\)", line):  # NOQA: W605
                     bot.type_text(" ")
                     lines = bot.message.split("\n")
+                    continue
+
+                # 2) when we reach item category we are interested in start marking
+                if item_class.name.lower() in line.lower():
+                    mark_items = True
                     continue
 
                 # 3) mark items for picking up

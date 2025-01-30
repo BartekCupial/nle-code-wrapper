@@ -8,7 +8,7 @@ from nle_code_wrapper.bot.strategies import (
     explore_corridor,
     explore_room,
     fight_engulfed,
-    fight_monster,
+    fight_melee,
     goto_corridor,
     goto_room,
     goto_unexplored_room,
@@ -39,7 +39,7 @@ class TestFightEngulfed:
             goto_corridor(bot)
             while True:
                 try:
-                    if fight_monster(bot):
+                    if fight_melee(bot):
                         continue
                     elif fight_engulfed(bot):
                         continue

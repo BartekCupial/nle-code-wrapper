@@ -11,7 +11,7 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     descend_stairs,
     explore_room,
-    fight_monster,
+    fight_melee,
     goto_unexplored_corridor,
     goto_unexplored_room,
     open_doors_kick,
@@ -24,7 +24,7 @@ from nle_code_wrapper.utils import utils
 
 def general_mini(bot: "Bot", where, action):
     while True:
-        fight_monster(bot)
+        fight_melee(bot)
         explore_room(bot)
         goto(bot, where, action)
 

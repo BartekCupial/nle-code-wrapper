@@ -6,7 +6,7 @@ from nle_code_wrapper.bot.exceptions import BotPanic
 from nle_code_wrapper.bot.strategies import (
     descend_stairs,
     explore_room,
-    fight_monster,
+    fight_melee,
     fight_multiple_monsters,
     goto_unexplored_corridor,
     goto_unexplored_room,
@@ -38,7 +38,7 @@ class TestMazewalkMapped(object):
                 try:
                     if fight_multiple_monsters(bot):
                         pass
-                    elif fight_monster(bot):
+                    elif fight_melee(bot):
                         pass
                     elif descend_stairs(bot):
                         pass
@@ -83,7 +83,7 @@ class TestMazewalkMapped(object):
             while True:
                 for strategy in [
                     fight_multiple_monsters,
-                    fight_monster,
+                    fight_melee,
                     descend_stairs,
                     open_doors,
                     goto_unexplored_corridor,

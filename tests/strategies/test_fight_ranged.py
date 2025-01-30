@@ -7,41 +7,41 @@ from nle_code_wrapper.bot.strategies import (
     descend_stairs,
     explore_corridor,
     explore_room,
-    fight_engulfed,
-    fight_melee,
+    fight_multiple_monsters,
+    fight_ranged,
     goto_corridor,
+    goto_item,
     goto_room,
     goto_unexplored_room,
     open_doors,
 )
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
+from nle_code_wrapper.utils.tests import create_bot
 
 
 @pytest.mark.usefixtures("register_components")
-class TestFightNeutral:
+class TestCrossLavaRive:
     @pytest.mark.parametrize(
         "env",
         [
-            "CustomMiniHack-FightNeutral-v0",
+            "CustomMiniHack-FightRanged-v0",
         ],
     )
     @pytest.mark.parametrize("seed", list(range(3)))
-    def test_fight_multiple_monsters(self, env, seed):
+    def test_fight_multiple_monsters_dark(self, env, seed):
         cfg = parse_minihack_args(
             argv=[
                 f"--env={env}",
-                "--no-render",
                 f"--seed={seed}",
+                # "--no-render",
+                "--autopickup=True",
+                "--code_wrapper=False",
             ]
         )
 
-        def solve(bot: "Bot"):
-            goto_corridor(bot)
-            fight_melee(bot)
-            bot.type_text("y")
-            fight_melee(bot)
-            descend_stairs(bot)
+        bot = create_bot(cfg)
+        bot.reset(seed=seed)
 
-        cfg.strategies = [solve]
-        status = play(cfg, get_action=lambda *_: 0)
-        assert status["end_status"].name == "TASK_SUCCESSFUL"
+        goto_item(bot)
+        goto_corridor(bot)
+        fight_ranged(bot)

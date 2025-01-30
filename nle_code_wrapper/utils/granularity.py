@@ -60,12 +60,12 @@ explore = [
 ]
 
 fight_monster_easy = [
-    "fight_monster",
+    "fight_melee",
     "fight_multiple_monsters",
 ]
 
 fight_monster_hard = [
-    "fight_monster",
+    "fight_melee",
     "goto_choke_point",
     "wait_for_monster",
     "run_away",
@@ -199,7 +199,7 @@ corridor_battle_easy = [
     "explore_room_north",
     "explore_room_south",
     "explore_room_west",
-    "fight_monster",
+    "fight_melee",
     "fight_multiple_monsters",
 ]
 
@@ -226,7 +226,7 @@ corridor_battle_hard = [
     "explore_room_north",
     "explore_room_south",
     "explore_room_west",
-    "fight_monster",
+    "fight_melee",
     "goto_choke_point",
     "wait_for_monster",
     "run_away",
@@ -359,7 +359,7 @@ minigrid_easy = [
     "explore_room",
     "open_doors",
     "open_doors_kick",
-    "fight_monster",
+    "fight_melee",
     "fight_multiple_monsters",
 ]
 
@@ -374,7 +374,7 @@ minigrid_hard = [
     "explore_room",
     "open_doors",
     "open_doors_kick",
-    "fight_monster",
+    "fight_melee",
     "goto_choke_point",
     "wait_for_monster",
     "run_away",
@@ -421,7 +421,7 @@ quest_easy = [
     "acquire_levitation",
     "cross_lava_river",
     "freeze_lava_river",
-    "fight_monster",
+    "fight_melee",
     "fight_multiple_monsters",
     "approach_and_zap_monster",
 ]
@@ -476,7 +476,7 @@ quest_hard = [
     "wear_shield",
     "wear_shirt",
     "wear_suit",
-    "fight_monster",
+    "fight_melee",
     "goto_choke_point",
     "wait_for_monster",
     "run_away",
@@ -492,7 +492,7 @@ river_easy = [
     "explore_room_north",
     "explore_room_south",
     "explore_room_west",
-    "fight_monster",
+    "fight_melee",
     "fight_multiple_monsters",
     "goto_boulder",
     "push_boulder_east",
@@ -512,7 +512,7 @@ river_hard = [
     "explore_room_north",
     "explore_room_south",
     "explore_room_west",
-    "fight_monster",
+    "fight_melee",
     "goto_choke_point",
     "wait_for_monster",
     "run_away",
@@ -583,7 +583,8 @@ nethack = [
     "explore_room_south",
     "explore_room_west",
     "fight_engulfed",
-    "fight_monster",
+    "fight_melee",
+    "fight_ranged",
     "fight_multiple_monsters",
     "goto_choke_point",
     "wait_for_monster",
@@ -618,7 +619,6 @@ nethack = [
     "pickup_tool",
     "pickup_wand",
     "pickup_weapon",
-    "pickup_corpse",
     "puton_ring",
     "quaff_potion",
     "wear_boots",
@@ -639,7 +639,8 @@ nethack = [
     "approach_and_zap_monster",
     "zap_monster",
     "approach_monster",
-    "eat_corpse_floor",
+    # "eat_corpse_floor",
+    # "pickup_corpse",
     "eat_corpse_inventory",
     "eat_food_inventory",
 ]

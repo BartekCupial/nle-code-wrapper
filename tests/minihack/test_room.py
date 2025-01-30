@@ -3,7 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import descend_stairs, explore_room, fight_monster, run_away
+from nle_code_wrapper.bot.strategies import descend_stairs, explore_room, fight_melee, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -62,7 +62,7 @@ class TestMazewalkMapped(object):
         def general_fight(bot: "Bot"):
             while True:
                 try:
-                    if fight_monster(bot):
+                    if fight_melee(bot):
                         pass
                     elif descend_stairs(bot):
                         pass
@@ -124,7 +124,7 @@ class TestMazewalkMapped(object):
         def general_smart_fight(bot: "Bot"):
             while True:
                 try:
-                    if fight_monster(bot):
+                    if fight_melee(bot):
                         pass
                     elif descend_stairs(bot):
                         pass

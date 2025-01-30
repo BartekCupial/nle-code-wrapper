@@ -140,7 +140,12 @@ class Item:
 
     @property
     def main_hand(self):
-        return re.search(r"\(weapon in (?:hands|(?:left|right) hand)\)", self.full_name)
+        return (
+            "(weapon in hands)" in self.full_name
+            or "(weapon in right hand)" in self.full_name
+            or "(weapon in left hand)" in self.full_name
+            or "(wielded)" in self.full_name
+        )
 
     @property
     def off_hand(self):
@@ -153,28 +158,36 @@ class Item:
 
         return self.name in ["bow", "long bow", "elven bow", "orcish bow", "yumi", "crossbow", "sling"]
 
-    @property
-    def is_firing_projectile(self, launcher: Item = None):
+    def can_shoot_projectile(self, projectile: Item):
         if not self.is_weapon:
             return False
 
         arrows = ["arrow", "elven arrow", "orcish arrow", "silver arrow", "ya"]
 
-        if launcher is None:
-            return arrows + ["crossbow bolt"]  # TODO: sling ammo
+        if self.name == "crossbow":
+            return projectile.name == "crossbow bolt"
 
-        if launcher.name == "crossbow":
-            return self.name == "crossbow bolt"
-
-        if launcher.name == "sling":
+        if self.name == "sling":
             # TODO: implement sling ammo validation
             return False
 
         bows = ["bow", "long bow", "elven bow", "orcish bow", "yumi"]
-        if launcher.name in bows:
-            return self.name in arrows
+        if self.name in bows:
+            return projectile.name in arrows
 
-        raise ValueError(f"Unknown launcher type: {launcher.name}")
+    @property
+    def is_firing_projectile(self):
+        if not self.is_weapon:
+            return False
+
+        return self.name in [
+            "arrow",
+            "elven arrow",
+            "orcish arrow",
+            "silver arrow",
+            "ya",
+            "crossbow bolt",
+        ]  # TODO: sling ammo
 
     @property
     def is_thrown_projectile(self):
