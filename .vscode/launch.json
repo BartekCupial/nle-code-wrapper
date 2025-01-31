@@ -11,7 +11,7 @@
             "module": "mrunner_run",
             "justMyCode": false,
             "args": [
-                "--ex", "experiments/language_representations/2025_01_24_language_flat_nethack.py",
+                "--ex", "train_configs/2025_01/nethack/2025_01_27_nethack_single_seed.py",
             ],
         },
         {
@@ -34,6 +34,18 @@
             ],
         },
         {
+            "name": "enjoy",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.agents.sample_factory.nethack.random",
+            "justMyCode": false,
+            "args": [
+                "--env", "NetHackScore-v0",
+                "--single_seed", "0",
+                // "--code_wrapper", "False",
+            ],
+        },
+        {
             "name": "play minihack",
             "type": "debugpy",
             "request": "launch",
@@ -47,7 +59,8 @@
                 // "--env", "CustomMiniHack-FightDiagonally-v0",
                 // "--env", "MiniHack-River-v0",
                 // "--env", "CustomMiniHack-WearSuit-Distr-v0",
-                "--env", "MiniHack-CorridorBattle-v0",
+                // "--env", "CustomMiniHack-FightRanged-v0",
+                "--env", "CustomMiniHack-Ray-v0",
                 // "--env", "MiniHack-Quest-Easy-v0",
                 // "--env", "MiniHack-KeyRoom-Dark-S5-v0",
                 // "--env", "MiniHack-MultiRoom-N10-Lava-OpenDoor-v0",
@@ -67,12 +80,14 @@
             "args": [
                 "--env", "NetHackProgress-v0",
                 "--character", "mon-hum-neu-mal",
+                // "--character", "ran-elf-neu-mal",
+                // "--character", "@",
                 // "--code_wrapper", "False",
                 "--penalty_time", "0.0",
                 "--penalty_step", "0.0",
                 "--verbose", "True",
                 // // "--no-render",
-                "--seed", "11",
+                "--seed", "27",
             ],
         },
         {
@@ -86,5 +101,14 @@
             ],
             "justMyCode": false,
         },
+        {
+            "name": "Python: Debug Current File",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal",
+            "justMyCode": false
+        }
+        
     ]
 }

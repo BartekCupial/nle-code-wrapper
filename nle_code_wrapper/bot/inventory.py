@@ -155,7 +155,7 @@ class Item:
         return f"{chr(self.letter)}) {self.full_name}"
 
     def __repr__(self):
-        return f"{chr(self.letter)}) {self.full_name})"
+        return f"{chr(self.letter)}) {self.full_name}"
 
     @property
     def object(self):

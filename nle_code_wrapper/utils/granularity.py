@@ -641,6 +641,6 @@ nethack = [
     "approach_monster",
     # "eat_corpse_floor",
     # "pickup_corpse",
-    "eat_corpse_inventory",
+    # "eat_corpse_inventory",
     "eat_food_inventory",
 ]

@@ -128,26 +128,26 @@ example for how gather items strategy is constructed
 ### what next?:
 - what skills we are missing?
     - inventory management
-        - item usage (zap wand, read scroll/book, quaff potion, wear armor, wield weapon)
+        - (done) item usage (zap wand, read scroll/book, quaff potion, wear armor, wield weapon)
         - item identification
         - weight management
         - resource prioritization
         - armor class maximization
     - combat
-        - fighting (target selection, melee, kiting, engulfed)
+        - (done) fighting (target selection, melee, kiting, engulfed)
         - spellcasting (heal, protection)
         - passive defence (passive attacks from monsters)
-        - use the optimal weapon or spell given situation
+        - (done) use the optimal weapon or spell given situation
     - matter manipulation
-        - boulder pushing
+        - (done) boulder pushing
         - corridor digging
         - phasing or other forms of manipulating the environment
     - survival
-        - food strategy
+        - (done) food strategy
         - praying strategy
         - resource prioritization
         - escape strategy (eg. scroll of teleportation)
     - interactions with neutral monsters (shopkeeper, guards, quest giver)
-    - engraving
+    - (done) engraving
     - skill enhancement: improve weapon and spell proficiencies
 
