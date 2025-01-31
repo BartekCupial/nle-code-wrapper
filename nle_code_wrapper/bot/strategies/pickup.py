@@ -67,7 +67,7 @@ def pickup_item(bot: "Bot", item_class: ItemClasses, include_corpses: bool = Fal
 
                 # 0) if we reach (end) get out
                 if "(end)" in line:
-                    bot.step(A.Command.ESC)
+                    bot.step(A.MiscAction.MORE)
                     break
 
                 # 1) if we ehxausted the current page go to the next one
