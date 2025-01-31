@@ -1,114 +1,164 @@
 from __future__ import annotations
 
+import enum
 import re
-from typing import Dict, List
+from dataclasses import dataclass
+from typing import Dict, List, Tuple
 
 import numpy as np
-from nle import nethack
+from nle import nethack as nh
 from nle_utils.item import ArmorType, ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
 
-GLYPH_TO_OBJECT = {}
-item_range = list(range(nethack.GLYPH_OBJ_OFF, nethack.GLYPH_OBJ_OFF + nethack.NUM_OBJECTS))
-corpse_range = list(range(nethack.GLYPH_BODY_OFF, nethack.GLYPH_BODY_OFF + nethack.NUMMONS))
-statue_range = list(range(nethack.GLYPH_STATUE_OFF, nethack.GLYPH_STATUE_OFF + nethack.NUMMONS))
-for glyph in item_range + corpse_range + statue_range:
-    obj = nethack.objclass(nethack.glyph_to_obj(glyph))
-    GLYPH_TO_OBJECT[glyph] = dict(
-        obj=obj, obj_class=obj.oc_class, obj_name=nethack.OBJ_NAME(obj), obj_description=nethack.OBJ_DESCR(obj)
-    )
+
+class GlyphCategory(enum.Enum):
+    OTHER = -1
+    ITEM = 0
+    MONSTER = 1
+    CORPSE = 2
+    STATUE = 3
 
 
-def get_object_name(obj):
-    return nethack.objdescr.from_idx(obj.oc_name_idx).oc_name
+def name_and_category_from_glyph(glyph) -> Tuple[str, GlyphCategory]:
+    name = ""
+    category = GlyphCategory.OTHER
+
+    if glyph >= nh.GLYPH_STATUE_OFF:
+        permonst = nh.permonst(nh.glyph_to_mon(glyph))
+        mon_name = permonst.mname
+        name = mon_name + " statue"
+
+        obj = nh.objclass(nh.glyph_to_obj(glyph))
+        category = GlyphCategory.STATUE
+    elif glyph >= nh.GLYPH_WARNING_OFF:
+        pass
+    elif glyph >= nh.GLYPH_SWALLOW_OFF:
+        pass
+    elif glyph >= nh.GLYPH_ZAP_OFF:
+        pass
+    elif glyph >= nh.GLYPH_EXPLODE_OFF:
+        pass
+    elif glyph >= nh.GLYPH_CMAP_OFF:
+        pass
+    elif glyph >= nh.GLYPH_OBJ_OFF:
+        obj_name = ""
+        obj_description = ""
+
+        obj = nh.objclass(nh.glyph_to_obj(glyph))
+        obj_class = obj.oc_class
+        category = GlyphCategory.ITEM
+
+        if nh.OBJ_NAME(obj) is not None:
+            obj_name = nh.OBJ_NAME(obj)
+        if nh.OBJ_DESCR(obj) is not None:
+            obj_description = nh.OBJ_DESCR(obj)
+
+        match ItemClasses(ord(obj_class)):
+            case ItemClasses.ILLOBJ:
+                name = obj_name
+            case ItemClasses.WEAPON:
+                name = obj_name
+            case ItemClasses.ARMOR:
+                if len(obj_description) > 0:
+                    name = obj_description
+                else:
+                    name = obj_name
+            case ItemClasses.RING:
+                name = obj_description + " ring"
+            case ItemClasses.AMULET:
+                if "Amulet" not in obj_description:
+                    name = obj_description + " amulet"
+                else:
+                    name = obj_description
+            case ItemClasses.TOOL:
+                if len(obj_description) > 0:
+                    name = obj_description
+                else:
+                    name = obj_name
+            case ItemClasses.COMESTIBLES:
+                name = obj_name + obj_description
+            case ItemClasses.POTION:
+                name = obj_description + " potion"
+            case ItemClasses.SCROLL:
+                name = "scroll labeled " + obj_description
+            case ItemClasses.SPELLBOOK:
+                name = obj_description + " spellbook"
+            case ItemClasses.WAND:
+                name = obj_description + " wand"
+            case ItemClasses.COIN:
+                name = obj_name
+            case ItemClasses.GEM:
+                if obj_description not in obj_name:
+                    name = obj_description + " " + obj_name
+                else:
+                    name = obj_name
+            case ItemClasses.ROCK:
+                name = obj_name
+            case ItemClasses.BALL:
+                name = obj_name
+            case ItemClasses.CHAIN:
+                name = obj_name
+            case ItemClasses.VENOM:
+                name = "splash of " + obj_name
+            case _:
+                name = ""
+    elif glyph >= nh.GLYPH_RIDDEN_OFF:
+        permonst = nh.permonst(nh.glyph_to_mon(glyph))
+        mon_name = permonst.mname
+        name = "ridden " + mon_name
+        category = GlyphCategory.MONSTER
+    elif glyph >= nh.GLYPH_BODY_OFF:
+        monster_idx = glyph - nh.GLYPH_BODY_OFF
+        permonst = nh.permonst(monster_idx)
+        name = permonst.mname + " corpse"
+        category = GlyphCategory.CORPSE
+    elif glyph >= nh.GLYPH_DETECT_OFF:
+        permonst = nh.permonst(nh.glyph_to_mon(glyph))
+        mon_name = permonst.mname
+        name = "detected " + mon_name
+    elif glyph >= nh.GLYPH_INVIS_OFF:
+        name = "invisible creature"
+    elif glyph >= nh.GLYPH_PET_OFF:
+        permonst = nh.permonst(nh.glyph_to_mon(glyph))
+        mon_name = permonst.mname
+        name = "tame " + mon_name
+        category = GlyphCategory.MONSTER
+    else:
+        permonst = nh.permonst(nh.glyph_to_mon(glyph))
+        mon_name = permonst.mname
+        name = mon_name
+        category = GlyphCategory.MONSTER
+
+    return name, category
 
 
-def get_object_weight(obj):
-    """
-    Calculate the weight of the given object, including recursive calculation
-    of contained objects' weights.
-
-    Args:
-        obj: The object to calculate weight for
-
-    Returns:
-        int: Total weight of the object
-    """
-    # TODO: recursive calculation
-    # TODO: monster weight (corpse)
-    return obj.oc_weight
+@dataclass
+class GlyphObject:
+    glyph: int
+    name: str
+    category: GlyphCategory
 
 
-def arm_bonus(obj, enchantment: int, erosion: int):
-    return obj.a_ac + enchantment - min(erosion, obj.a_ac)
+GLYPH_TO_OBJECT: Dict[int, GlyphObject] = {}
+for glyph in range(nh.MAX_GLYPH):
+    name, category = name_and_category_from_glyph(glyph)
+    GLYPH_TO_OBJECT[glyph] = GlyphObject(glyph, name, category)
 
 
 class Item:
-    def __init__(
-        self,
-        letter=None,
-        glyph=None,
-        full_name=None,
-        item_class=None,
-        beatitude=None,
-        enchantment=None,
-        erosion=None,
-        shop_status=None,  # TODO:
-        object=None,
-        name=None,
-        weight=None,
-    ):
-        self.letter = letter
-        self.glyph = glyph
-        self.full_name = full_name
-        self.item_class = item_class
-        self.beatitude = beatitude
-        self.enchantment = enchantment
-        self.erosion = erosion
-        self.shop_status = shop_status
-        self.object = object
-        self.name = name
-        self.weight = weight
+    def __init__(self, inv_letter, inv_str, inv_oclass, inv_glyph):
+        glyph_object = GLYPH_TO_OBJECT[inv_glyph]
 
-    @staticmethod
-    def from_inv(inv_letter, inv_str, inv_oclass, inv_glyph):
-        full_name = "".join(map(chr, inv_str)).rstrip("\x00")
-        item_class = ItemClasses.from_oclass(inv_oclass)
-        beatitude = ItemBeatitude.from_name(full_name)
-        enchantment = ItemEnchantment.from_name(full_name)
-        erosion = ItemErosion.from_name(full_name)
-        object = GLYPH_TO_OBJECT[inv_glyph]["obj"]
-        name = get_object_name(object)
-        weight = get_object_weight(object)
+        self.glyph = inv_glyph
+        self.name = glyph_object.name
+        self.category = glyph_object.category
+        self.letter = inv_letter
+        self.full_name = bytes(inv_str).decode("latin-1")
 
-        return Item(
-            letter=inv_letter,
-            glyph=inv_glyph,
-            full_name=full_name,
-            item_class=item_class,
-            beatitude=beatitude,
-            enchantment=enchantment,
-            erosion=erosion,
-            object=object,
-            name=name,
-            weight=weight,
-        )
-
-    @staticmethod
-    def from_obj(obj):
-        object = obj
-        name = get_object_name(object)
-        weight = get_object_weight(object)
-
-        item_class = ItemClasses.from_oclass(ord(obj.oc_class))
-        inv_glyph = [glyph for glyph, o in GLYPH_TO_OBJECT.items() if o["obj"] == obj][0]
-
-        return Item(
-            glyph=inv_glyph,
-            item_class=item_class,
-            object=object,
-            name=name,
-            weight=weight,
-        )
+        self.item_class = ItemClasses.from_oclass(inv_oclass)
+        self.beatitude = ItemBeatitude.from_name(self.full_name)
+        self.enchantment = ItemEnchantment.from_name(self.full_name)
+        self.erosion = ItemErosion.from_name(self.full_name)
+        # self.shop_status TODO:
 
     def __str__(self):
         return f"{chr(self.letter)}) {self.full_name}"
@@ -117,11 +167,11 @@ class Item:
         return f"{chr(self.letter)}) {self.full_name})"
 
     @property
-    def in_use(self):
-        if "(" in self.full_name:
-            return True
+    def object(self):
+        if self.category in [GlyphCategory.CORPSE, GlyphCategory.ITEM, GlyphCategory.STATUE]:
+            return nh.objclass(nh.glyph_to_obj(self.glyph))
         else:
-            return False
+            return None
 
     @property
     def quantity(self):
@@ -218,9 +268,10 @@ class Item:
     def is_armor(self):
         return self.item_class == ItemClasses.ARMOR
 
-    @property
     def arm_bonus(self):
-        return arm_bonus(self.object, self.enchantment.value, self.erosion.value)
+        if self.object is None:
+            return 0
+        return self.object.a_ac + self.enchantment.value - min(self.erosion.value, self.object.a_ac)
 
     @property
     def is_worn(self):
@@ -232,11 +283,11 @@ class Item:
 
     @property
     def is_corpse(self):
-        return self.item_class == ItemClasses.COMESTIBLES and nethack.OBJ_NAME(self.object) == "corpse"
+        return self.item_class == ItemClasses.COMESTIBLES and self.category == GlyphCategory.CORPSE
 
     @property
     def is_food(self):
-        return self.item_class == ItemClasses.COMESTIBLES and nethack.OBJ_NAME(self.object) != "corpse"
+        return self.item_class == ItemClasses.COMESTIBLES and self.category == GlyphCategory.ITEM
 
     """
     TOOLS
@@ -245,6 +296,93 @@ class Item:
     @property
     def is_key(self):
         return self.item_class == ItemClasses.TOOL and self.name in ["skeleton key", "lock pick", "credit card"]
+
+    @property
+    def nutrition(self):
+        """Calculate base nutrition of a food object."""
+
+        # Determine base nutrition value based on object type
+        # NOTE: skipped globby and special cases for certain food types
+        if self.category == GlyphCategory.CORPSE:
+            monster_idx = self.glyph - nh.GLYPH_BODY_OFF
+            permonst = nh.permonst(nh.glyph_to_mon(monster_idx))
+            nut = permonst.cnutrit
+        else:
+            nut = self.object.oc_nutrition
+
+        return nut
+
+    @property
+    def weight(self):
+        if self.object is None:
+            return 0
+
+        wt = self.object.oc_weight
+
+        # NOTE: we ignore globby, partly_eaten (food, corpses), candelabrum
+
+        # container or statue
+        # if (Is_container(obj) || obj->otyp == STATUE) {
+        #     struct obj *contents;
+        #     register int cwt = 0;
+
+        #     if (obj->otyp == STATUE && obj->corpsenm >= LOW_PM)
+        #         wt = (int) obj->quan * ((int) mons[obj->corpsenm].cwt * 3 / 2);
+
+        #     for (contents = obj->cobj; contents; contents = contents->nobj)
+        #         cwt += weight(contents);
+        #     /*
+        #      *  The weight of bags of holding is calculated as the weight
+        #      *  of the bag plus the weight of the bag's contents modified
+        #      *  as follows:
+        #      *
+        #      *      Bag status      Weight of contents
+        #      *      ----------      ------------------
+        #      *      cursed                  2x
+        #      *      blessed                 x/4 [rounded up: (x+3)/4]
+        #      *      otherwise               x/2 [rounded up: (x+1)/2]
+        #      *
+        #      *  The macro DELTA_CWT in pickup.c also implements these
+        #      *  weight equations.
+        #      */
+        #     if (obj->otyp == BAG_OF_HOLDING)
+        #         cwt = obj->cursed ? (cwt * 2) : obj->blessed ? ((cwt + 3) / 4)
+        #                                                      : ((cwt + 1) / 2);
+
+        #     return wt + cwt;
+        # }
+        # TODO:
+
+        # corpse
+        # if (obj->otyp == CORPSE && obj->corpsenm >= LOW_PM) {
+        #     long long_wt = obj->quan * (long) mons[obj->corpsenm].cwt;
+
+        #     wt = (long_wt > LARGEST_INT) ? LARGEST_INT : (int) long_wt;
+        #     if (obj->oeaten)
+        #         wt = eaten_stat(wt, obj);
+        #     return wt;
+        # long_wt = obj.quan * mons[obj.corpsenm].cwt
+        if self.category == GlyphCategory.CORPSE:
+            monster_idx = self.glyph - nh.GLYPH_BODY_OFF
+            permonst = nh.permonst(nh.glyph_to_mon(monster_idx))
+            return self.quantity * permonst.cwt
+            # NOTE: we ignore partly eaten
+
+        # coin
+        # } else if (obj->oclass == COIN_CLASS) {
+        #     return (int) ((obj->quan + 50L) / 100L);
+        if self.item_class == ItemClasses.COIN:
+            return (self.quantity + 50) // 100
+
+        # heavy iron ball
+        # } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
+        #     return (int) obj->owt; /* kludge for "very" heavy iron ball */
+        # TODO:
+
+        if wt:
+            return wt * self.quantity
+        else:
+            return (self.quantity + 1) >> 1
 
 
 class Inventory:
@@ -259,7 +397,7 @@ class Inventory:
             if letter == 0:
                 break
 
-            item = Item.from_inv(letter, name, oclass, glyph)
+            item = Item(letter, name, oclass, glyph)
             self.items.append(item)
 
         self.inventory: Dict[str, List[Item]] = {}
@@ -354,13 +492,15 @@ if __name__ == "__main__":
     import gym
     import nle
 
-    env = gym.make("NetHackScore-v0")
-    obs = env.reset()
+    env = gym.make("NetHackScore-v0", character="@")
+    for i in range(10):
+        env.seed(i)
+        obs = env.reset()
 
-    inv_glyphs = obs["inv_glyphs"]
-    inv_letters = obs["inv_letters"]
-    inv_oclasses = obs["inv_oclasses"]
-    inv_strs = obs["inv_strs"]
+        inv_glyphs = obs["inv_glyphs"]
+        inv_letters = obs["inv_letters"]
+        inv_oclasses = obs["inv_oclasses"]
+        inv_strs = obs["inv_strs"]
 
-    inventory = Inventory(inv_strs, inv_letters, inv_oclasses, inv_glyphs)
-    print(inventory)
+        inventory = Inventory(inv_strs, inv_letters, inv_oclasses, inv_glyphs)
+        print(inventory)
