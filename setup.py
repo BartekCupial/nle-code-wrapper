@@ -34,6 +34,8 @@ setup(
     keywords="reinforcement learning ai nlp llm code",
     project_urls={},
     install_requires=[
+        "einops",
+        "transormers",
         "sortedcontainers",
         "networkx",
         "nle-progress @ git+https://github.com/BartekCupial/nle-progress.git",

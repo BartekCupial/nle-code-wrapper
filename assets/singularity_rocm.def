@@ -68,7 +68,6 @@ From: rocm/pytorch:rocm6.2_ubuntu22.04_py3.10_pytorch_release_2.3.0
     pip install -e external/nle_utils
     pip install -e external/sample_factory
     pip install -e .[dev,mrunner]
-    pip install einops
 
     chmod a+rw -R /opt/conda/bin/python
 
