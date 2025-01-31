@@ -167,7 +167,7 @@ def find_tactical_positions(bot: "Bot", nearby_monsters: List[Entity]) -> List[T
         number_of_tiles_reachable = 0
         for adjacent in bot.pathfinder.adjacents(tactical_spot):
             for monster in nearby_monsters:
-                reachable = bot.pathfinder.reachable(adjacent, monster.position, adjacent=True)
+                reachable = bot.pathfinder.reachable(adjacent, monster.position)
                 if reachable is None:
                     continue
 
