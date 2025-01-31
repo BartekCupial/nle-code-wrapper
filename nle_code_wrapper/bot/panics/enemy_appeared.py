@@ -6,7 +6,8 @@ from nle_code_wrapper.bot.pathfinder.movements import Movements
 
 
 def enemy_appeared(bot: "Bot"):
-    bot.movements = Movements(bot, monster_collision=False)
+    monster_collistion = bot.movements.monster_collision
+    bot.movements.monster_collision = False
 
     last_entities = defaultdict(int)
     current_entities = defaultdict(int)
@@ -20,6 +21,8 @@ def enemy_appeared(bot: "Bot"):
     for entity in bot.get_entities(bot.last_obs):
         if bot.pathfinder.reachable(bot.entity.position, entity.position, adjacent=True):
             last_entities[entity.glyph] += 1
+
+    bot.movements.monster_collision = monster_collistion
 
     # Check for new enemies by comparing counts
     for glyph, count in current_entities.items():
