@@ -199,7 +199,9 @@ def descend_stairs(bot: "Bot") -> bool:
     """
     if goto_object(bot, G.STAIR_DOWN):
         bot.step(A.MiscDirection.DOWN)
-    return True
+        return True
+    else:
+        return False
 
 
 @strategy
@@ -209,7 +211,9 @@ def ascend_stairs(bot: "Bot") -> bool:
     """
     if goto_object(bot, G.STAIR_UP):
         bot.step(A.MiscDirection.UP)
-    return True
+        return True
+    else:
+        return False
 
 
 @strategy
