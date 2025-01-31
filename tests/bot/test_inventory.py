@@ -201,31 +201,31 @@ def test_nutrition(name, nutrition):
     "full_name,name,oclass,weight",
     [
         ("100 gold pieces", "gold piece", ItemClasses.COIN, 1),
-        ("gem", "red ruby", ItemClasses.GEM, 1),
-        ("shiny ring", "shiny ring", ItemClasses.RING, 3),
-        ("enchant armor", "scroll labeled MAPIRO MAHAMA DIROMAT", ItemClasses.SCROLL, 5),
-        ("wand of wishing", "long wand", ItemClasses.WAND, 7),
-        ("luckstone", "gray luckstone", ItemClasses.GEM, 10),
+        ("red gem", "ruby", ItemClasses.GEM, 1),
+        ("shiny ring", "ring of gain strength", ItemClasses.RING, 3),
+        ("scroll labeled MAPIRO MAHAMA DIROMAT", "scroll of enchant armor", ItemClasses.SCROLL, 5),
+        ("long wand", "wand of wishing", ItemClasses.WAND, 7),
+        ("luckstone", "luckstone", ItemClasses.GEM, 10),
         ("tripe ration", "tripe ration", ItemClasses.COMESTIBLES, 10),
         ("lizard corpse", "lizard corpse", ItemClasses.COMESTIBLES, 10),
         ("bugle", "bugle", ItemClasses.TOOL, 10),
-        ("looking glass", "looking glass", ItemClasses.TOOL, 13),
+        ("looking glass", "mirror", ItemClasses.TOOL, 13),
         ("flail", "flail", ItemClasses.WEAPON, 15),
-        ("bag", "bag", ItemClasses.TOOL, 15),
-        ("amulet of life saving", "oval amulet", ItemClasses.AMULET, 20),
-        ("potion of speed", "dark green potion", ItemClasses.POTION, 20),
+        ("bag", "bag of holding", ItemClasses.TOOL, 15),
+        ("oval amulet", "amulet of life saving", ItemClasses.AMULET, 20),
+        ("dark green potion", "potion of speed", ItemClasses.POTION, 20),
         ("food ration", "food ration", ItemClasses.COMESTIBLES, 20),
         ("lichen corpse", "lichen corpse", ItemClasses.COMESTIBLES, 20),
         ("unicorn horn", "unicorn horn", ItemClasses.TOOL, 20),
         ("mace", "mace", ItemClasses.WEAPON, 30),
         ("gray dragon scale mail", "gray dragon scale mail", ItemClasses.ARMOR, 40),
         ("long sword", "long sword", ItemClasses.WEAPON, 40),
-        ("pink spellbook", "pink spellbook", ItemClasses.SPELLBOOK, 50),
+        ("pink spellbook", "spellbook of sleep", ItemClasses.SPELLBOOK, 50),
         ("fauchard", "fauchard", ItemClasses.WEAPON, 60),
         ("pick-axe", "pick-axe", ItemClasses.TOOL, 100),
         ("plate mail", "plate mail", ItemClasses.ARMOR, 450),
         ("iron ball", "heavy iron ball", ItemClasses.RANDOM, 480),
-        ("loadstone", "gray loadstone", ItemClasses.ROCK, 500),
+        ("loadstone", "loadstone", ItemClasses.ROCK, 500),
         ("human corpse", "human corpse", ItemClasses.COMESTIBLES, 1450),
         ("blue dragon corpse", "blue dragon corpse", ItemClasses.COMESTIBLES, 4500),
         ("boulder", "boulder", ItemClasses.RANDOM, 6000),
@@ -236,7 +236,7 @@ def test_weight(full_name, name, oclass, weight):
         if glyph_object.name == name:
             break
     else:
-        glyph = None
+        assert False
 
     item = Item(
         inv_letter="a",
@@ -245,7 +245,4 @@ def test_weight(full_name, name, oclass, weight):
         inv_glyph=glyph,
     )
 
-    if item.weight == weight:
-        pass
-    else:
-        item.weight
+    assert item.weight == weight

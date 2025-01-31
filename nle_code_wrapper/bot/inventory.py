@@ -58,39 +58,30 @@ def name_and_category_from_glyph(glyph) -> Tuple[str, GlyphCategory]:
             case ItemClasses.WEAPON:
                 name = obj_name
             case ItemClasses.ARMOR:
-                if len(obj_description) > 0:
-                    name = obj_description
-                else:
+                if len(obj_name) > 0:
                     name = obj_name
+                else:
+                    name = obj_description
             case ItemClasses.RING:
-                name = obj_description + " ring"
+                name = obj_name if "ring" in obj_name else "ring of " + obj_name
             case ItemClasses.AMULET:
-                if "Amulet" not in obj_description:
-                    name = obj_description + " amulet"
-                else:
-                    name = obj_description
+                name = obj_name
             case ItemClasses.TOOL:
-                if len(obj_description) > 0:
-                    name = obj_description
-                else:
-                    name = obj_name
+                name = obj_name
             case ItemClasses.COMESTIBLES:
                 name = obj_name + obj_description
             case ItemClasses.POTION:
-                name = obj_description + " potion"
+                name = obj_name if "potion" in obj_name else "potion of " + obj_name
             case ItemClasses.SCROLL:
-                name = "scroll labeled " + obj_description
+                name = obj_name if "scroll" in obj_name else "scroll of " + obj_name
             case ItemClasses.SPELLBOOK:
-                name = obj_description + " spellbook"
+                name = obj_name if "spellbook" in obj_name else "spellbook of " + obj_name
             case ItemClasses.WAND:
-                name = obj_description + " wand"
+                name = obj_name if "wand" in obj_name else "wand of " + obj_name
             case ItemClasses.COIN:
                 name = obj_name
             case ItemClasses.GEM:
-                if obj_description not in obj_name:
-                    name = obj_description + " " + obj_name
-                else:
-                    name = obj_name
+                name = obj_name
             case ItemClasses.ROCK:
                 name = obj_name
             case ItemClasses.BALL:
