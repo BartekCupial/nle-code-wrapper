@@ -16,9 +16,8 @@ def open_container_kick(bot: "Bot"):
     """
     container_glyphs = frozenset(
         glyph
-        for glyph, obj in GLYPH_TO_OBJECT.items()
-        if obj["obj_class"] == chr(ItemClasses.TOOL.value)
-        and obj["obj_name"]
+        for glyph, glyph_object in GLYPH_TO_OBJECT.items()
+        if glyph_object.name
         in [
             "large box",
             "chest",
@@ -57,9 +56,8 @@ def open_container_key(bot: "Bot"):
     """
     container_glyphs = frozenset(
         glyph
-        for glyph, obj in GLYPH_TO_OBJECT.items()
-        if obj["obj_class"] == chr(ItemClasses.TOOL.value)
-        and obj["obj_name"]
+        for glyph, glyph_object in GLYPH_TO_OBJECT.items()
+        if glyph_object.name
         in [
             "large box",
             "chest",
@@ -101,9 +99,8 @@ def loot_container(bot: "Bot"):
     """
     container_glyphs = frozenset(
         glyph
-        for glyph, obj in GLYPH_TO_OBJECT.items()
-        if obj["obj_class"] == chr(ItemClasses.TOOL.value)
-        and obj["obj_name"]
+        for glyph, glyph_object in GLYPH_TO_OBJECT.items()
+        if glyph_object.name
         in [
             "large box",
             "chest",
