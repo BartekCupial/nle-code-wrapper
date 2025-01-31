@@ -7,7 +7,7 @@ from nle.nethack import USEFUL_ACTIONS
 class CustomMiniHackKeyRoom(MiniHack):
     def __init__(self, *args, **kwargs):
         # Play with Caveman character by default
-        kwargs["character"] = kwargs.pop("character", "cav-hum-new-mal")
+        kwargs["character"] = kwargs.pop("character", "cav-hum-neu-mal")
         # Default episode limit
         kwargs["max_episode_steps"] = kwargs.pop("max_episode_steps", 250)
         default_keys = MH_DEFAULT_OBS_KEYS + [

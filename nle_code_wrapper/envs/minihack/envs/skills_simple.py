@@ -37,7 +37,7 @@ class MiniHackWearSuitFixed(MiniHackSkill):
     """Environment for "wear" task."""
 
     def __init__(self, *args, **kwargs):
-        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["character"] = kwargs.pop("character", "val-hum-neu-fem")
 
         lvl_gen = LevelGenerator(w=5, h=5, lit=True)
         lvl_gen.add_object("plate mail", "[", place=(0, 0))
@@ -54,7 +54,7 @@ class MiniHackWearSuitDistr(MiniHackSkill):
     """Environment for "wear" task."""
 
     def __init__(self, *args, **kwargs):
-        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["character"] = kwargs.pop("character", "val-hum-neu-fem")
 
         lvl_gen = LevelGenerator(w=5, h=5, lit=True)
         lvl_gen.add_object("plate mail", "[", place=(0, 0))
@@ -74,7 +74,7 @@ class MiniHackWearSuitSmallPile(MiniHackSkill):
     """Environment for "wear" task."""
 
     def __init__(self, *args, **kwargs):
-        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["character"] = kwargs.pop("character", "val-hum-neu-fem")
         kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
         kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
 
@@ -94,7 +94,7 @@ class MiniHackWearSuitPile(MiniHackSkill):
     """Environment for "wear" task."""
 
     def __init__(self, *args, **kwargs):
-        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["character"] = kwargs.pop("character", "val-hum-neu-fem")
         kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
         kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
 
@@ -117,7 +117,7 @@ class MiniHackWearSuitHugePile(MiniHackSkill):
     """Environment for "wear" task."""
 
     def __init__(self, *args, **kwargs):
-        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["character"] = kwargs.pop("character", "val-hum-neu-fem")
         kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
         kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
 
@@ -141,7 +141,7 @@ class MiniHackWearSuitCloakPile(MiniHackSkill):
     """Environment for "wear" task."""
 
     def __init__(self, *args, **kwargs):
-        kwargs["character"] = kwargs.pop("character", "val-hum-new-fem")
+        kwargs["character"] = kwargs.pop("character", "val-hum-neu-fem")
         kwargs["allow_all_yn_questions"] = kwargs.pop("allow_all_yn_questions", True)
         kwargs["allow_all_modes"] = kwargs.pop("allow_all_modes", True)
 
