@@ -97,7 +97,7 @@ class Property:
 
 
 class Character:
-    def __init__(self, bot: "Bot"):
+    def __init__(self, bot: "Bot", character: str):
         self.bot = bot
         self.prop = Property(bot)
         self.role = None
@@ -110,12 +110,21 @@ class Character:
         self.is_lycanthrope = False
         self.init = False
 
-    def update(self):
-        if "welcome to NetHack!" in self.bot.message:
-            self.parse_welcome(self.bot.message)
-        if "welcome back to NetHack!" in self.bot.message:
-            assert False, "game was loaded from save"
+        # try to init from character str example: rog-elf-neu-mal
+        self.parse_character(character)
 
+    def update(self):
+        if self.self_glyph is None:
+            self.self_glyph = self.bot.entity.glyph
+
+        # 1) try to init from welcome message
+        if not self.init:
+            if "welcome to NetHack!" in self.bot.message:
+                self.parse_welcome(self.bot.message)
+            if "welcome back to NetHack!" in self.bot.message:
+                assert False, "game was loaded from save"
+
+        # 2) we failed to init from welcome init from attributes
         if not self.init:
             # TODO: fix nle so it doesn't skip at the reset
             obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.ATTRIBUTES))
@@ -133,6 +142,18 @@ class Character:
         # TODO: levitation, etc
         return min(1000, (self.bot.blstats.strength_percentage + self.bot.blstats.constitution) * 25 + 50)
 
+    def parse_character(self, character):
+        if character.split("-") == ["@"]:
+            return
+
+        role, race, alignment, gender = character.split("-")
+        self.role = Role.from_str(role)
+        self.race = Race.from_str(race)
+        self.alignment = Alignment.from_str(alignment)
+        self.gender = Gender.from_str(gender)
+        self.skill = Skill.from_role(self.role)
+        self.init = True
+
     def parse_welcome(self, message):
         """
         parse agent gender, race, role, alignment form starting message
@@ -142,7 +163,6 @@ class Character:
         self.role = Role.parse(message)
         self.alignment = Alignment.parse(message)
         self.skill = Skill.from_role(self.role)
-        self.self_glyph = self.bot.entity.glyph
         self.init = True
 
     def get_melee_bonus(self, weapon: Optional[Item] = None):

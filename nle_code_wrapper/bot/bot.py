@@ -37,7 +37,7 @@ class Bot:
         self.gamma = gamma
 
         self._movements: Movements = None
-        self.character: Character = Character(self)
+        self.character: Character = Character(self, self.env.gym_env.unwrapped.character)
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.pvp: Pvp = Pvp(self)
 
