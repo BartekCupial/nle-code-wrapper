@@ -198,10 +198,11 @@ def eat_food_inventory(bot: "Bot"):
     """
     Eats food from inventory.
     """
-    items = bot.inventory["comestibles"]
-    for item in items:
-        if item.is_food:
-            return eat_from_inventory(bot, item)
+    food_items = [(item.nutrition / item.weight, item) for item in bot.inventory["comestibles"] if item.is_food]
+
+    if food_items:
+        food = min(food_items, key=lambda x: x[0])[1]
+        return eat_from_inventory(bot, food)
 
     return False
 
@@ -211,10 +212,11 @@ def eat_corpse_inventory(bot: "Bot"):
     """
     Eats corpse from inventory.
     """
-    items = bot.inventory["comestibles"]
-    for item in items:
-        if item.is_corpse:
-            return eat_from_inventory(bot, item)
+    food_items = [(item.nutrition / item.weight, item) for item in bot.inventory["comestibles"] if item.is_corpse]
+
+    if food_items:
+        food = min(food_items, key=lambda x: x[0])[1]
+        return eat_from_inventory(bot, food)
 
     return False
 
