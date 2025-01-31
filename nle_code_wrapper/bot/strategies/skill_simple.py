@@ -39,67 +39,77 @@ def wear_if_removed(bot: "Bot", letter: Optional[int]) -> bool:
         bot.step(letter)
 
 
-def create_wear_function(armor_type: ArmorType) -> Callable[["Bot"], bool]:
-    """Dynamically create a function that wears a given armor type."""
+def wear_func(bot: "Bot", armor_type) -> bool:
+    # 1) Take off
+    # Handle special prerequisites:
+    if armor_type == ArmorType.SUIT:
+        # Must take off cloak before wearing a suit
+        removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
+    elif armor_type == ArmorType.SHIRT:
+        # Must take off suit, then cloak, in that order
+        removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
+        removed_suit = remove_if_worn(bot, ArmorType.SUIT)
 
-    def wear_func(bot: "Bot") -> bool:
-        # 1) Take off
-        # Handle special prerequisites:
-        if armor_type == ArmorType.SUIT:
-            # Must take off cloak before wearing a suit
-            removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
-        elif armor_type == ArmorType.SHIRT:
-            # Must take off suit, then cloak, in that order
-            removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
-            removed_suit = remove_if_worn(bot, ArmorType.SUIT)
+    # 2) Wear an item of this armor type (if present in inventory)
+    ret = wear_atype(bot, armor_type)
 
-        # 2) Wear an item of this armor type (if present in inventory)
-        ret = wear_atype(bot, armor_type)
+    # put on suit and shirt back
+    if armor_type == ArmorType.SUIT:
+        wear_if_removed(bot, removed_cloak)
+    elif armor_type == ArmorType.SHIRT:
+        wear_if_removed(bot, removed_suit)
+        wear_if_removed(bot, removed_cloak)
 
-        # put on suit and shirt back
-        if armor_type == ArmorType.SUIT:
-            wear_if_removed(bot, removed_cloak)
-        elif armor_type == ArmorType.SHIRT:
-            wear_if_removed(bot, removed_suit)
-            wear_if_removed(bot, removed_cloak)
-
-        return ret
-
-    wear_func.__name__ = f"wear_{armor_type.name.lower()}"
-    wear_func.__doc__ = f"Wears {armor_type.name.lower()} from inventory."
-    return wear_func
+    return ret
 
 
 def wear_suit(bot: "Bot") -> bool:
-    ...
+    """
+    Wears SUIT from inventory
+    """
+    return wear_func(bot, ArmorType.SUIT)
 
 
 def wear_shield(bot: "Bot") -> bool:
-    ...
+    """
+    Wears SHIELD from inventory
+    """
+    return wear_func(bot, ArmorType.SHIELD)
 
 
 def wear_helm(bot: "Bot") -> bool:
-    ...
+    """
+    Wears SHIELD from inventory
+    """
+    return wear_func(bot, ArmorType.SHIELD)
 
 
 def wear_boots(bot: "Bot") -> bool:
-    ...
+    """
+    Wears BOOTS from inventory
+    """
+    return wear_func(bot, ArmorType.BOOTS)
 
 
 def wear_gloves(bot: "Bot") -> bool:
-    ...
+    """
+    Wears GLOVES from inventory
+    """
+    return wear_func(bot, ArmorType.GLOVES)
 
 
 def wear_cloak(bot: "Bot") -> bool:
-    ...
+    """
+    Wears CLOAK from inventory
+    """
+    return wear_func(bot, ArmorType.CLOAK)
 
 
 def wear_shirt(bot: "Bot") -> bool:
-    ...
-
-
-for a_type in ArmorType:
-    globals()[f"wear_{a_type.name.lower()}"] = strategy(create_wear_function(a_type))
+    """
+    Wears SHIRT from inventory
+    """
+    return wear_func(bot, ArmorType.SHIRT)
 
 
 @strategy

@@ -54,11 +54,7 @@ def isin(array: ndarray, *elems) -> ndarray:
                 else (
                     e
                     if isinstance(e, frozenset)
-                    else tuple(e)
-                    if isinstance(e, list)
-                    else frozenset(e)
-                    if isinstance(e, set)
-                    else e
+                    else tuple(e) if isinstance(e, list) else frozenset(e) if isinstance(e, set) else e
                 )
             )
             for e in elems
