@@ -28,5 +28,14 @@ def add_code_wrapper_cli_args(p: ArgumentParser) -> None:
         default="nle_code_wrapper.bot.panics",
         help="where to search for panics implementation",
     )
-    p.add_argument("--experiment", type=str, default="default_experiment")
-    p.add_argument("--train_dir", default=join(os.getcwd(), "train_dir"), type=str, help="Root for all experiments")
+    if "experiment" not in [action.dest for action in p._actions]:
+        p.add_argument(
+            "--experiment",
+            type=str,
+            default="default_experiment",
+            help="Unique experiment name. This will also be the name for the experiment folder in the train dir."
+            "If the experiment folder with this name aleady exists the experiment will be RESUMED!"
+            "Any parameters passed from command line that do not match the parameters stored in the experiment config.json file will be overridden.",
+        )
+    if "train_dir" not in [action.dest for action in p._actions]:
+        p.add_argument("--train_dir", default=join(os.getcwd(), "train_dir"), type=str, help="Root for all experiments")
