@@ -1,22 +1,15 @@
-import os
-import pickle
-import time
 from functools import partial
-from pathlib import Path
 from string import ascii_lowercase, ascii_uppercase
 from typing import Any, Callable, Dict, List, Tuple, Union
 
 import gymnasium as gym
 import numpy as np
-from nle import nethack
 from nle.nethack import actions as A
-from nle_utils.utils.utils import log
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
-from nle_code_wrapper.utils.seed import get_unique_seed
 
 
 @strategy
@@ -63,12 +56,8 @@ class NLECodeWrapper(gym.Wrapper):
         add_direction_strategies: bool = True,
         add_more_strategy: bool = True,
         gamma: float = 0.99,
-        failed_game_path: str = None,
     ) -> None:
         super().__init__(env)
-        self.failed_game_path = failed_game_path
-        self.episode_number = 0
-
         if max_strategy_steps is None:
             max_strategy_steps = env.gym_env.unwrapped._max_episode_steps
         self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma)
@@ -124,53 +113,14 @@ class NLECodeWrapper(gym.Wrapper):
             {"env_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
         )
 
-    def reset(self, seed=None, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Any]]:
-        if seed is None:
-            seed = get_unique_seed(episode_idx=self.episode_number)
-
-        self.recorded_seed = seed
-        self.recorded_actions = []
-        self.named_actions = []
-        self.episode_number += 1
-
-        try:
-            obs, info = self.bot.reset(seed=seed, **kwargs)
-            obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
-        except Exception as e:
-            self.save_to_file()
-            raise e
+    def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Any]]:
+        obs, info = self.bot.reset(**kwargs)
+        obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
 
         return obs, info
 
     def step(self, action: Union[int64, int]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
-        try:
-            self.recorded_actions.append(action)
-            self.named_actions.append(self.bot.strategies[action].__name__)
-
-            obs, reward, terminated, truncated, info = self.bot.strategy_step(action)
-            obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
-        except Exception as e:
-            self.save_to_file()
-            log.error(f"Bot failed due to unhandled exception: {e}")
-            self.bot.current_obs["env_steps"] = np.array([0])
-            return self.bot.current_obs, 0, True, False, {}
+        obs, reward, terminated, truncated, info = self.bot.strategy_step(action)
+        obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
 
         return obs, reward, terminated, truncated, info
-
-    def save_to_file(self):
-        dat = {
-            "actions": self.recorded_actions,
-            "seed": self.recorded_seed,
-        }
-        og_ttyrec = self.env.unwrapped.nethack._ttyrec
-        if og_ttyrec is not None:
-            ttyrec = Path(og_ttyrec).stem
-        else:
-            ttyrec_prefix = f"nle.{os.getpid()}.{self.recorded_seed}"
-            ttyrec_version = f".ttyrec{nethack.TTYREC_VERSION}.bz2"
-            ttyrec = ttyrec_prefix + ttyrec_version
-
-        fname = os.path.join(self.failed_game_path, f"{ttyrec}.demo")
-        with open(fname, "wb") as f:
-            log.debug(f"Saving demo to {fname}...")
-            pickle.dump(dat, f)
