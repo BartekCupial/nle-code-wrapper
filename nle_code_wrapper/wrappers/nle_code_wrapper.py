@@ -9,6 +9,7 @@ import gymnasium as gym
 import numpy as np
 from nle import nethack
 from nle.nethack import actions as A
+from nle_utils.utils.utils import log
 from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
@@ -143,11 +144,8 @@ class NLECodeWrapper(gym.Wrapper):
             obs["env_steps"] = np.array([info["episode_extra_stats"]["env_steps"]])
         except Exception as e:
             self.save_to_file()
-            print(f"Bot failed due to unhandled exception: {e}")
+            log.error(f"Bot failed due to unhandled exception: {e}")
             return self.bot.current_obs, 0, True, False, {}
-
-        if len(self.recorded_actions) > 10:
-            self.save_to_file()
 
         return obs, reward, terminated, truncated, info
 
@@ -164,5 +162,7 @@ class NLECodeWrapper(gym.Wrapper):
             ttyrec_version = f".ttyrec{nethack.TTYREC_VERSION}.bz2"
             ttyrec = ttyrec_prefix + ttyrec_version
 
-        with open(os.path.join(self.failed_game_path, f"{ttyrec}.demo"), "wb") as f:
+        fname = os.path.join(self.failed_game_path, f"{ttyrec}.demo")
+        with open(fname, "wb") as f:
+            log.debug(f"Saving demo to {fname}...")
             pickle.dump(dat, f)
