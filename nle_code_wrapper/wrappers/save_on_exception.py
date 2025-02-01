@@ -1,5 +1,6 @@
 import os
 import pickle
+import traceback
 from pathlib import Path
 
 import gymnasium as gym
@@ -17,19 +18,16 @@ class SaveOnException(gym.Wrapper):
         self.episode_number = 0
 
     def reset(self, *, seed=None, **kwargs):
-        if seed is None:
-            seed = get_unique_seed(episode_idx=self.episode_number)
-
-        self.recorded_seed = seed
+        self.recorded_seed = seed if seed is not None else get_unique_seed(episode_idx=self.episode_number)
         self.recorded_actions = []
         self.named_actions = []
         self.episode_number += 1
 
         try:
-            return super().reset(seed=seed, **kwargs)
+            return super().reset(seed=self.recorded_seed, **kwargs)
         except Exception as e:
+            log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
             self.save_to_file()
-            log.error(f"Bot failed due to unhandled exception: {e}")
 
             return self.observation_space.sample(), {}
 
@@ -38,8 +36,8 @@ class SaveOnException(gym.Wrapper):
             self.recorded_actions.append(action)
             return super().step(action)
         except Exception as e:
+            log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
             self.save_to_file()
-            log.error(f"Bot failed due to unhandled exception: {e}")
 
             return self.observation_space.sample(), 0, True, False, {}
 
