@@ -1,115 +1,215 @@
-import re
-from typing import Callable, Optional
+from typing import List, Optional
 
 from nle.nethack import actions as A
-from nle_utils.glyph import G
-from nle_utils.item import ArmorType
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import Item
-from nle_code_wrapper.bot.strategies.goto import goto_glyph
+from nle_code_wrapper.bot.inventory import ArmorType, Item, ItemBeatitude
 from nle_code_wrapper.bot.strategy import strategy
 
 
-def remove_if_worn(bot: "Bot", cat: ArmorType) -> Optional[int]:
-    """
-    Removes armor of the given type if it is currently worn.
-    Returns True if removal was attempted, False otherwise.
-    """
+def _get_best_armor(bot: "Bot", armor_type: ArmorType) -> Optional[Item]:
+    """Selects best armor item by arm_bonus for given type"""
+    best = None
+    best_unknown = None
+
     for item in bot.inventory["armor"]:
-        if item.object.oc_armcat == cat.value and item.is_worn:
+        if item.armor_type == armor_type:
+            if item.beatitude == ItemBeatitude.CURSED:
+                continue
+            elif item.beatitude == ItemBeatitude.UNKNOWN:
+                # Track best unknown item separately
+                if best_unknown is None or item.arm_bonus > best_unknown.arm_bonus:
+                    best_unknown = item
+            else:
+                # For BLESSED / UNCURSED items, update if better
+                if best is None or item.arm_bonus > best.arm_bonus:
+                    best = item
+
+    # Return best blessed / uncursed item if found, otherwise return best non-cursed item
+    return best if best is not None else best_unknown
+
+
+def _simple_wear(bot: "Bot", armor_type) -> bool:
+    """Base function for simple wear operations"""
+    best_item = _get_best_armor(bot, armor_type)
+    if best_item is None or best_item.is_worn:
+        return False
+
+    bot.step(A.Command.WEAR)
+    bot.step(best_item.letter)
+
+    return bot.inventory.worn_armor_by_type[armor_type] is not None
+
+
+def _wear_with_dependencies(bot: "Bot", dependencies: List[ArmorType], armor_type: ArmorType) -> bool:
+    """Helper for wearing items that require removing other items first"""
+    best_item = _get_best_armor(bot, armor_type)
+    if best_item is None or best_item.is_worn:
+        return False
+
+    # Store letters of items we need to remove first
+    temp_items = []
+
+    # Take off dependent items in order
+    for dep_type in dependencies:
+        item = bot.inventory.worn_armor_by_type[dep_type]
+        if item is not None:
+            temp_items.append(item.letter)
             bot.step(A.Command.TAKEOFF)
             bot.step(item.letter)
-            return item.letter
-    return None
 
+            # Check if dependent item couldn't be taken off
+            if bot.inventory.worn_armor_by_type[dep_type] is not None:
+                # Put back any items we've already removed
+                for letter in reversed(temp_items):
+                    bot.step(A.Command.WEAR)
+                    bot.step(letter)
+                return False
 
-def wear_atype(bot: "Bot", a_type):
-    for item in bot.inventory["armor"]:
-        if item.object.oc_armcat == a_type.value:
-            bot.step(A.Command.WEAR)
-            bot.step(item.letter)
-            return True
-    return False
+    # Wear target item
+    bot.step(A.Command.WEAR)
+    bot.step(best_item.letter)
 
-
-def wear_if_removed(bot: "Bot", letter: Optional[int]) -> bool:
-    if letter is not None:
+    # Put back dependent items in reverse order
+    for letter in reversed(temp_items):
         bot.step(A.Command.WEAR)
         bot.step(letter)
 
-
-def wear_func(bot: "Bot", armor_type) -> bool:
-    # 1) Take off
-    # Handle special prerequisites:
-    if armor_type == ArmorType.SUIT:
-        # Must take off cloak before wearing a suit
-        removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
-    elif armor_type == ArmorType.SHIRT:
-        # Must take off suit, then cloak, in that order
-        removed_cloak = remove_if_worn(bot, ArmorType.CLOAK)
-        removed_suit = remove_if_worn(bot, ArmorType.SUIT)
-
-    # 2) Wear an item of this armor type (if present in inventory)
-    ret = wear_atype(bot, armor_type)
-
-    # put on suit and shirt back
-    if armor_type == ArmorType.SUIT:
-        wear_if_removed(bot, removed_cloak)
-    elif armor_type == ArmorType.SHIRT:
-        wear_if_removed(bot, removed_suit)
-        wear_if_removed(bot, removed_cloak)
-
-    return ret
+    return bot.inventory.worn_armor_by_type[armor_type] is not None
 
 
-def wear_suit(bot: "Bot") -> bool:
-    """
-    Wears SUIT from inventory
-    """
-    return wear_func(bot, ArmorType.SUIT)
-
-
+@strategy
 def wear_shield(bot: "Bot") -> bool:
-    """
-    Wears SHIELD from inventory
-    """
-    return wear_func(bot, ArmorType.SHIELD)
+    return _simple_wear(bot, ArmorType.SHIELD)
 
 
+@strategy
 def wear_helm(bot: "Bot") -> bool:
-    """
-    Wears SHIELD from inventory
-    """
-    return wear_func(bot, ArmorType.SHIELD)
+    return _simple_wear(bot, ArmorType.HELM)
 
 
+@strategy
 def wear_boots(bot: "Bot") -> bool:
-    """
-    Wears BOOTS from inventory
-    """
-    return wear_func(bot, ArmorType.BOOTS)
+    return _simple_wear(bot, ArmorType.BOOTS)
 
 
+@strategy
 def wear_gloves(bot: "Bot") -> bool:
-    """
-    Wears GLOVES from inventory
-    """
-    return wear_func(bot, ArmorType.GLOVES)
+    return _simple_wear(bot, ArmorType.GLOVES)
 
 
+@strategy
 def wear_cloak(bot: "Bot") -> bool:
-    """
-    Wears CLOAK from inventory
-    """
-    return wear_func(bot, ArmorType.CLOAK)
+    return _simple_wear(bot, ArmorType.CLOAK)
 
 
+@strategy
+def wear_suit(bot: "Bot") -> bool:
+    # Note: To wear a suit, we need to remove the cloak first
+    return _wear_with_dependencies(
+        bot,
+        dependencies=[ArmorType.CLOAK],
+        armor_type=ArmorType.SUIT,
+    )
+
+
+@strategy
 def wear_shirt(bot: "Bot") -> bool:
-    """
-    Wears SHIRT from inventory
-    """
-    return wear_func(bot, ArmorType.SHIRT)
+    # To wear a shirt, we need to remove both cloak and suit
+    return _wear_with_dependencies(
+        bot,
+        dependencies=[ArmorType.CLOAK, ArmorType.SUIT],
+        armor_type=ArmorType.SHIRT,
+    )
+
+
+def _simple_takeoff(bot: "Bot", armor_type: ArmorType) -> bool:
+    """Base function for simple takeoff operations"""
+    item = bot.inventory.worn_armor_by_type[armor_type]
+    if item is not None:
+        bot.step(A.Command.TAKEOFF)
+        bot.step(item.letter)
+        return bot.inventory.worn_armor_by_type[armor_type] is None
+    return False
+
+
+def _takeoff_with_dependencies(bot: "Bot", dependencies: List[ArmorType], armor_type: ArmorType) -> bool:
+    """Helper for taking off items that require removing other items first"""
+    if bot.inventory.worn_armor_by_type[armor_type] is None:
+        return False
+
+    # Store letters of items we need to remove first
+    temp_items = []
+
+    # Take off dependent items in order
+    for dep_type in dependencies:
+        item = bot.inventory.worn_armor_by_type[dep_type]
+        if item is not None:
+            temp_items.append(item.letter)
+            bot.step(A.Command.TAKEOFF)
+            bot.step(item.letter)
+
+            # Check if dependent item couldn't be taken off
+            if bot.inventory.worn_armor_by_type[dep_type] is not None:
+                # Put back any items we've already removed
+                for letter in reversed(temp_items):
+                    bot.step(A.Command.WEAR)
+                    bot.step(letter)
+                return False
+
+    # Take off target item
+    bot.step(A.Command.TAKEOFF)
+    bot.step(bot.inventory.worn_armor_by_type[armor_type].letter)
+
+    # Put back dependent items in reverse order
+    for letter in reversed(temp_items):
+        bot.step(A.Command.WEAR)
+        bot.step(letter)
+
+    return bot.inventory.worn_armor_by_type[armor_type] is None
+
+
+@strategy
+def takeoff_shield(bot: "Bot") -> bool:
+    return _simple_takeoff(bot, ArmorType.SHIELD)
+
+
+@strategy
+def takeoff_helm(bot: "Bot") -> bool:
+    return _simple_takeoff(bot, ArmorType.HELM)
+
+
+@strategy
+def takeoff_boots(bot: "Bot") -> bool:
+    return _simple_takeoff(bot, ArmorType.BOOTS)
+
+
+@strategy
+def takeoff_gloves(bot: "Bot") -> bool:
+    return _simple_takeoff(bot, ArmorType.GLOVES)
+
+
+@strategy
+def takeoff_cloak(bot: "Bot") -> bool:
+    return _simple_takeoff(bot, ArmorType.CLOAK)
+
+
+@strategy
+def takeoff_suit(bot: "Bot") -> bool:
+    return _takeoff_with_dependencies(
+        bot,
+        dependencies=[ArmorType.CLOAK],
+        armor_type=ArmorType.SUIT,
+    )
+
+
+@strategy
+def takeoff_shirt(bot: "Bot") -> bool:
+    return _takeoff_with_dependencies(
+        bot,
+        dependencies=[ArmorType.CLOAK, ArmorType.SUIT],
+        armor_type=ArmorType.SHIRT,
+    )
 
 
 @strategy

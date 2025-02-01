@@ -114,7 +114,7 @@ def test_arm_bonus(name, base_ac, enchantment, erosion, expected_bonus):
     item.erosion = ItemErosion(erosion)
 
     assert item.object.a_ac == base_ac
-    assert item.arm_bonus() == expected_bonus
+    assert item.arm_bonus == expected_bonus
 
 
 @pytest.mark.parametrize(
