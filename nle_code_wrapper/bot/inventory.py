@@ -181,16 +181,22 @@ class Item:
 
     @property
     def main_hand(self):
-        return (
-            "(weapon in hands)" in self.full_name
-            or "(weapon in right hand)" in self.full_name
-            or "(weapon in left hand)" in self.full_name
-            or "(wielded)" in self.full_name
-        )
+        wield_messages = [
+            "(weapon in hands)",
+            "(weapon in right hand)",
+            "(weapon in left hand)",
+            "(weapon in hand)",
+            "(wielded)",
+        ]
+        return any([message in self.full_name for message in wield_messages])
 
     @property
     def off_hand(self):
-        return "(alternate weapon; not wielded)" in self.full_name
+        wield_messages = [
+            " (alternate weapon; not wielded)",
+            " (wielded in other ",
+        ]
+        return any([message in self.full_name for message in wield_messages])
 
     @property
     def is_launcher(self):
@@ -259,6 +265,12 @@ class Item:
     def is_armor(self):
         return self.item_class == ItemClasses.ARMOR
 
+    @property
+    def armor_type(self):
+        if self.is_armor:
+            return ArmorType(self.object.oc_armcat)
+
+    @property
     def arm_bonus(self):
         if self.object is None:
             return 0
