@@ -125,13 +125,13 @@ class NLECodeWrapper(gym.Wrapper):
         )
 
     def reset(self, seed=None, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Any]]:
+        if seed is None:
+            seed = get_unique_seed(episode_idx=self.episode_number)
+
         self.recorded_seed = seed
         self.recorded_actions = []
         self.named_actions = []
         self.episode_number += 1
-
-        if seed is None:
-            seed = get_unique_seed(episode_idx=self.episode_number)
 
         try:
             obs, info = self.bot.reset(seed=seed, **kwargs)
