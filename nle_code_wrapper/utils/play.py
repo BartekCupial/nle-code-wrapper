@@ -71,3 +71,11 @@ def play_using_strategies_autocomplete(env, action_mode="human"):
                     continue
 
     return action
+
+
+def play_from_actions(env, action_mode="human", actions=[]):
+    if len(actions) > 0:
+        action = actions.pop(0)
+        return action
+    else:
+        return play_using_strategies_autocomplete(env, action_mode)
