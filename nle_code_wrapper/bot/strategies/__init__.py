@@ -31,6 +31,7 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
     freeze_lava_wand,
     levitate_over_lava_river,
 )
+from nle_code_wrapper.bot.strategies.eat import eat_corpse_floor, eat_corpse_inventory, eat_food_inventory
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.explore import (
     explore_corridor,
@@ -106,6 +107,7 @@ from nle_code_wrapper.bot.strategies.push_boulder import (
     push_boulder_south,
     push_boulder_west,
 )
+from nle_code_wrapper.bot.strategies.quaff import quaff_potion
 from nle_code_wrapper.bot.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategies.run_away import run_away
 from nle_code_wrapper.bot.strategies.search import (
@@ -113,12 +115,7 @@ from nle_code_wrapper.bot.strategies.search import (
     search_for_traps,
     search_room_for_hidden_doors,
 )
-from nle_code_wrapper.bot.strategies.skill_simple import (
-    eat_corpse_floor,
-    eat_corpse_inventory,
-    eat_food_inventory,
-    puton_ring,
-    quaff_potion,
+from nle_code_wrapper.bot.strategies.takeoff import (
     takeoff_boots,
     takeoff_cloak,
     takeoff_gloves,
@@ -126,6 +123,9 @@ from nle_code_wrapper.bot.strategies.skill_simple import (
     takeoff_shield,
     takeoff_shirt,
     takeoff_suit,
+)
+from nle_code_wrapper.bot.strategies.wear import (
+    puton_ring,
     wear_boots,
     wear_cloak,
     wear_gloves,

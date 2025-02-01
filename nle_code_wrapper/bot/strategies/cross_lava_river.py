@@ -8,7 +8,8 @@ from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategies.explore import explore_room
 from nle_code_wrapper.bot.strategies.goto import get_other_features, goto_closest
 from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_potion, pickup_ring, pickup_tool, pickup_wand
-from nle_code_wrapper.bot.strategies.skill_simple import puton_ring, quaff_potion, wear_boots
+from nle_code_wrapper.bot.strategies.quaff import quaff_potion
+from nle_code_wrapper.bot.strategies.wear import puton_ring, wear_boots
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features, room_detection, save_boolean_array_pillow

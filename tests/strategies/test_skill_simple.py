@@ -2,8 +2,10 @@ import pytest
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.exceptions import BotFinished
-from nle_code_wrapper.bot.strategies.pickup import pickup_armor, pickup_potion, pickup_ring
-from nle_code_wrapper.bot.strategies.skill_simple import (
+from nle_code_wrapper.bot.strategies import (
+    pickup_armor,
+    pickup_potion,
+    pickup_ring,
     puton_ring,
     quaff_potion,
     wear_boots,
