@@ -12,7 +12,7 @@ import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
 import nle_code_wrapper.envs.minihack.envs  # noqa: E402
 from nle_code_wrapper.utils.utils import get_function_by_name
-from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback
+from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback, SaveOnException
 
 MINIHACK_ENVS = []
 for env_spec in gym.envs.registry.all():
@@ -100,8 +100,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     if cfg.code_wrapper:
         gamma = cfg.gamma if hasattr(cfg, "gamma") else 1.0
-        failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
-        ensure_dir_exists(failed_game_path)
         env = NLECodeWrapper(
             env,
             cfg.strategies,
@@ -111,8 +109,12 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
             add_direction_strategies=cfg.add_direction_strategies,
             add_more_strategy=cfg.add_more_strategy,
             gamma=gamma,
-            failed_game_path=failed_game_path,
         )
         env = NoProgressFeedback(env)
+
+    if cfg.save_on_exception:
+        failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
+        ensure_dir_exists(failed_game_path)
+        env = SaveOnException(env, failed_game_path=failed_game_path)
 
     return env
