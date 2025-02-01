@@ -1,5 +1,6 @@
 import os
 import pickle
+import time
 from functools import partial
 from pathlib import Path
 from string import ascii_lowercase, ascii_uppercase
@@ -15,6 +16,7 @@ from numpy import int64, ndarray
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
+from nle_code_wrapper.utils.seed import get_unique_seed
 
 
 @strategy
@@ -65,6 +67,7 @@ class NLECodeWrapper(gym.Wrapper):
     ) -> None:
         super().__init__(env)
         self.failed_game_path = failed_game_path
+        self.episode_number = 0
 
         if max_strategy_steps is None:
             max_strategy_steps = env.gym_env.unwrapped._max_episode_steps
@@ -125,6 +128,10 @@ class NLECodeWrapper(gym.Wrapper):
         self.recorded_seed = seed
         self.recorded_actions = []
         self.named_actions = []
+        self.episode_number += 1
+
+        if seed is None:
+            seed = get_unique_seed(episode_idx=self.episode_number)
 
         try:
             obs, info = self.bot.reset(seed=seed, **kwargs)
@@ -145,6 +152,7 @@ class NLECodeWrapper(gym.Wrapper):
         except Exception as e:
             self.save_to_file()
             log.error(f"Bot failed due to unhandled exception: {e}")
+            self.bot.current_obs["env_steps"] = np.array([0])
             return self.bot.current_obs, 0, True, False, {}
 
         return obs, reward, terminated, truncated, info
