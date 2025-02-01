@@ -1,10 +1,12 @@
 import inspect
+from os.path import join
 from typing import Optional
 
 import gym
 import minihack  # NOQA: F401
 from nle.env.base import FULL_ACTIONS
 from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, NoProgressAbort, SingleSeed
+from sample_factory.utils.utils import ensure_dir_exists, experiment_dir
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
@@ -98,6 +100,8 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     if cfg.code_wrapper:
         gamma = cfg.gamma if hasattr(cfg, "gamma") else 1.0
+        failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
+        ensure_dir_exists(failed_game_path)
         env = NLECodeWrapper(
             env,
             cfg.strategies,
@@ -107,6 +111,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
             add_direction_strategies=cfg.add_direction_strategies,
             add_more_strategy=cfg.add_more_strategy,
             gamma=gamma,
+            failed_game_path=failed_game_path,
         )
         env = NoProgressFeedback(env)
 

@@ -1,3 +1,4 @@
+from os.path import join
 from typing import Optional
 
 import gym
@@ -19,6 +20,7 @@ from nle_utils.wrappers import (
     TaskRewardsInfoWrapper,
     TileTTY,
 )
+from sample_factory.utils.utils import ensure_dir_exists, experiment_dir
 
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback
@@ -119,6 +121,8 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         panics.append(panic_func)
 
     if cfg.code_wrapper:
+        failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
+        ensure_dir_exists(failed_game_path)
         env = NLECodeWrapper(
             env,
             strategies,
@@ -128,6 +132,7 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
             add_direction_strategies=cfg.add_direction_strategies,
             add_more_strategy=cfg.add_more_strategy,
             gamma=cfg.gamma,
+            failed_game_path=failed_game_path,
         )
         env = NoProgressFeedback(env)
 

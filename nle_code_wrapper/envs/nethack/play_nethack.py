@@ -1,3 +1,4 @@
+import json
 from functools import partial
 
 from nle_utils.cfg.arguments import parse_args, parse_full_cfg
@@ -5,6 +6,8 @@ from nle_utils.envs.env_utils import register_env
 from nle_utils.envs.nethack.nethack_params import add_extra_params_nethack_env
 from nle_utils.play import play
 from nle_utils.scripts.play_nethack import get_action as play_using_nethack
+from sample_factory.cfg.arguments import cfg_dict
+from sample_factory.utils.utils import cfg_file
 
 from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args
 from nle_code_wrapper.envs.nethack.nethack_env import NETHACK_ENVS, make_nethack_env
@@ -31,6 +34,11 @@ def parse_nethack_args(argv=None):
 def main():
     register_nethack_components()
     cfg = parse_nethack_args()
+
+    fname = cfg_file(cfg)
+    with open(fname, "w") as json_file:
+        print(f"Saving configuration to {fname}...")
+        json.dump(cfg_dict(cfg), json_file, indent=2)
 
     if cfg.code_wrapper:
         setup_autocomplete(partial(completer, commands=cfg.strategies))

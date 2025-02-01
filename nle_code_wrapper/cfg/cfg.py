@@ -1,5 +1,7 @@
 import ast
+import os
 from argparse import ArgumentParser
+from os.path import join
 
 from nle_utils.utils.utils import str2bool
 
@@ -26,3 +28,5 @@ def add_code_wrapper_cli_args(p: ArgumentParser) -> None:
         default="nle_code_wrapper.bot.panics",
         help="where to search for panics implementation",
     )
+    p.add_argument("--experiment", type=str, default="default_experiment")
+    p.add_argument("--train_dir", default=join(os.getcwd(), "train_dir"), type=str, help="Root for all experiments")
