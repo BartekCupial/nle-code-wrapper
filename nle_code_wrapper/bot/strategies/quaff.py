@@ -1,22 +1,18 @@
 from nle.nethack import actions as A
-from nle_utils.glyph import G
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.strategy import strategy
 
 
 @strategy
-def quaff_potion_from_inv(bot: "Bot") -> bool:
+def quaff_potion(bot: "Bot"):
     """
-    Quaff a potion from the inventory.
+    Drinks potion from inventory.
     """
-    potions = bot.inventory["potions"]
-
-    if potions:
-        # find the last potion in the inventory
-        potion_char = potions[-1].letter
+    items = bot.inventory["potions"]
+    for item in items:
         bot.step(A.Command.QUAFF)
-        bot.step(potion_char)
+        bot.step(item.letter)
         return True
-    else:
-        return False
+
+    return False

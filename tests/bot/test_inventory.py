@@ -120,7 +120,7 @@ def test_arm_bonus(name, base_ac, enchantment, erosion, expected_bonus):
 @pytest.mark.parametrize(
     "full_name,enchantment",
     [
-        ("battle-axe", None),
+        ("battle-axe", 0),
         ("+2 battle-axe", 2),
         ("-1 battle-axe", -1),
         ("a +1 dagger", 1),
