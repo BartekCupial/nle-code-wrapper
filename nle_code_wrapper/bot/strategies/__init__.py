@@ -21,6 +21,16 @@ from nle_code_wrapper.bot.strategies.basic_items import (
     wield,
     zap,
 )
+from nle_code_wrapper.bot.strategies.boulder import (
+    align_boulder_for_bridge,
+    goto_boulder,
+    goto_boulder_closest_to_river,
+    push_boulder_east,
+    push_boulder_into_river,
+    push_boulder_north,
+    push_boulder_south,
+    push_boulder_west,
+)
 from nle_code_wrapper.bot.strategies.container import loot_container, open_container_key, open_container_kick
 from nle_code_wrapper.bot.strategies.cross_lava_river import (
     acquire_levitation,
@@ -96,16 +106,6 @@ from nle_code_wrapper.bot.strategies.pickup import (
     pickup_tool,
     pickup_wand,
     pickup_weapon,
-)
-from nle_code_wrapper.bot.strategies.push_boulder import (
-    align_boulder_for_bridge,
-    goto_boulder,
-    goto_boulder_closest_to_river,
-    push_boulder_east,
-    push_boulder_into_river,
-    push_boulder_north,
-    push_boulder_south,
-    push_boulder_west,
 )
 from nle_code_wrapper.bot.strategies.quaff import quaff_potion
 from nle_code_wrapper.bot.strategies.random_move import random_move
