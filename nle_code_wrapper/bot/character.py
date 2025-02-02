@@ -69,42 +69,13 @@ ALL_SPELL_CATEGORIES = [
 ]
 
 
-class Property:
-    def __init__(self, bot: "Bot"):
-        self.bot = bot
-
-    @property
-    def confusion(self):
-        return "Conf" in bytes(self.bot.tty_chars).decode()
-
-    @property
-    def stun(self):
-        return "Stun" in bytes(self.bot.tty_chars).decode()
-
-    @property
-    def hallu(self):
-        return "Hallu" in bytes(self.bot.tty_chars).decode()
-
-    @property
-    def blind(self):
-        return "Blind" in bytes(self.bot.tty_chars).decode()
-
-    @property
-    def polymorph(self):
-        if not nh.glyph_is_monster(self.bot.entity.glyph):
-            return False
-        return self.bot.character.self_glyph != self.bot.entity.glyph
-
-
 class Character:
     def __init__(self, bot: "Bot", character: str):
         self.bot = bot
-        self.prop = Property(bot)
         self.role = None
         self.alignment = None
         self.race = None
         self.gender = None
-        self.self_glyph = None
         self.upgradable_skills = dict()
 
         self.is_lycanthrope = False
@@ -114,9 +85,6 @@ class Character:
         self.parse_character(character)
 
     def update(self):
-        if self.self_glyph is None:
-            self.self_glyph = self.bot.entity.glyph
-
         # 1) try to init from welcome message
         if not self.init:
             if "welcome to NetHack!" in self.bot.message:

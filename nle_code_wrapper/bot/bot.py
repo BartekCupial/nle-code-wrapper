@@ -17,7 +17,7 @@ from numpy import int64, ndarray
 from nle_code_wrapper.bot.character import Character
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
-from nle_code_wrapper.bot.inventory import Inventory
+from nle_code_wrapper.bot.inventory import InventoryManager
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Movements, Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
@@ -39,6 +39,7 @@ class Bot:
         self._movements: Movements = None
         self.character: Character = Character(self, self.env.gym_env.unwrapped.character)
         self.pathfinder: Pathfinder = Pathfinder(self)
+        self.inventory_mangager: InventoryManager = InventoryManager(self)
         self.pvp: Pvp = Pvp(self)
 
         self.strategies: list[Callable] = []
@@ -244,12 +245,12 @@ class Bot:
         self.tty_chars = self.get_tty_chars(self.current_obs)
         self.tty_colors = self.get_tty_colors(self.current_obs)
         self.cursor = self.get_cursor(self.current_obs)
-        self.inventory = self.get_inventory(self.current_obs)
         self.entity = self.get_entity(self.current_obs)
         self.entities = self.get_entities(self.current_obs)
         self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
+        self.inventory_mangager.update()
         self.character.update()
         self.movements.update()
         self.pathfinder.update()
@@ -281,14 +282,6 @@ class Bot:
 
     def get_cursor(self, last_obs):
         return tuple(last_obs["tty_cursor"])
-
-    def get_inventory(self, last_obs) -> Inventory:
-        return Inventory(
-            last_obs["inv_strs"],
-            last_obs["inv_letters"],
-            last_obs["inv_oclasses"],
-            last_obs["inv_glyphs"],
-        )
 
     def get_entity(self, last_obs) -> Entity:
         """
@@ -322,5 +315,30 @@ class Bot:
         return self.levels[key]
 
     @property
+    def inventory(self):
+        return self.inventory_mangager.inventory
+
+    @property
     def engulfed(self):
         return utils.isin(self.glyphs, G.SWALLOW).any()
+
+    @property
+    def confused(self):
+        return "Conf" in bytes(self.tty_chars).decode()
+
+    @property
+    def stunned(self):
+        return "Stun" in bytes(self.tty_chars).decode()
+
+    @property
+    def hallucinating(self):
+        return "Hallu" in bytes(self.tty_chars).decode()
+
+    @property
+    def blinded(self):
+        return "Blind" in bytes(self.tty_chars).decode()
+
+    @property
+    def polymorphed(self):
+        if not nethack.glyph_is_monster(self.entity.glyph):
+            return False
