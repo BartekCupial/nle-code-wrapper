@@ -43,8 +43,9 @@ class SaveOnException(gym.Wrapper):
 
     def save_to_file(self):
         dat = {
-            "actions": self.recorded_actions,
             "seed": self.recorded_seed,
+            "actions": self.recorded_actions,
+            "last_observation": self.env.unwrapped.last_observation,
         }
         og_ttyrec = self.env.unwrapped.nethack._ttyrec
         if og_ttyrec is not None:
