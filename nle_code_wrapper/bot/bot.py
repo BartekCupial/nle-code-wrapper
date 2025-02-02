@@ -324,19 +324,19 @@ class Bot:
 
     @property
     def confused(self):
-        return "Conf" in bytes(self.tty_chars).decode()
+        return "Conf" in bytes(self.tty_chars).decode("latin-1")
 
     @property
     def stunned(self):
-        return "Stun" in bytes(self.tty_chars).decode()
+        return "Stun" in bytes(self.tty_chars).decode("latin-1")
 
     @property
     def hallucinating(self):
-        return "Hallu" in bytes(self.tty_chars).decode()
+        return "Hallu" in bytes(self.tty_chars).decode("latin-1")
 
     @property
     def blinded(self):
-        return "Blind" in bytes(self.tty_chars).decode()
+        return "Blind" in bytes(self.tty_chars).decode("latin-1")
 
     @property
     def polymorphed(self):
