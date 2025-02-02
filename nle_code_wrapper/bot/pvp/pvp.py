@@ -202,7 +202,7 @@ class Pvp:
                 continue
 
             p = position
-            while level.walkable[p[0] + dx, p[1] + dy]:
+            while level.safe_walkable(p[0] + dx, p[1] + dy):
                 p = (p[0] + dx, p[1] + dy)
                 positions.append(p)
 

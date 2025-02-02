@@ -34,11 +34,7 @@ class RaySimulator:
             x += dx
             y += dy
 
-            # Add bounds check
-            if not self._is_in_bounds(x, y):
-                return
-
-            if self.bot.current_level.walkable[x, y]:
+            if self.bot.current_level.safe_walkable[x, y]:
                 for entity in self.bot.entities + [self.bot.entity]:
                     if entity.position == (x, y):
                         remaining_range -= 2
@@ -100,15 +96,11 @@ class RaySimulator:
         # Ray heading
         # up-left
 
-        # Check if all accessed positions are in bounds
-        if not all(self._is_in_bounds(px, py) for px, py in [(x, y), (x + dx, y), (x, y + dy), (x + dx, y + dy)]):
-            return False
-
         return (
-            self.bot.current_level.walkable[x, y]
-            and self.bot.current_level.walkable[x + dx, y]
-            and self.bot.current_level.walkable[x, y + dy]
-            and not self.bot.current_level.walkable[x + dx, y + dy]
+            self.bot.current_level.safe_walkable[x, y]
+            and self.bot.current_level.safe_walkable[x + dx, y]
+            and self.bot.current_level.safe_walkable[x, y + dy]
+            and not self.bot.current_level.safe_walkable[x + dx, y + dy]
         )
 
     def _is_concave_corner(self, dx: int, dy: int, x: int, y: int) -> bool:
@@ -119,15 +111,11 @@ class RaySimulator:
         # Ray heading
         # up-left
 
-        # Check if all accessed positions are in bounds
-        if not all(self._is_in_bounds(px, py) for px, py in [(x, y), (x + dx, y), (x, y + dy), (x + dx, y + dy)]):
-            return False
-
         return (
-            self.bot.current_level.walkable[x, y]
-            and not self.bot.current_level.walkable[x + dx, y]
-            and not self.bot.current_level.walkable[x, y + dy]
-            and not self.bot.current_level.walkable[x + dx, y + dy]
+            self.bot.current_level.safe_walkable[x, y]
+            and not self.bot.current_level.safe_walkable[x + dx, y]
+            and not self.bot.current_level.safe_walkable[x, y + dy]
+            and not self.bot.current_level.safe_walkable[x + dx, y + dy]
         )
 
     def _straight_bounce(self, dx: int, dy: int) -> Tuple[int, int]:
@@ -160,14 +148,11 @@ class RaySimulator:
         # up-left
 
         # if hitting a vertical wall
-        if self.bot.current_level.walkable[x + dx, y]:
+        if self.bot.current_level.safe_walkable[x + dx, y]:
             return dx, -dy
 
         # if hitting a horizontal wall
-        if self.bot.current_level.walkable[x, y + dy]:
+        if self.bot.current_level.safe_walkable[x, y + dy]:
             return -dx, dy
 
         raise ValueError()
-
-    def _is_in_bounds(self, x: int, y: int) -> bool:
-        return 0 <= x < self.bot.current_level.walkable.shape[0] and 0 <= y < self.bot.current_level.walkable.shape[1]
