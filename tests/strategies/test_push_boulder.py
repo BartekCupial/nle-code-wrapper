@@ -1,13 +1,13 @@
 import pytest
 
-from nle_code_wrapper.bot.strategies.explore import explore_room, explore_room_systematically
-from nle_code_wrapper.bot.strategies.push_boulder import (
+from nle_code_wrapper.bot.strategies.boulder import (
     align_boulder_for_bridge,
     goto_boulder,
     goto_boulder_closest_to_river,
     push_boulder_direction,
     push_boulder_into_river,
 )
+from nle_code_wrapper.bot.strategies.explore import explore_room, explore_room_systematically
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
