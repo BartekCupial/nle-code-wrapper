@@ -247,7 +247,7 @@ def align_boulder_for_bridge(bot: "Bot") -> bool:
     ):
         return False
 
-    walkable_target_pos = [pos for pos in intersections if bot.current_level.walkable[pos]]
+    walkable_target_pos = [pos for pos in intersections if bot.current_level.safe_walkable[pos]]
     if walkable_target_pos == []:  # this can happen if boulder is in the intersection
         return False
 

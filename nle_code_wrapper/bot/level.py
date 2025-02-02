@@ -10,6 +10,17 @@ from numpy import int64, ndarray
 from nle_code_wrapper.utils import utils
 
 
+class SafeAccess:
+    def __init__(self, array):
+        self.array = array
+
+    def __getitem__(self, key):
+        try:
+            return self.array[key]
+        except IndexError:
+            return False
+
+
 class Level:
     """
     Level class to store information about the current level.
@@ -20,6 +31,8 @@ class Level:
         self.level_number = level_number
 
         self.walkable = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
+        self.safe_walkable = SafeAccess(self.walkable)
+
         self.seen = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.objects = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
         self.objects[:] = -1
