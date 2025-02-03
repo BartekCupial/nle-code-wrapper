@@ -1,108 +1,81 @@
 import re
-from typing import List, Union
 
 from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import ItemClass
+from nle_code_wrapper.bot.inventory import Item, ItemClass
 from nle_code_wrapper.bot.strategies.goto import goto_glyph
 from nle_code_wrapper.bot.strategy import strategy
 
 
-# TODO: track items on the floor and use them for pickup
-# TODO: currently there can be a loop, pickup_armor, we are standing on ring
-# we will pickup ring drop it and return
+def pickup_multipage(bot: "Bot", item_class: ItemClass, text: str):
+    # Pattern for items
+    item_pattern = r"([a-zA-Z]) - (.+)"
+
+    # Pattern for end markers
+    end_pattern = r"\(end\)"
+    page_pattern = r"\((\d+) of \1\)"  # Same number (e.g., "2 of 2")
+    diff_page_pattern = r"\((\d+) of (\d+)\)"  # Different numbers (e.g., "1 of 2")
+
+    items = re.finditer(item_pattern, text, re.MULTILINE)
+    for match in items:
+        letter, item = match.group(1), match.group(2)
+        item = Item.from_text(item)
+        if item.item_class == item_class:
+            bot.type_text(letter)
+
+    # Check for (end)
+    if re.search(end_pattern, text):
+        bot.step(A.MiscAction.MORE)
+
+    # Check for (n of n) - same number
+    elif re.search(page_pattern, text):
+        bot.step(A.MiscAction.MORE)
+
+    # Check for (n of m) - different numbers
+    elif re.search(diff_page_pattern, text):
+        bot.step(A.TextCharacters.SPACE)
+        pickup_multipage(bot, item_class, bot.message)
+
+
+def look(bot: "Bot", item_class: ItemClass) -> bool:
+    # look below us
+    bot.step(A.Command.LOOK)
+
+    # only one item
+    if match := re.search(r"You see here(.*?)\.", bot.message):
+        text = match.group(1).strip()
+        item = Item.from_text(text)
+        if item.item_class == item_class:
+            bot.step(A.Command.PICKUP)
+            return True
+
+    # multiple items
+    elif "Things that are here:" in bot.message:
+        items = []
+        lines = bot.message.strip().split("\n")
+        for line in lines[1:]:
+            item = Item.from_text(line)
+            items.append(item)
+
+        # check if there is an item we would like to pick up
+        if any([item.item_class == item_class for item in items]):
+            bot.step(A.Command.PICKUP)
+            pickup_multipage(bot, item_class, bot.message)
+            return True
+
+    return False
+
+
 @strategy
-def pickup_item(bot: "Bot", item_class: ItemClass, include_corpses: bool = False):
-    bot.step(A.Command.PICKUP)
+def pickup_item(bot: "Bot", item_class: ItemClass):
+    if look(bot, item_class):
+        return True
 
-    # Check if the game shows a single item, e.g. "a - a cloudy potion"
-    if re.match(r"[a-zA-Z]\s-\s", bot.message):
-        # If there's exactly one item below us
-        letter = bot.message[0]
-        succ = True
-
-    # Check if there's a pile or multiple items
-    elif (
-        "There are several objects here" in bot.message or "Pick up what?" in bot.message or "items here" in bot.message
-    ):
-        # For a pile, just mark success and let the code below handle
-        succ = True
-
-    else:
-        # No obvious item under us; try moving to an appropriate glyph
-        item_glyphs = getattr(G, f"{item_class.name}_CLASS")
-
-        succ = False
-        if goto_glyph(bot, item_glyphs):
-            succ = True
-            bot.step(A.Command.PICKUP)
-
-        # If we can't find the specific item glyph, try all items
-        # TODO: we could pickup single item based on message,
-        # it would require mapping message to item class
-        # for now easier to drop the item if it has wrong class
-        elif goto_glyph(bot, G.ITEMS):
-            succ = True
-            bot.step(A.Command.PICKUP)
-
-        # Finally, try corpses if applicable
-        # TODO: implement loot corpses strategy?
-        # TODO: also eat corpses
-        elif goto_glyph(bot, G.CORPSES):
-            succ = True
-            bot.step(A.Command.PICKUP)
-
-        item_glyphs = getattr(G, f"{item_class.name}_CLASS")
-
-    # If we succeeded in initiating a pickup (single item, pile, or walking onto it):
-    if succ:
-        if bot.xwaitingforspace:
-            lines = bot.message.split("\n")
-            mark_items = False
-            while lines:
-                line = lines.pop(0)
-
-                # 0) if we reach (end) get out
-                if "(end)" in line:
-                    bot.step(A.MiscAction.MORE)
-                    break
-
-                # 1) if we ehxausted the current page go to the next one
-                if re.match("\(\d+ of \d+\)", line):  # NOQA: W605
-                    bot.type_text(" ")
-                    lines = bot.message.split("\n")
-                    continue
-
-                # 2) when we reach item category we are interested in start marking
-                if not mark_items and item_class.name.lower() in line.lower():
-                    mark_items = True
-                    continue
-
-                # 3) mark items for picking up
-                if mark_items:
-                    # example: e - a cloudy potion
-                    if re.match("[a-zA-Z] -", line):
-                        if include_corpses and "corpse" in line or not include_corpses and "corpse" not in line:
-                            # first character in line is an item letter
-                            bot.type_text(line[0])
-                    else:
-                        if line != "":
-                            bot.step(A.MiscAction.MORE)  # confirm
-                        return True
-        else:
-            # if there is no message we picked nothing
-            # this can happen in some minihack environments
-            if bot.message:
-                letter = bot.message[0]
-                for item in bot.inventory.items:
-                    if item.letter == ord(letter):
-                        if item.item_class == item_class:
-                            return True
-                        else:
-                            bot.step(A.Command.DROP)
-                            bot.type_text(letter)
+    if goto_glyph(bot, G.ITEMS.union(G.CORPSES)):
+        if look(bot, item_class):
+            return True
 
     return False
 
@@ -151,7 +124,7 @@ def pickup_food(bot: "Bot") -> bool:
     """
     Makes bot pick up food from the floor.
     """
-    return pickup_item(bot, ItemClass.COMESTIBLES, include_corpses=False)
+    return pickup_item(bot, ItemClass.COMESTIBLES)
 
 
 @strategy
@@ -159,7 +132,7 @@ def pickup_corpse(bot: "Bot") -> bool:
     """
     Makes bot pick up corpse from the floor.
     """
-    return pickup_item(bot, ItemClass.COMESTIBLES, include_corpses=True)
+    return pickup_item(bot, ItemClass.CORPSE)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
