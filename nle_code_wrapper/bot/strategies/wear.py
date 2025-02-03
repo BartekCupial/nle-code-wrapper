@@ -3,17 +3,17 @@ from typing import List, Optional
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import ArmorType, Item, ItemBeatitude
+from nle_code_wrapper.bot.inventory import ArmorClass, Item, ItemBeatitude
 from nle_code_wrapper.bot.strategy import strategy
 
 
-def _get_best_armor(bot: "Bot", armor_type: ArmorType) -> Optional[Item]:
+def _get_best_armor(bot: "Bot", armor_class: ArmorClass) -> Optional[Item]:
     """Selects best armor item by arm_bonus for given type"""
     best = None
     best_unknown = None
 
     for item in bot.inventory["armor"]:
-        if item.armor_type == armor_type:
+        if item.armor_class == armor_class:
             if item.beatitude == ItemBeatitude.CURSED:
                 continue
             elif item.beatitude == ItemBeatitude.UNKNOWN:
@@ -29,22 +29,22 @@ def _get_best_armor(bot: "Bot", armor_type: ArmorType) -> Optional[Item]:
     return best if best is not None else best_unknown
 
 
-def _simple_wear(bot: "Bot", armor_type) -> bool:
+def _simple_wear(bot: "Bot", armor_class) -> bool:
     """Base function for simple wear operations"""
-    best_item = _get_best_armor(bot, armor_type)
-    if best_item is None or best_item.is_worn:
+    best_item = _get_best_armor(bot, armor_class)
+    if best_item is None or best_item.equipped:
         return False
 
     bot.step(A.Command.WEAR)
     bot.step(best_item.letter)
 
-    return bot.inventory.worn_armor_by_type[armor_type] is not None
+    return bot.inventory.worn_armor_by_type[armor_class] is not None
 
 
-def _wear_with_dependencies(bot: "Bot", dependencies: List[ArmorType], armor_type: ArmorType) -> bool:
+def _wear_with_dependencies(bot: "Bot", dependencies: List[ArmorClass], armor_class: ArmorClass) -> bool:
     """Helper for wearing items that require removing other items first"""
-    best_item = _get_best_armor(bot, armor_type)
-    if best_item is None or best_item.is_worn:
+    best_item = _get_best_armor(bot, armor_class)
+    if best_item is None or best_item.equipped:
         return False
 
     # Store letters of items we need to remove first
@@ -75,32 +75,32 @@ def _wear_with_dependencies(bot: "Bot", dependencies: List[ArmorType], armor_typ
         bot.step(A.Command.WEAR)
         bot.step(letter)
 
-    return bot.inventory.worn_armor_by_type[armor_type] is not None
+    return bot.inventory.worn_armor_by_type[armor_class] is not None
 
 
 @strategy
 def wear_shield(bot: "Bot") -> bool:
-    return _simple_wear(bot, ArmorType.SHIELD)
+    return _simple_wear(bot, ArmorClass.SHIELD)
 
 
 @strategy
 def wear_helm(bot: "Bot") -> bool:
-    return _simple_wear(bot, ArmorType.HELM)
+    return _simple_wear(bot, ArmorClass.HELM)
 
 
 @strategy
 def wear_boots(bot: "Bot") -> bool:
-    return _simple_wear(bot, ArmorType.BOOTS)
+    return _simple_wear(bot, ArmorClass.BOOTS)
 
 
 @strategy
 def wear_gloves(bot: "Bot") -> bool:
-    return _simple_wear(bot, ArmorType.GLOVES)
+    return _simple_wear(bot, ArmorClass.GLOVES)
 
 
 @strategy
 def wear_cloak(bot: "Bot") -> bool:
-    return _simple_wear(bot, ArmorType.CLOAK)
+    return _simple_wear(bot, ArmorClass.CLOAK)
 
 
 @strategy
@@ -108,8 +108,8 @@ def wear_suit(bot: "Bot") -> bool:
     # Note: To wear a suit, we need to remove the cloak first
     return _wear_with_dependencies(
         bot,
-        dependencies=[ArmorType.CLOAK],
-        armor_type=ArmorType.SUIT,
+        dependencies=[ArmorClass.CLOAK],
+        armor_class=ArmorClass.SUIT,
     )
 
 
@@ -118,8 +118,8 @@ def wear_shirt(bot: "Bot") -> bool:
     # To wear a shirt, we need to remove both cloak and suit
     return _wear_with_dependencies(
         bot,
-        dependencies=[ArmorType.CLOAK, ArmorType.SUIT],
-        armor_type=ArmorType.SHIRT,
+        dependencies=[ArmorClass.CLOAK, ArmorClass.SUIT],
+        armor_class=ArmorClass.SHIRT,
     )
 
 
@@ -134,6 +134,20 @@ def puton_ring(bot: "Bot"):
         bot.step(item.letter)
         if "Which ring-finger, Right or Left?" in bot.message:
             bot.type_text("r")
+        return True
+
+    return False
+
+
+@strategy
+def puton_amulet(bot: "Bot"):
+    """
+    Puts on amulet from an inventory.
+    """
+    items = bot.inventory["amulets"]
+    for item in items:
+        bot.step(A.Command.PUTON)
+        bot.step(item.letter)
         return True
 
     return False

@@ -530,8 +530,8 @@ class CharacterSkills:
             skill_level = skill_entry[1]  # Basic, Skilled, etc.
             self.skill_levels[skill_type.value] = self.name_to_skill_level[skill_level]
 
-    @staticmethod
-    def from_role(role: Role):
+    @classmethod
+    def from_role(cls, role: Role):
         role_to_skill = {
             Role.ARCHEOLOGIST: Skill_A,
             Role.BARBARIAN: Skill_B,
@@ -548,7 +548,7 @@ class CharacterSkills:
             Role.WIZARD: Skill_W,
         }
         skill = role_to_skill[role]
-        return Skill(skill)
+        return cls(skill)
 
     def get_skill_str_list(self):
         inv_skill_type = {v: k for k, v in self.name_to_skill_type.items()}

@@ -1,10 +1,9 @@
 import numpy as np
 from nle.nethack import actions as A
 from nle_utils.glyph import SS, G
-from nle_utils.item import ItemClasses
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import GLYPH_TO_OBJECT
+from nle_code_wrapper.bot.inventory import NAME_TO_GLYPHS
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
 
@@ -16,9 +15,7 @@ def open_container_kick(bot: "Bot"):
     """
     container_glyphs = frozenset(
         glyph
-        for glyph, glyph_object in GLYPH_TO_OBJECT.items()
-        if glyph_object.name
-        in [
+        for name in [
             "large box",
             "chest",
             "ice box",
@@ -28,6 +25,7 @@ def open_container_kick(bot: "Bot"):
             "sack",
             "bag of tricks",
         ]
+        for glyph in NAME_TO_GLYPHS[name]
     )
     containers = np.argwhere(utils.isin(bot.glyphs, container_glyphs))
 
@@ -56,9 +54,7 @@ def open_container_key(bot: "Bot"):
     """
     container_glyphs = frozenset(
         glyph
-        for glyph, glyph_object in GLYPH_TO_OBJECT.items()
-        if glyph_object.name
-        in [
+        for name in [
             "large box",
             "chest",
             "ice box",
@@ -68,6 +64,7 @@ def open_container_key(bot: "Bot"):
             "sack",
             "bag of tricks",
         ]
+        for glyph in NAME_TO_GLYPHS[name]
     )
     containers = np.argwhere(utils.isin(bot.glyphs, container_glyphs))
 
@@ -99,9 +96,7 @@ def loot_container(bot: "Bot"):
     """
     container_glyphs = frozenset(
         glyph
-        for glyph, glyph_object in GLYPH_TO_OBJECT.items()
-        if glyph_object.name
-        in [
+        for name in [
             "large box",
             "chest",
             "ice box",
@@ -111,6 +106,7 @@ def loot_container(bot: "Bot"):
             "sack",
             "bag of tricks",
         ]
+        for glyph in NAME_TO_GLYPHS[name]
     )
     containers = np.argwhere(utils.isin(bot.glyphs, container_glyphs))
 

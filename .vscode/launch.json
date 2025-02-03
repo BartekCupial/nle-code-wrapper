@@ -11,7 +11,7 @@
             "module": "mrunner_run",
             "justMyCode": false,
             "args": [
-                "--ex", "train_configs/2025_01/nethack/2025_01_27_nethack_single_seed.py",
+                "--ex", "train_configs/2025_01/nethack/2025_02_01_nethack3.py",
             ],
         },
         {
@@ -78,8 +78,8 @@
             "module": "nle_code_wrapper.envs.nethack.play_nethack",
             "justMyCode": false,
             "args": [
-                "--env", "NetHackProgress-v0",
-                "--character", "mon-hum-neu-mal",
+                "--env", "NetHackScore-v0",
+                "--character", "val-dwa-neu-fem",
                 // "--character", "ran-elf-neu-mal",
                 // "--character", "@",
                 // "--code_wrapper", "False",
@@ -87,7 +87,21 @@
                 "--penalty_step", "0.0",
                 "--verbose", "True",
                 // // "--no-render",
-                "--seed", "27",
+                // "--seed", "27",
+            ],
+        },
+        {
+            "name": "load nethack",
+            "type": "debugpy",
+            "request": "launch",
+            "module": "nle_code_wrapper.agents.sample_factory.nethack.load_nethack",
+            "justMyCode": false,
+            "args": [
+                "--env", "NetHackScore-v0",
+                // "--demo_name", "nle.392801.3535211115.ttyrec3.bz2.demo",
+                // "--demo_name", "nle.14432.1680179258.ttyrec3.bz2.demo",
+                "--train_dir", "/home/bartek/train_dir",
+                "--demo_name", "nle.49727.2889514751.ttyrec3.bz2.demo",
             ],
         },
         {

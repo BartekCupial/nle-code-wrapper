@@ -112,9 +112,9 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         )
         env = NoProgressFeedback(env)
 
-    if cfg.save_on_exception:
-        failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
-        ensure_dir_exists(failed_game_path)
-        env = SaveOnException(env, failed_game_path=failed_game_path)
+    # if cfg.save_on_exception:
+    #     failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
+    #     ensure_dir_exists(failed_game_path)
+    #     env = SaveOnException(env, failed_game_path=failed_game_path)
 
     return env
