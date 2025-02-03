@@ -35,6 +35,12 @@ class ItemClass(enum.Enum):
     def from_oclass(cls, oclass: int) -> ItemClass:
         return cls(oclass)
 
+    def __str__(self):
+        return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
+
 
 class WeaponClass(enum.Enum):
     WEAPON = 0
@@ -50,6 +56,12 @@ class WeaponClass(enum.Enum):
         else:
             return WeaponClass.WEAPON
 
+    def __str__(self):
+        return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
+
 
 class ArmorClass(enum.Enum):
     SUIT = 0
@@ -59,6 +71,12 @@ class ArmorClass(enum.Enum):
     BOOTS = 4
     CLOAK = 5
     SHIRT = 6
+
+    def __str__(self):
+        return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
 
 
 class ToolClass(enum.Enum):
@@ -71,6 +89,12 @@ class ToolClass(enum.Enum):
     def from_obj(cls, obj):
         return cls()
 
+    def __str__(self):
+        return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
+
 
 class GemClass(enum.Enum):
     GEM = 0
@@ -79,6 +103,12 @@ class GemClass(enum.Enum):
     @classmethod
     def from_oc_tough(cls, oc_tough):
         return cls(oc_tough)
+
+    def __str__(self):
+        return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
 
 
 class ItemQuantity:
@@ -98,6 +128,9 @@ class ItemQuantity:
     def __str__(self):
         return self.repr
 
+    def __repr__(self):
+        return str(self)
+
 
 class ItemBeatitude(enum.Enum):
     # beatitude
@@ -116,6 +149,9 @@ class ItemBeatitude(enum.Enum):
                 return ""
             case _:
                 return self.name.lower()
+
+    def __repr__(self):
+        return str(self)
 
 
 class ItemEnchantment:
@@ -137,6 +173,9 @@ class ItemEnchantment:
 
     def __str__(self):
         return "" if self.unknown else f"{'+' if self.value >= 0 else '-'}{self.value}"
+
+    def __repr__(self):
+        return str(self)
 
 
 class ItemErosion(enum.Enum):
@@ -176,6 +215,9 @@ class ItemErosion(enum.Enum):
             case ItemErosion.SEVERE:
                 return "thoroughly eroded"
 
+    def __repr__(self):
+        return str(self)
+
 
 class ShopStatus(enum.Enum):
     NOT_SHOP = 0
@@ -195,6 +237,9 @@ class ShopStatus(enum.Enum):
             case ShopStatus.UNPAID:
                 return "unpaid"
 
+    def __repr__(self):
+        return str(self)
+
 
 class ShopPrice:
     def __init__(self, value: int):
@@ -209,3 +254,6 @@ class ShopPrice:
 
     def __str__(self):
         return str(self.value)
+
+    def __repr__(self):
+        return str(self)
