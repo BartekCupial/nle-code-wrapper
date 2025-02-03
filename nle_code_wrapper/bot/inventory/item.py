@@ -138,24 +138,36 @@ class Item:
             permonst = None
             item_class = None
 
-            if "corpse" in name:
+            if name.endswith(" corpse") or name.endswith(" corpses"):
                 name = Item.make_singular(name)
                 name = name.removesuffix(" corpse")
+                name = name.removeprefix("an ")
+                name = name.removeprefix("a ")
                 permonst = name_to_monsters[name]
                 item_class = ItemClass.CORPSE
                 name = "corpse"
-            elif "statue" in name:
+            elif (
+                name.startswith("statue of ")
+                or name.startswith("statues of ")
+                or name.startswith("historic statue of ")
+                or name.startswith("historic statues of ")
+            ):
                 name = Item.make_singular(name)
-                name = name.removesuffix(" statue")
+                name = name.removeprefix("historic statue of ")
+                name = name.removeprefix("statue of ")
+                name = name.removeprefix("an ")
+                name = name.removeprefix("a ")
                 permonst = name_to_monsters[name]
                 item_class = ItemClass.STATUE
                 name = "statue"
-            elif "figurine of" in name or "figurines of" in name:
+            elif name.startswith("figurine of ") or name.startswith("figurines of "):
                 name = Item.make_singular(name)
                 name = name.removeprefix("figurine of ")
+                name = name.removeprefix("an ")
+                name = name.removeprefix("a ")
                 permonst = name_to_monsters[name]
                 name = "figurine"
-            elif "tin of" in name or "tins of" in name:
+            elif name.startswith("tin of ") or name.startswith("tins of "):
                 name = Item.make_singular(name)
                 name = name.removeprefix("tin of ")
                 if "meat" in name:
@@ -164,6 +176,12 @@ class Item:
                 elif "spinach" in name:
                     pass
                 name = "tin"
+            elif name.endswith(" egg") or name.endswith(" eggs"):
+                name = Item.make_singular(name)
+                name = name.removeprefix("an ")
+                name = name.removeprefix("a ")
+                permonst = name_to_monsters[name]
+                name = "egg"
 
             # TODO: what about monsters (python?)
 
