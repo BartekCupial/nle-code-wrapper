@@ -48,20 +48,6 @@ class Level:
         self.search_count = np.zeros((C.SIZE_Y, C.SIZE_X), np.int32)
         self.door_open_count = np.zeros((C.SIZE_Y, C.SIZE_X), np.int32)
 
-        # TODO: we currently do not update what is lying on the floor if we randomly step over sth
-        self.item_disagreement_counter = np.zeros((C.SIZE_Y, C.SIZE_X), np.int32)
-        self.items = np.empty((C.SIZE_Y, C.SIZE_X), dtype=object)
-        self.items.fill([])
-        self.item_count = np.zeros((C.SIZE_Y, C.SIZE_X), dtype=np.int32)
-
-        self.stair_destination = {}  # {(y, x) -> ((dungeon, level), (y, x))}
-        self.altars = {}  # {(y, x) -> alignment}
-
-        self.corpses_to_eat = defaultdict(lambda: defaultdict(lambda: -10000))  # {(y, x) -> {monster_id -> age_turn}}
-
-        # ad aerarium -- avoid valut entrance
-        self.forbidden = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
-
     def key(self):
         return (self.dungeon_number, self.level_number)
 

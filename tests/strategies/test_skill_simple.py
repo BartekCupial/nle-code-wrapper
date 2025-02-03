@@ -147,7 +147,7 @@ class TestSkillSimple:
             argv=[
                 f"--env={env}",
                 f"--seed={seed}",
-                # "--no-render",
+                "--no-render",
                 "--code_wrapper=False",
             ]
         )

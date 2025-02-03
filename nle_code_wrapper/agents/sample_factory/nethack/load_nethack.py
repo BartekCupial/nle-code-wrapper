@@ -32,7 +32,7 @@ def main():
 
     seed = dat["seed"]
     recorded_actions = dat["actions"]
-    last_observation = dat["last_observation"]
+    # last_observation = dat["last_observation"]
     cfg.seed = seed
 
     env = create_env(
@@ -48,7 +48,6 @@ def main():
         strategy = bot.strategies[action]
         print(strategy.__name__)
         obs, reward, teraminated, truncated, info = env.step(action)
-        print(bot.inventory)
 
 
 if __name__ == "__main__":
