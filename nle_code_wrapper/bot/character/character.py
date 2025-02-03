@@ -339,7 +339,7 @@ class Character:
             else:
                 return self.skill.unarmed_bonus[self.skill.skill_levels[Skill.BARE_HANDED_COMBAT.value]]
 
-        wep_type = CharacterSkills(np.abs(weapon.objects[0].oc_skill))
+        wep_type = Skill(np.abs(weapon.objects[0].oc_skill))
         return self.skill.weapon_bonus[self.skill.skill_levels[wep_type.value]]
 
     def __str__(self):

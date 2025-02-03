@@ -1,248 +1,261 @@
-import numpy as np
 import pytest
-from nle import nethack
-from nle_utils.item import ItemClasses, ItemEnchantment, ItemErosion
 
-from nle_code_wrapper.bot.inventory import GLYPH_TO_OBJECT, Item
+from nle_code_wrapper.bot.inventory import Item
 
 
 @pytest.mark.parametrize(
-    "full_name,expected",
+    "text,expected",
     [
-        ("rusty small shield", 1),
-        ("very rusty corroded small shield", 2),
-        ("thoroughly burnt very corroded small shield", 3),
-        ("rusty rotted small shield", 1),
-        ("very rusty thoroughly corroded small shield", 3),
-        ("thoroughly burnt very corroded rusty small shield", 3),
+        ("a rusty small shield", 1),
+        ("a very rusty corroded small shield", 2),
+        ("a thoroughly burnt very corroded small shield", 3),
+        ("a rusty rotted small shield", 1),
+        ("a very rusty thoroughly corroded small shield", 3),
+        ("a thoroughly burnt very corroded rusty small shield", 3),
     ],
 )
-def test_greatest_erosion(full_name, expected):
-    assert ItemErosion.from_name(full_name).value == expected
+def test_greatest_erosion(text, expected):
+    item = Item.from_text(text)
+    assert item.erosion.value == expected
 
 
 @pytest.mark.parametrize(
-    "name",
+    "text",
     [
-        "arrow",
-        "elven arrow",
-        "orcish arrow",
-        "silver arrow",
-        "ya",
-        "crossbow bolt",
+        "an arrow",
+        "an elven arrow",
+        "an orcish arrow",
+        "a silver arrow",
+        "a ya",
+        "a crossbow bolt",
     ],
 )
-def test_item_firing_projectiles(name):
-    for glyph, glyph_object in GLYPH_TO_OBJECT.items():
-        if glyph_object.name == name:
-            break
-
-    item = Item(
-        inv_letter="a",
-        inv_str=np.array([ord(c) for c in name], dtype=np.uint8),
-        inv_oclass=ItemClasses.WEAPON.value,
-        inv_glyph=glyph,
-    )
+def test_item_firing_projectiles(text):
+    item = Item.from_text(text)
     assert item.is_firing_projectile
 
 
 @pytest.mark.parametrize(
-    "name",
+    "text",
     [
-        "boomerang",
-        "dagger",
-        "elven dagger",
-        "orcish dagger",
-        "silver dagger",
-        "worm tooth",
-        "crysknife",
-        "knife",
-        "athame",
-        "scalpel",
-        "stiletto",
-        "dart",
-        "shuriken",
+        "a boomerang",
+        "a dagger",
+        "a elven dagger",
+        "a orcish dagger",
+        "a silver dagger",
+        "a worm tooth",
+        "a crysknife",
+        "a knife",
+        "a athame",
+        "a scalpel",
+        "a stiletto",
+        "a dart",
+        "a shuriken",
     ],
 )
-def test_item_thrown_projectiles(name):
-    for glyph, glyph_object in GLYPH_TO_OBJECT.items():
-        if glyph_object.name == name:
-            break
-
-    item = Item(
-        inv_letter="a",
-        inv_str=np.array([ord(c) for c in name], dtype=np.uint8),
-        inv_oclass=ItemClasses.WEAPON.value,
-        inv_glyph=glyph,
-    )
+def test_item_thrown_projectiles(text):
+    item = Item.from_text(text)
     assert item.is_thrown_projectile
 
 
 @pytest.mark.parametrize(
-    "name,base_ac,enchantment,erosion,expected_bonus",
+    "text,base_ac,expected_bonus",
     [
-        # Basic cases - no erosion
-        ("leather armor", 2, 0, 0, 2),  # Base AC only
-        ("leather armor", 2, 1, 0, 3),  # Base AC + enchantment
-        # Erosion cases
-        ("leather armor", 2, 0, 1, 1),  # Partial erosion
-        ("leather armor", 2, 0, 2, 0),  # Full erosion
-        ("leather armor", 2, 0, 3, 0),  # Over-erosion (should cap at AC)
+        # # Basic cases - no erosion
+        ("a leather armor", 2, 2),  # Base AC only
+        ("a +1 leather armor", 2, 3),  # Base AC + enchantment
+        # # # Erosion cases
+        ("a rotted leather armor", 2, 1),  # Partial erosion
+        ("a rusty corroded helmet", 1, 0),  # Full erosion
+        ("a thoroughly burnt helmet", 1, 0),  # Over-erosion (should cap at AC)
         # Enchantment + erosion combinations
-        ("leather armor", 2, 2, 1, 3),  # +2 enchant, 1 erosion
-        ("plate mail", 7, -1, 1, 5),  # Negative enchant, partial erosion
-        ("plate mail", 7, 3, 2, 8),  # High enchant, high erosion
+        ("a rotted +2 leather armor", 2, 3),  # +2 enchant, 1 erosion
+        ("a rusty -1 plate mail", 7, 5),  # Negative enchant, partial erosion
+        ("a thoroughly corroded +3 plate mail", 7, 7),  # High enchant, high erosion
         # Different armor types
-        ("crystal plate mail", 7, 0, 0, 7),  # High AC armor
-        ("Hawaiian shirt", 0, 0, 0, 0),  # Low AC armor
+        ("a crystal plate mail", 7, 7),  # High AC armor
+        ("a Hawaiian shirt", 0, 0),  # Low AC armor
     ],
 )
-def test_arm_bonus(name, base_ac, enchantment, erosion, expected_bonus):
-    for glyph, glyph_object in GLYPH_TO_OBJECT.items():
-        if glyph_object.name == name:
-            break
-    else:
-        glyph = None
-
-    item = Item(
-        inv_letter="a",
-        inv_str=np.array([ord(c) for c in name], dtype=np.uint8),
-        inv_oclass=ItemClasses.WEAPON.value,
-        inv_glyph=glyph,
-    )
-    item.enchantment = ItemEnchantment(enchantment)
-    item.erosion = ItemErosion(erosion)
-
-    assert item.object.a_ac == base_ac
+def test_arm_bonus(text, base_ac, expected_bonus):
+    item = Item.from_text(text)
+    assert item.objects[0].a_ac == base_ac
     assert item.arm_bonus == expected_bonus
 
 
 @pytest.mark.parametrize(
-    "full_name,enchantment",
+    "text,enchantment",
     [
-        ("battle-axe", 0),
-        ("+2 battle-axe", 2),
-        ("-1 battle-axe", -1),
+        ("a battle-axe", 0),
+        ("a +2 battle-axe", 2),
+        ("a -1 battle-axe", -1),
         ("a +1 dagger", 1),
         ("51 +2 crossbow bolts (in quiver pouch)", 2),
         ("37 blessed +0 crossbow bolts", 0),
         ("an uncursed +2 cloak of displacement (being worn)", 2),
     ],
 )
-def test_enchantment(full_name, enchantment):
-    assert ItemEnchantment.from_name(full_name).value == enchantment
+def test_enchantment(text, enchantment):
+    item = Item.from_text(text)
+    assert item.enchantment.value == enchantment
 
 
 @pytest.mark.parametrize(
-    "name,nutrition",
+    "text,nutrition",
     [
         # /* special case because it's not mergable */
-        ("meat ring", 5),
-        # /* corpses */
-        ("lichen corpse", 200),
-        ("lizard corpse", 40),
-        ("mastodon corpse", 800),
-        ("killer bee corpse", 5),
-        ("glob of gray ooze", 20),
+        ("a meat ring", 5),
+        # # /* corpses */
+        ("a lichen corpse", 200),
+        ("2 lizard corpses", 80),
+        ("a mastodon corpse", 800),
+        ("a killer bee corpse", 5),
+        ("a glob of gray ooze", 20),
         # /* meat */
-        ("tripe ration", 200),
-        ("corpse", 0),
-        ("egg", 80),
-        ("meatball", 5),
-        ("meat stick", 5),
-        ("huge chunk of meat", 2000),
+        ("a tripe ration", 200),
+        ("a newt corpse", 20),
+        ("an egg", 80),
+        ("a meatball", 5),
+        ("a meat stick", 5),
+        ("a huge chunk of meat", 2000),
         # /* fruits & veggies */
-        ("kelp frond", 30),
-        ("eucalyptus leaf", 30),
-        ("apple", 50),
-        ("orange", 80),
-        ("pear", 50),
-        ("melon", 100),
-        ("banana", 80),
-        ("carrot", 50),
-        ("sprig of wolfsbane", 40),
-        ("clove of garlic", 40),
-        ("slime mold", 250),
+        ("a kelp frond", 30),
+        ("a eucalyptus leaf", 30),
+        ("a apple", 50),
+        ("a orange", 80),
+        ("a pear", 50),
+        ("a melon", 100),
+        ("a banana", 80),
+        ("a carrot", 50),
+        ("a sprig of wolfsbane", 40),
+        ("a clove of garlic", 40),
+        ("a slime mold", 250),
         # /* people food */
-        ("lump of royal jelly", 200),
-        ("cream pie", 100),
-        ("candy bar", 100),
-        ("fortune cookie", 40),
-        ("pancake", 200),
-        ("lembas wafer", 800),
-        ("cram ration", 600),
-        ("food ration", 800),
-        ("K-ration", 400),
-        ("C-ration", 300),
+        ("a lump of royal jelly", 200),
+        ("a cream pie", 100),
+        ("a candy bar", 100),
+        ("a fortune cookie", 40),
+        ("a pancake", 200),
+        ("a lembas wafer", 800),
+        ("a cram ration", 600),
+        ("a food ration", 800),
+        ("a K-ration", 400),
+        ("a C-ration", 300),
         # /* tins have type specified by obj->spe (+1 for spinach, other implies
         #    flesh; negative specifies preparation method {homemade,boiled,&c})
         #    and by obj->corpsenm (type of monster flesh) */
-        ("tin", 0),
+        ("a tin", 0),
     ],
 )
-def test_nutrition(name, nutrition):
-    for glyph, glyph_object in GLYPH_TO_OBJECT.items():
-        if glyph_object.name == name:
-            break
-    else:
-        glyph = None
-
-    item = Item(
-        inv_letter="a",
-        inv_str=np.array([ord(c) for c in name], dtype=np.uint8),
-        inv_oclass=ItemClasses.COMESTIBLES.value,
-        inv_glyph=glyph,
-    )
-
+def test_nutrition(text, nutrition):
+    item = Item.from_text(text)
     assert item.nutrition == nutrition
 
 
 @pytest.mark.parametrize(
-    "full_name,name,oclass,weight",
+    "text,weight",
     [
-        ("100 gold pieces", "gold piece", ItemClasses.COIN, 1),
-        ("red gem", "ruby", ItemClasses.GEM, 1),
-        ("shiny ring", "ring of gain strength", ItemClasses.RING, 3),
-        ("scroll labeled MAPIRO MAHAMA DIROMAT", "scroll of enchant armor", ItemClasses.SCROLL, 5),
-        ("long wand", "wand of wishing", ItemClasses.WAND, 7),
-        ("luckstone", "luckstone", ItemClasses.GEM, 10),
-        ("tripe ration", "tripe ration", ItemClasses.COMESTIBLES, 10),
-        ("lizard corpse", "lizard corpse", ItemClasses.COMESTIBLES, 10),
-        ("bugle", "bugle", ItemClasses.TOOL, 10),
-        ("looking glass", "mirror", ItemClasses.TOOL, 13),
-        ("flail", "flail", ItemClasses.WEAPON, 15),
-        ("bag", "bag of holding", ItemClasses.TOOL, 15),
-        ("oval amulet", "amulet of life saving", ItemClasses.AMULET, 20),
-        ("dark green potion", "potion of speed", ItemClasses.POTION, 20),
-        ("food ration", "food ration", ItemClasses.COMESTIBLES, 20),
-        ("lichen corpse", "lichen corpse", ItemClasses.COMESTIBLES, 20),
-        ("unicorn horn", "unicorn horn", ItemClasses.TOOL, 20),
-        ("mace", "mace", ItemClasses.WEAPON, 30),
-        ("gray dragon scale mail", "gray dragon scale mail", ItemClasses.ARMOR, 40),
-        ("long sword", "long sword", ItemClasses.WEAPON, 40),
-        ("pink spellbook", "spellbook of sleep", ItemClasses.SPELLBOOK, 50),
-        ("fauchard", "fauchard", ItemClasses.WEAPON, 60),
-        ("pick-axe", "pick-axe", ItemClasses.TOOL, 100),
-        ("plate mail", "plate mail", ItemClasses.ARMOR, 450),
-        ("iron ball", "heavy iron ball", ItemClasses.RANDOM, 480),
-        ("loadstone", "loadstone", ItemClasses.ROCK, 500),
-        ("human corpse", "human corpse", ItemClasses.COMESTIBLES, 1450),
-        ("blue dragon corpse", "blue dragon corpse", ItemClasses.COMESTIBLES, 4500),
-        ("boulder", "boulder", ItemClasses.RANDOM, 6000),
+        ("100 gold pieces", 1),
+        ("a red gem", 1),
+        ("a shiny ring", 3),
+        ("a scroll labeled MAPIRO MAHAMA DIROMAT", 5),
+        ("a long wand", 7),
+        ("a luckstone", 10),
+        ("a tripe ration", 10),
+        ("a lizard corpse", 10),
+        ("a bugle", 10),
+        ("a looking glass", 13),
+        ("a flail", 15),
+        ("a bag", 15),
+        ("an oval amulet", 20),
+        ("a dark green potion", 20),
+        ("a food ration", 20),
+        ("a lichen corpse", 20),
+        ("an unicorn horn", 20),
+        ("a mace", 30),
+        ("a gray dragon scale mail", 40),
+        ("a long sword", 40),
+        ("a pink spellbook", 50),
+        ("a fauchard", 60),
+        ("a pick-axe", 100),
+        ("a plate mail", 450),
+        ("a heavy iron ball", 480),
+        ("a loadstone", 500),
+        ("a human corpse", 1450),
+        ("a blue dragon corpse", 4500),
+        ("a boulder", 6000),
     ],
 )
-def test_weight(full_name, name, oclass, weight):
-    for glyph, glyph_object in GLYPH_TO_OBJECT.items():
-        if glyph_object.name == name:
-            break
-    else:
-        assert False
-
-    item = Item(
-        inv_letter="a",
-        inv_str=np.array([ord(c) for c in full_name], dtype=np.uint8),
-        inv_oclass=oclass.value,
-        inv_glyph=glyph,
-    )
-
+def test_weight(text, weight):
+    item = Item.from_text(text)
     assert item.weight == weight
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "a wakizashi",
+        "a ninja-to",
+        "a nunchaku",
+        "a shito",
+        "a naginata",
+        "a gunyoki",
+        "a osaku",
+        "a tanko",
+        "a kabuto",
+        "a yugake",
+        "an unlabeled scroll",
+        "5 unlabeled scrolls",
+        "a scroll of blank paper",
+        "a flint stone",
+        "2 flint stones",
+        "a pair of lenses",
+        "11 knives",
+        "4 eucalyptus leaves",
+    ],
+)
+def test_special(text):
+    Item.from_text(text)
+
+
+@pytest.mark.parametrize(
+    "text",
+    [
+        "an Excalibur",
+        "a Stormbringer",
+        "a Mjollnir",
+        "a Cleaver",
+        "a Grimtooth",
+        "a Orcrist",
+        "a Sting",
+        "a Magicbane",
+        "a Frost Brand",
+        "a Fire Brand",
+        "a Dragonbane",
+        "a Demonbane",
+        "a Werebane",
+        "a Grayswandir",
+        "a Giantslayer",
+        "a Ogresmasher",
+        "a Trollsbane",
+        "a Vorpal Blade",
+        "a Snickersnee",
+        "a Sunsword",
+        "a glass orb named The Orb of Detection",
+        "a gray stone named The Heart of Ahriman",
+        "a mace named The Sceptre of Might",
+        "a crystal ball named The Palantir of Westernesse",
+        "a quarterstaff named The Staff of Aesculapius",
+        "a mirror named The Magic Mirror of Merlin",
+        "a pair of lenses named The Eyes of the Overworld",
+        "a helmet named The Mitre of Holiness",
+        "a bow named The Longbow of Diana",
+        "a key named The Master Key of Thievery",
+        "a tsurugi named The Tsurugi of Muramasa",
+        "a credit card named The Platinum Yendorian Express Card",
+        "a glass orb named The Orb of Fate",
+        "a amulet of ESP named The Eye of the Aethiopica",
+    ],
+)
+def test_artifacts(text):
+    Item.from_text(text)

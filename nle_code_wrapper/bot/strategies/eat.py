@@ -39,10 +39,7 @@ def eat_from_floor(bot: "Bot", item: Item):
 
     bot.step(A.Command.EAT)
     while "; eat it? [ynq]" in bot.message or "; eat one? [ynq]" in bot.message:
-        if (
-            f"{item.full_name} here; eat it? [ynq]" in bot.message
-            or f"{item.full_name} here; eat one? [ynq]" in bot.message
-        ):
+        if f"{item.name} here; eat it? [ynq]" in bot.message or f"{item.name} here; eat one? [ynq]" in bot.message:
             bot.type_text("y")
 
             while "Continue eating?" in bot.message:

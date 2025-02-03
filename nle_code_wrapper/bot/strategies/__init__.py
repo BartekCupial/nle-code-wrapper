@@ -107,13 +107,20 @@ from nle_code_wrapper.bot.strategies.pickup import (
     pickup_wand,
     pickup_weapon,
 )
-from nle_code_wrapper.bot.strategies.quaff import quaff_potion
 from nle_code_wrapper.bot.strategies.random_move import random_move
 from nle_code_wrapper.bot.strategies.run_away import run_away
 from nle_code_wrapper.bot.strategies.search import (
     search_corridor_for_hidden_doors,
     search_for_traps,
     search_room_for_hidden_doors,
+)
+from nle_code_wrapper.bot.strategies.skills_simple import (
+    pray_altar,
+    quaff_fouintain,
+    quaff_potion,
+    quaff_sink,
+    read_scroll,
+    zap_wand,
 )
 from nle_code_wrapper.bot.strategies.takeoff import (
     takeoff_boots,
@@ -125,6 +132,7 @@ from nle_code_wrapper.bot.strategies.takeoff import (
     takeoff_suit,
 )
 from nle_code_wrapper.bot.strategies.wear import (
+    puton_amulet,
     puton_ring,
     wear_boots,
     wear_cloak,
@@ -134,6 +142,7 @@ from nle_code_wrapper.bot.strategies.wear import (
     wear_shirt,
     wear_suit,
 )
+from nle_code_wrapper.bot.strategies.wield import wield_melee_weapon, wield_ranged_set
 from nle_code_wrapper.bot.strategies.zap_monster import approach_and_zap_monster, approach_monster, zap_monster
 
 __all__ = [
@@ -229,7 +238,13 @@ __all__ = [
     pickup_weapon,
     pickup_corpse,
     puton_ring,
+    puton_amulet,
     quaff_potion,
+    quaff_fouintain,
+    quaff_sink,
+    read_scroll,
+    pray_altar,
+    zap_wand,
     wear_boots,
     wear_cloak,
     wear_gloves,
@@ -263,4 +278,6 @@ __all__ = [
     eat_corpse_floor,
     eat_corpse_inventory,
     eat_food_inventory,
+    wield_melee_weapon,
+    wield_ranged_set,
 ]

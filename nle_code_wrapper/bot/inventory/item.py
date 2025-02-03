@@ -1,210 +1,302 @@
 from __future__ import annotations
 
-import enum
-from dataclasses import dataclass
-from typing import Dict, Tuple
+import re
+from typing import List, Optional
 
+import inflect
 from nle import nethack as nh
-from nle_utils.item import ArmorType, ItemBeatitude, ItemClasses, ItemEnchantment, ItemErosion, ItemShopStatus
 
+from nle_code_wrapper.bot.inventory.objects import NAME_TO_OBJECTS, name_to_monsters
+from nle_code_wrapper.bot.inventory.properties import (
+    ArmorClass,
+    GemClass,
+    ItemBeatitude,
+    ItemClass,
+    ItemEnchantment,
+    ItemErosion,
+    ItemQuantity,
+    ShopPrice,
+    ShopStatus,
+    ToolClass,
+    WeaponClass,
+)
 
-class GlyphCategory(enum.Enum):
-    OTHER = -1
-    ITEM = 0
-    MONSTER = 1
-    CORPSE = 2
-    STATUE = 3
-
-
-def name_and_category_from_glyph(glyph) -> Tuple[str, GlyphCategory]:
-    name = ""
-    category = GlyphCategory.OTHER
-
-    if glyph >= nh.GLYPH_STATUE_OFF:
-        permonst = nh.permonst(nh.glyph_to_mon(glyph))
-        mon_name = permonst.mname
-        name = mon_name + " statue"
-
-        obj = nh.objclass(nh.glyph_to_obj(glyph))
-        category = GlyphCategory.STATUE
-    elif glyph >= nh.GLYPH_WARNING_OFF:
-        pass
-    elif glyph >= nh.GLYPH_SWALLOW_OFF:
-        pass
-    elif glyph >= nh.GLYPH_ZAP_OFF:
-        pass
-    elif glyph >= nh.GLYPH_EXPLODE_OFF:
-        pass
-    elif glyph >= nh.GLYPH_CMAP_OFF:
-        pass
-    elif glyph >= nh.GLYPH_OBJ_OFF:
-        obj_name = ""
-        obj_description = ""
-
-        obj = nh.objclass(nh.glyph_to_obj(glyph))
-        obj_class = obj.oc_class
-        category = GlyphCategory.ITEM
-
-        if nh.OBJ_NAME(obj) is not None:
-            obj_name = nh.OBJ_NAME(obj)
-        if nh.OBJ_DESCR(obj) is not None:
-            obj_description = nh.OBJ_DESCR(obj)
-
-        match ItemClasses(ord(obj_class)):
-            case ItemClasses.ILLOBJ:
-                name = obj_name
-            case ItemClasses.WEAPON:
-                name = obj_name
-            case ItemClasses.ARMOR:
-                if len(obj_name) > 0:
-                    name = obj_name
-                else:
-                    name = obj_description
-            case ItemClasses.RING:
-                name = obj_name if "ring" in obj_name else "ring of " + obj_name
-            case ItemClasses.AMULET:
-                name = obj_name
-            case ItemClasses.TOOL:
-                name = obj_name
-            case ItemClasses.COMESTIBLES:
-                name = obj_name + obj_description
-            case ItemClasses.POTION:
-                name = obj_name if "potion" in obj_name else "potion of " + obj_name
-            case ItemClasses.SCROLL:
-                name = obj_name if "scroll" in obj_name else "scroll of " + obj_name
-            case ItemClasses.SPELLBOOK:
-                name = obj_name if "spellbook" in obj_name else "spellbook of " + obj_name
-            case ItemClasses.WAND:
-                name = obj_name if "wand" in obj_name else "wand of " + obj_name
-            case ItemClasses.COIN:
-                name = obj_name
-            case ItemClasses.GEM:
-                name = obj_name
-            case ItemClasses.ROCK:
-                name = obj_name
-            case ItemClasses.BALL:
-                name = obj_name
-            case ItemClasses.CHAIN:
-                name = obj_name
-            case ItemClasses.VENOM:
-                name = "splash of " + obj_name
-            case _:
-                name = ""
-    elif glyph >= nh.GLYPH_RIDDEN_OFF:
-        permonst = nh.permonst(nh.glyph_to_mon(glyph))
-        mon_name = permonst.mname
-        name = "ridden " + mon_name
-        category = GlyphCategory.MONSTER
-    elif glyph >= nh.GLYPH_BODY_OFF:
-        monster_idx = glyph - nh.GLYPH_BODY_OFF
-        permonst = nh.permonst(monster_idx)
-        name = permonst.mname + " corpse"
-        category = GlyphCategory.CORPSE
-    elif glyph >= nh.GLYPH_DETECT_OFF:
-        permonst = nh.permonst(nh.glyph_to_mon(glyph))
-        mon_name = permonst.mname
-        name = "detected " + mon_name
-    elif glyph >= nh.GLYPH_INVIS_OFF:
-        name = "invisible creature"
-    elif glyph >= nh.GLYPH_PET_OFF:
-        permonst = nh.permonst(nh.glyph_to_mon(glyph))
-        mon_name = permonst.mname
-        name = "tame " + mon_name
-        category = GlyphCategory.MONSTER
-    else:
-        permonst = nh.permonst(nh.glyph_to_mon(glyph))
-        mon_name = permonst.mname
-        name = mon_name
-        category = GlyphCategory.MONSTER
-
-    return name, category
-
-
-@dataclass
-class GlyphObject:
-    glyph: int
-    name: str
-    category: GlyphCategory
-
-
-GLYPH_TO_OBJECT: Dict[int, GlyphObject] = {}
-for glyph in range(nh.MAX_GLYPH):
-    name, category = name_and_category_from_glyph(glyph)
-    GLYPH_TO_OBJECT[glyph] = GlyphObject(glyph, name, category)
+p = inflect.engine()
 
 
 class Item:
-    def __init__(self, inv_letter, inv_str, inv_oclass, inv_glyph):
-        glyph_object = GLYPH_TO_OBJECT[inv_glyph]
+    def __init__(
+        self,
+        name: str,
+        objects: List,
+        permonst,
+        letter: Optional[int],
+        quantity: ItemQuantity,
+        beatitude: ItemBeatitude,
+        erosion: ItemErosion,
+        enchantment: ItemEnchantment,
+        shop_status: ShopStatus,
+        shop_price: ShopPrice,
+        item_class: ItemClass,
+        equipped: bool,
+        at_ready: bool,
+    ):
+        self.name = name
+        self.objects = objects
+        self.permonst = permonst
+        self.letter = letter
 
-        self.glyph = inv_glyph
-        self.name = glyph_object.name
-        self.category = glyph_object.category
-        self.letter = inv_letter
-        self.full_name = bytes(inv_str).decode("latin-1")
+        self.quantity = quantity
+        self.beatitude = beatitude
+        self.erosion = erosion
+        self.enchantment = enchantment
+        self.shop_status = shop_status
+        self.shop_price = shop_price
+        self.item_class = item_class
 
-        self.item_class = ItemClasses.from_oclass(inv_oclass)
-        self.beatitude = ItemBeatitude.from_name(self.full_name)
-        self.enchantment = ItemEnchantment.from_name(self.full_name)
-        self.erosion = ItemErosion.from_name(self.full_name)
-        # self.shop_status TODO:
+        self.equipped = equipped
+        self.at_ready = at_ready
+
+        self.tool_class
+
+    @classmethod
+    def from_text(cls, text: str, letter: Optional[int] = None):
+        item_pattern = (
+            # Core item properties
+            r"^(?P<quantity>a|an|the|\d+)"
+            r"(?P<empty> empty)?"
+            r"(?:\s+(?P<beatitude>cursed|uncursed|blessed))?"
+            # Erosion conditions
+            r"(?P<erosion>(?:\s+"  # Start with space if there's a match
+            r"(?:(?:very|thoroughly)\s+)?"  # Intensity modifiers
+            r"(?:rusty|corroded|burnt|rotted)"
+            r")*)"
+            # Other conditions
+            r"(?P<other_condition>(?:\s+"  # Start with space if there's a match
+            r"(?:rustproof|poisoned|"
+            r"partly eaten|partly used|diluted|unlocked|locked|wet|greased)"
+            r")*)"
+            # Item details
+            r"(?:\s+(?P<enchantment>[+-]\d+))?"  # Space before enchantment
+            r"\s+(?P<name>[a-zA-z0-9-!'# ]+)"  # Required space before name
+            # Optional information
+            r"(?:\s+\((?P<uses>[0-9]+:[0-9]+|no charge)\))?"
+            r"(?:\s+\((?P<info>[a-zA-Z0-9; ]+(?:,\s+(?:flickering|gleaming|glimmering))?[a-zA-Z0-9; ]*)\))?"
+            # Shop information
+            r"(?:\s+\((?P<shop_status>for sale|unpaid),\s+"
+            r"(?:\d+\s+aum,\s+)?(?P<shop_price>\d+[a-zA-Z-]+|no charge)\))?"
+            r"$"
+        )
+
+        def clean_matches(match_dict):
+            """Clean up the matched groups by removing None and extra spaces"""
+            if not match_dict:
+                return None
+
+            return {key: value.strip() if value else "" for key, value in match_dict.items()}
+
+        # Usage:
+        matches = re.match(item_pattern, text)
+        if matches:
+            item_info = clean_matches(matches.groupdict())
+
+            name = item_info["name"]
+            quantity = ItemQuantity.from_str(item_info["quantity"])
+            beatitude = ItemBeatitude.from_str(item_info["beatitude"])
+            erosion = ItemErosion.from_str(item_info["erosion"])
+            enchantment = ItemEnchantment.from_str(item_info["enchantment"])
+            shop_status = ShopStatus.from_str(item_info["shop_status"])
+            shop_price = ShopPrice.from_str(item_info["shop_price"])
+
+            # some items can be identified from name
+            if name in ["potion of holy water", "potions of holy water"]:
+                name = "potion of water"
+                beatitude = ItemBeatitude.BLESSED
+            elif name in ["potion of unholy water", "potions of unholy water"]:
+                name = "potion of water"
+                beatitude = ItemBeatitude.CURSED
+            elif name in ["gold piece", "gold pieces"]:
+                beatitude = ItemBeatitude.UNCURSED
+
+            if (
+                item_info["info"]
+                in {"being worn", "being worn; slippery", "wielded", "chained to you", "on right hand", "on left hand"}
+                or item_info["info"].startswith("weapon in ")
+                or item_info["info"].startswith("tethered weapon in ")
+            ):
+                equipped = True
+                at_ready = False
+            elif item_info["info"] in {"at the ready", "in quiver", "in quiver pouch", "lit"}:
+                equipped = False
+                at_ready = True
+            elif item_info["info"] in {"", "alternate weapon; not wielded", "alternate weapon; notwielded"}:
+                equipped = False
+                at_ready = False
+            else:
+                assert False, item_info["info"]
+
+            permonst = None
+            item_class = None
+
+            if "corpse" in name:
+                name = Item.make_singular(name)
+                name = name.removesuffix(" corpse")
+                permonst = name_to_monsters[name]
+                item_class = ItemClass.CORPSE
+                name = "corpse"
+            elif "statue" in name:
+                name = Item.make_singular(name)
+                name = name.removesuffix(" statue")
+                permonst = name_to_monsters[name]
+                item_class = ItemClass.STATUE
+                name = "statue"
+            elif "figurine of" in name or "figurines of" in name:
+                name = Item.make_singular(name)
+                name = name.removeprefix("figurine of ")
+                permonst = name_to_monsters[name]
+                name = "figurine"
+            elif "tin of" in name or "tins of" in name:
+                name = Item.make_singular(name)
+                name = name.removeprefix("tin of ")
+                if "meat" in name:
+                    name = name.removesuffix(" meat")
+                    permonst = name_to_monsters[name]
+                elif "spinach" in name:
+                    pass
+                name = "tin"
+
+            # TODO: what about monsters (python?)
+
+            objects = Item.parse_name(name)
+
+            if item_class is None:
+                item_class = ItemClass.from_oclass(ord(objects[0].oc_class))
+
+            return cls(
+                name=name,
+                objects=objects,
+                permonst=permonst,
+                letter=letter,
+                quantity=quantity,
+                beatitude=beatitude,
+                erosion=erosion,
+                enchantment=enchantment,
+                shop_status=shop_status,
+                shop_price=shop_price,
+                item_class=item_class,
+                equipped=equipped,
+                at_ready=at_ready,
+            )
+        else:
+            raise ValueError()
+
+    @staticmethod
+    def make_singular(plural_word):
+        # exceptions
+        if plural_word in ["looking glass"]:
+            return plural_word
+
+        # Attempt to convert the plural word to singular
+        singular = p.singular_noun(plural_word)
+        # If the word is already singular or cannot be converted, return the original word
+        return singular if singular else plural_word
+
+    @staticmethod
+    def convert_from_japanese(japanese_name):
+        convert_from_japanese = {
+            "wakizashi": "short sword",
+            "ninja-to": "broadsword",
+            "nunchaku": "flail",
+            "naginata": "glaive",
+            "osaku": "lock pick",
+            "koto": "wooden harp",
+            "shito": "knife",
+            "tanko": "plate mail",
+            "kabuto": "helmet",
+            "yugake": "pair of leather gloves",
+            "gunyoki": "food ration",
+            "sake": "booze",
+        }
+        words = japanese_name.split(" ")
+        converted_words = [convert_from_japanese.get(word, word) for word in words]
+        return " ".join(converted_words)
+
+    @staticmethod
+    def parse_name(name):
+        name = Item.make_singular(name)
+        name = Item.convert_from_japanese(name)
+
+        objects = NAME_TO_OBJECTS[name]
+
+        if len(objects) == 0:
+            print(1)
+
+        assert len(objects) >= 1, f"There should be at least one object matching name: {name}"
+
+        lst = [ItemClass(ord(obj.oc_class)) for obj in objects]
+        assert all(x == lst[0] for x in lst), "Objects don't have the same category"
+
+        return objects
 
     def __str__(self):
-        return f"{chr(self.letter)}) {self.full_name}"
+        text = []
+        text.append(f"{chr(self.letter)})" if self.letter else "")
+        text.append(str(self.quantity))
+        text.append(str(self.beatitude))
+        text.append(str(self.erosion))
+        text.append(str(self.enchantment))
+
+        if self.item_class in [ItemClass.CORPSE, ItemClass.STATUE]:
+            text.append(f"{self.permonst.mname} {self.name}")
+        else:
+            text.append(self.name)
+
+        text.append(str(self.shop_status))
+        if self.shop_status in [ShopStatus.UNPAID, ShopStatus.FOR_SALE]:
+            text.append(str(self.shop_price))
+
+        if self.equipped:
+            text.append("(equipped)")
+        if self.at_ready:
+            text.append("(at ready)")
+
+        return " ".join([t for t in text if t])
 
     def __repr__(self):
-        return f"{chr(self.letter)}) {self.full_name}"
-
-    @property
-    def object(self):
-        if self.category in [GlyphCategory.CORPSE, GlyphCategory.ITEM, GlyphCategory.STATUE]:
-            return nh.objclass(nh.glyph_to_obj(self.glyph))
-        else:
-            return None
-
-    @property
-    def quantity(self):
-        if self.full_name.split(" ")[0].isdigit():
-            return int(self.full_name.split(" ")[0])
-        else:
-            return 1
+        return str(self)
 
     """
     WEAPON
     """
 
     @property
-    def is_weapon(self):
-        return self.item_class == ItemClasses.WEAPON
+    def weapon_class(self) -> Optional[WeaponClass]:
+        if self.item_class == ItemClass.WEAPON:
+            return WeaponClass.from_oc_skill(self.objects[0].oc_skill)
 
     @property
-    def main_hand(self):
-        wield_messages = [
-            "(weapon in hands)",
-            "(weapon in right hand)",
-            "(weapon in left hand)",
-            "(weapon in hand)",
-            "(wielded)",
-        ]
-        return any([message in self.full_name for message in wield_messages])
+    def is_weapon(self) -> bool:
+        if not self.item_class == ItemClass.WEAPON:
+            return False
 
-    @property
-    def off_hand(self):
-        wield_messages = [
-            " (alternate weapon; not wielded)",
-            " (wielded in other ",
-        ]
-        return any([message in self.full_name for message in wield_messages])
+        return self.weapon_class == WeaponClass.WEAPON
 
     @property
     def is_launcher(self):
-        if not self.is_weapon:
+        if not self.item_class == ItemClass.WEAPON:
             return False
 
-        return self.name in ["bow", "long bow", "elven bow", "orcish bow", "yumi", "crossbow", "sling"]
+        return self.weapon_class == WeaponClass.BOW
+
+    @property
+    def is_projectile(self) -> bool:
+        if not self.item_class == ItemClass.WEAPON:
+            return False
+
+        return self.weapon_class == WeaponClass.PROJECTILE
 
     def can_shoot_projectile(self, projectile: Item):
-        if not self.is_weapon:
+        if not self.is_launcher:
             return False
 
         arrows = ["arrow", "elven arrow", "orcish arrow", "silver arrow", "ya"]
@@ -222,23 +314,11 @@ class Item:
 
     @property
     def is_firing_projectile(self):
-        if not self.is_weapon:
-            return False
-
-        return self.name in [
-            "arrow",
-            "elven arrow",
-            "orcish arrow",
-            "silver arrow",
-            "ya",
-            "crossbow bolt",
-        ]  # TODO: sling ammo
+        # TODO: sling ammo
+        return self.is_projectile
 
     @property
     def is_thrown_projectile(self):
-        if not self.is_weapon:
-            return False
-
         return self.name in [
             "boomerang",
             "dagger",
@@ -260,23 +340,13 @@ class Item:
     """
 
     @property
-    def is_armor(self):
-        return self.item_class == ItemClasses.ARMOR
-
-    @property
-    def armor_type(self):
-        if self.is_armor:
-            return ArmorType(self.object.oc_armcat)
+    def armor_class(self):
+        if self.item_class == ItemClass.ARMOR:
+            return ArmorClass(self.objects[0].oc_armcat)
 
     @property
     def arm_bonus(self):
-        if self.object is None:
-            return 0
-        return self.object.a_ac + self.enchantment.value - min(self.erosion.value, self.object.a_ac)
-
-    @property
-    def is_worn(self):
-        return "(being worn)" in self.full_name
+        return self.objects[0].a_ac + self.enchantment.value - min(self.erosion.value, self.objects[0].a_ac)
 
     """
     COMESTIBLES
@@ -284,19 +354,11 @@ class Item:
 
     @property
     def is_corpse(self):
-        return self.item_class == ItemClasses.COMESTIBLES and self.category == GlyphCategory.CORPSE
+        return self.item_class == ItemClass.CORPSE
 
     @property
     def is_food(self):
-        return self.item_class == ItemClasses.COMESTIBLES and self.category == GlyphCategory.ITEM
-
-    """
-    TOOLS
-    """
-
-    @property
-    def is_key(self):
-        return self.item_class == ItemClasses.TOOL and self.name in ["skeleton key", "lock pick", "credit card"]
+        return self.item_class == ItemClass.COMESTIBLES
 
     @property
     def nutrition(self):
@@ -304,21 +366,40 @@ class Item:
 
         # Determine base nutrition value based on object type
         # NOTE: skipped globby and special cases for certain food types
-        if self.category == GlyphCategory.CORPSE:
-            monster_idx = self.glyph - nh.GLYPH_BODY_OFF
-            permonst = nh.permonst(nh.glyph_to_mon(monster_idx))
-            nut = permonst.cnutrit
+        if self.item_class == ItemClass.CORPSE:
+            nut = self.permonst.cnutrit
         else:
-            nut = self.object.oc_nutrition
+            nut = self.objects[0].oc_nutrition
 
-        return nut
+        return self.quantity.value * nut
+
+    """
+    TOOLS
+    """
+
+    # TODO:
+    @property
+    def tool_class(self):
+        if self.item_class == ItemClass.TOOL:
+            return ToolClass(1)
+
+    @property
+    def is_key(self):
+        return self.item_class == ItemClass.TOOL and self.name in ["skeleton key", "lock pick", "credit card"]
+
+    """
+    GEMS
+    """
+
+    # TODO:
+    @property
+    def gem_class(self):
+        if self.item_class == ItemClass.GEM:
+            return GemClass(self.objects[0].oc_tough)
 
     @property
     def weight(self):
-        if self.object is None:
-            return 0
-
-        wt = self.object.oc_weight
+        wt = self.objects[0].oc_weight
 
         # NOTE: we ignore globby, partly_eaten (food, corpses), candelabrum
 
@@ -363,17 +444,15 @@ class Item:
         #         wt = eaten_stat(wt, obj);
         #     return wt;
         # long_wt = obj.quan * mons[obj.corpsenm].cwt
-        if self.category == GlyphCategory.CORPSE:
-            monster_idx = self.glyph - nh.GLYPH_BODY_OFF
-            permonst = nh.permonst(nh.glyph_to_mon(monster_idx))
-            return self.quantity * permonst.cwt
+        if self.item_class == ItemClass.CORPSE:
+            return self.quantity.value * self.permonst.cwt
             # NOTE: we ignore partly eaten
 
         # coin
         # } else if (obj->oclass == COIN_CLASS) {
         #     return (int) ((obj->quan + 50L) / 100L);
-        if self.item_class == ItemClasses.COIN:
-            return (self.quantity + 50) // 100
+        if self.item_class == ItemClass.COIN:
+            return (self.quantity.value + 50) // 100
 
         # heavy iron ball
         # } else if (obj->otyp == HEAVY_IRON_BALL && obj->owt != 0) {
@@ -381,6 +460,6 @@ class Item:
         # TODO:
 
         if wt:
-            return wt * self.quantity
+            return self.quantity.value * wt
         else:
-            return (self.quantity + 1) >> 1
+            return (self.quantity.value + 1) >> 1

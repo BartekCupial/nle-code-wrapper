@@ -3,10 +3,9 @@ from typing import List, Union
 
 from nle.nethack import actions as A
 from nle_utils.glyph import G
-from nle_utils.item import ItemClasses
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import GLYPH_TO_OBJECT
+from nle_code_wrapper.bot.inventory import ItemClass
 from nle_code_wrapper.bot.strategies.goto import goto_glyph
 from nle_code_wrapper.bot.strategy import strategy
 
@@ -15,7 +14,7 @@ from nle_code_wrapper.bot.strategy import strategy
 # TODO: currently there can be a loop, pickup_armor, we are standing on ring
 # we will pickup ring drop it and return
 @strategy
-def pickup_item(bot: "Bot", item_class: ItemClasses, include_corpses: bool = False):
+def pickup_item(bot: "Bot", item_class: ItemClass, include_corpses: bool = False):
     bot.step(A.Command.PICKUP)
 
     # Check if the game shows a single item, e.g. "a - a cloudy potion"
@@ -77,7 +76,7 @@ def pickup_item(bot: "Bot", item_class: ItemClasses, include_corpses: bool = Fal
                     continue
 
                 # 2) when we reach item category we are interested in start marking
-                if item_class.name.lower() in line.lower():
+                if not mark_items and item_class.name.lower() in line.lower():
                     mark_items = True
                     continue
 
@@ -124,35 +123,35 @@ def pickup_coin(bot: "Bot") -> bool:
     """
     Makes bot pick up coins from the floor.
     """
-    return pickup_item(bot, ItemClasses.COIN)
+    return pickup_item(bot, ItemClass.COIN)
 
 
 def pickup_amulet(bot: "Bot") -> bool:
     """
     Makes bot pick up amulets from the floor.
     """
-    return pickup_item(bot, ItemClasses.AMULET)
+    return pickup_item(bot, ItemClass.AMULET)
 
 
 def pickup_weapon(bot: "Bot") -> bool:
     """
     Makes bot pick up weapons from the floor.
     """
-    return pickup_item(bot, ItemClasses.WEAPON)
+    return pickup_item(bot, ItemClass.WEAPON)
 
 
 def pickup_armor(bot: "Bot") -> bool:
     """
     Makes bot pick up armor and shieds from the floor.
     """
-    return pickup_item(bot, ItemClasses.ARMOR)
+    return pickup_item(bot, ItemClass.ARMOR)
 
 
 def pickup_food(bot: "Bot") -> bool:
     """
     Makes bot pick up food from the floor.
     """
-    return pickup_item(bot, ItemClasses.COMESTIBLES, include_corpses=False)
+    return pickup_item(bot, ItemClass.COMESTIBLES, include_corpses=False)
 
 
 @strategy
@@ -160,56 +159,56 @@ def pickup_corpse(bot: "Bot") -> bool:
     """
     Makes bot pick up corpse from the floor.
     """
-    return pickup_item(bot, ItemClasses.COMESTIBLES, include_corpses=True)
+    return pickup_item(bot, ItemClass.COMESTIBLES, include_corpses=True)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
     """
     Makes bot pick up scrolls from the floor.
     """
-    return pickup_item(bot, ItemClasses.SCROLL)
+    return pickup_item(bot, ItemClass.SCROLL)
 
 
 def pickup_spellbook(bot: "Bot") -> bool:
     """
     Makes bot pick up spellbooks from the floor.
     """
-    return pickup_item(bot, ItemClasses.SPELLBOOK)
+    return pickup_item(bot, ItemClass.SPELLBOOK)
 
 
 def pickup_potion(bot: "Bot") -> bool:
     """
     Makes bot pick up potions from the floor.
     """
-    return pickup_item(bot, ItemClasses.POTION)
+    return pickup_item(bot, ItemClass.POTION)
 
 
 def pickup_ring(bot: "Bot") -> bool:
     """
     Makes bot pick up rings from the floor.
     """
-    return pickup_item(bot, ItemClasses.RING)
+    return pickup_item(bot, ItemClass.RING)
 
 
 def pickup_wand(bot: "Bot") -> bool:
     """
     Makes bot pick up wands from the floor.
     """
-    return pickup_item(bot, ItemClasses.WAND)
+    return pickup_item(bot, ItemClass.WAND)
 
 
 def pickup_tool(bot: "Bot") -> bool:
     """
     Makes bot pick up tools from the floor.
     """
-    return pickup_item(bot, ItemClasses.TOOL)
+    return pickup_item(bot, ItemClass.TOOL)
 
 
 def pickup_gem(bot: "Bot") -> bool:
     """
     Makes bot pick up gems from the floor.
     """
-    return pickup_item(bot, ItemClasses.GEM)
+    return pickup_item(bot, ItemClass.GEM)
 
 
 # PICKUP TOOLS
@@ -231,7 +230,7 @@ def pickup_gem(bot: "Bot") -> bool:
 #         tool_glyphs = frozenset(
 #             glyph
 #             for glyph, obj in GLYPH_TO_OBJECT.items()
-#             if obj["obj_class"] == chr(ItemClasses.TOOL.value) and obj["obj_description"] == description
+#             if obj["obj_class"] == chr(ItemClass.TOOL.value) and obj["obj_description"] == description
 #         )
 #         return pickup_glyph(bot, tool_glyphs)
 

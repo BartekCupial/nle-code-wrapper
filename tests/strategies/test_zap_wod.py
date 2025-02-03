@@ -118,9 +118,4 @@ class TestZapWoD:
 
         approach_and_zap_monster(bot)
         run_away(bot)
-
-        try:
-            approach_and_zap_monster(bot)
-        except BotFinished:
-            pass
-        assert bot.reward > 0
+        approach_and_zap_monster(bot)

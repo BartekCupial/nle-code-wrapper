@@ -3,8 +3,8 @@ from typing import TYPE_CHECKING, List, Optional, Tuple
 
 import numpy as np
 from nle.nethack import actions as A
-from nle_utils.role import Role
 
+from nle_code_wrapper.bot.character import Role
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.exceptions import EnemyAppeared
 from nle_code_wrapper.bot.inventory import Item
@@ -111,9 +111,20 @@ class Pvp:
     def wield_best_melee_weapon(self):
         best_melee_weapon = self.get_best_melee_weapon()
         if best_melee_weapon:
-            if best_melee_weapon != self.bot.inventory.main_hand:
+            if not best_melee_weapon.equipped:
                 self.bot.step(A.Command.WIELD)
                 self.bot.step(best_melee_weapon.letter)
+
+            # we should have weapon at equipped now
+            if not best_melee_weapon.equipped:
+                return False
+
+            return True
+        else:
+            if self.bot.character.role == Role.MONK:
+                return True
+            else:
+                return False
 
     def get_best_melee_weapon(self) -> Item:
         if self.bot.character.role == Role.MONK:
@@ -166,8 +177,7 @@ class Pvp:
                 return (p1[0] + dx, p1[1] + dy)
 
             # 1) Check ranged weapon and ammo
-            launcher, ammo = self.get_best_ranged_set()
-            if not launcher and not ammo:
+            if not self.wield_best_ranged_set():
                 return False
 
             # 2) Get into range
@@ -187,9 +197,8 @@ class Pvp:
 
             # 4) Execute attack
             self.bot.step(A.Command.FIRE)
-            if self.bot.in_yn_function and "In what direction?" not in self.bot.message:
-                self.bot.step(ammo.letter)
-            self.bot.pathfinder.direction(direction)
+            if "In what direction?" in self.bot.message:
+                self.bot.pathfinder.direction(direction)
             return True
 
         self.handle_combat(entity, attack_action)
@@ -202,11 +211,36 @@ class Pvp:
                 continue
 
             p = position
-            while level.safe_walkable(p[0] + dx, p[1] + dy):
+            while level.safe_walkable[p[0] + dx, p[1] + dy]:
                 p = (p[0] + dx, p[1] + dy)
                 positions.append(p)
 
         return positions
+
+    def wield_best_ranged_set(self):
+        best_launcher, best_ammo = self.get_best_ranged_set()
+        if not best_launcher and not best_ammo:
+            return False
+
+        if best_launcher:
+            if not best_launcher.equipped:
+                self.bot.step(A.Command.WIELD)
+                self.bot.step(best_launcher.letter)
+
+            # we should have launcher equipped now
+            if not best_launcher.equipped:
+                return False
+
+        if best_ammo:
+            if not best_ammo.at_ready:
+                self.bot.step(A.Command.QUIVER)
+                self.bot.step(best_ammo.letter)
+
+            # we should have ammo at ready now
+            if not best_ammo.at_ready:
+                return False
+
+        return True
 
     def get_best_ranged_set(self) -> Tuple[Item, Item]:
         best_launcher, best_ammo, best_dps = None, None, -np.inf
@@ -279,12 +313,12 @@ class Pvp:
 
         # First try wands of death, then cold, then any other wands
         wand_priorities = [
-            lambda item: "wand of death" in item.full_name,
-            lambda item: "wand of cold" in item.full_name,
-            lambda item: "wand of striking" in item.full_name,
-            lambda item: "wand of fire" in item.full_name,
-            lambda item: "wand of lightning" in item.full_name,
-            lambda item: "wand of sleep" in item.full_name,
+            lambda item: "wand of death" in item.name,
+            lambda item: "wand of cold" in item.name,
+            lambda item: "wand of striking" in item.name,
+            lambda item: "wand of fire" in item.name,
+            lambda item: "wand of lightning" in item.name,
+            lambda item: "wand of sleep" in item.name,
             lambda item: True,
         ]
 
