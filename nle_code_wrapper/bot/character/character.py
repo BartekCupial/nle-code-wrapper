@@ -3,12 +3,9 @@ from typing import TYPE_CHECKING, Optional
 import nle.nethack as nh
 import numpy as np
 from nle.nethack import actions as A
-from nle_utils.alignment import Alignment
-from nle_utils.gender import Gender
-from nle_utils.race import Race
-from nle_utils.role import Role
-from nle_utils.skill import P_SKILLS, Skill
 
+from nle_code_wrapper.bot.character.properties import Alignment, Gender, Race, Role
+from nle_code_wrapper.bot.character.skill import CharacterSkills, Skill
 from nle_code_wrapper.bot.inventory import Item
 
 if TYPE_CHECKING:
@@ -119,7 +116,7 @@ class Character:
         self.race = Race.from_str(race)
         self.alignment = Alignment.from_str(alignment)
         self.gender = Gender.from_str(gender)
-        self.skill = Skill.from_role(self.role)
+        self.skill = CharacterSkills.from_role(self.role)
         self.init = True
 
     def parse_welcome(self, message):
@@ -130,7 +127,7 @@ class Character:
         self.gender = Gender.parse(message)
         self.role = Role.parse(message)
         self.alignment = Alignment.parse(message)
-        self.skill = Skill.from_role(self.role)
+        self.skill = CharacterSkills.from_role(self.role)
         self.init = True
 
     def get_melee_bonus(self, weapon: Optional[Item] = None):
@@ -338,11 +335,11 @@ class Character:
         """
         if weapon is None:
             if self.role in (Role.MONK, Role.SAMURAI):
-                return self.skill.martial_bonus[self.skill.skill_levels[P_SKILLS.P_BARE_HANDED_COMBAT.value]]
+                return self.skill.martial_bonus[self.skill.skill_levels[Skill.BARE_HANDED_COMBAT.value]]
             else:
-                return self.skill.unarmed_bonus[self.skill.skill_levels[P_SKILLS.P_BARE_HANDED_COMBAT.value]]
+                return self.skill.unarmed_bonus[self.skill.skill_levels[Skill.BARE_HANDED_COMBAT.value]]
 
-        wep_type = P_SKILLS(np.abs(weapon.object.oc_skill))
+        wep_type = CharacterSkills(np.abs(weapon.objects[0].oc_skill))
         return self.skill.weapon_bonus[self.skill.skill_levels[wep_type.value]]
 
     def __str__(self):
