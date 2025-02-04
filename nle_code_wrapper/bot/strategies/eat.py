@@ -1,7 +1,9 @@
+import re
+
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import Item
+from nle_code_wrapper.bot.inventory import Item, ItemClass
 from nle_code_wrapper.bot.strategy import strategy
 
 
@@ -34,9 +36,6 @@ def eat_from_inventory(bot: "Bot", item: Item):
 
 
 def eat_from_floor(bot: "Bot", item: Item):
-    # TODO: implement items_below_me
-    assert item in bot.items_below_me
-
     bot.step(A.Command.EAT)
     while "; eat it? [ynq]" in bot.message or "; eat one? [ynq]" in bot.message:
         if f"{item.name} here; eat it? [ynq]" in bot.message or f"{item.name} here; eat one? [ynq]" in bot.message:
@@ -84,19 +83,26 @@ def eat_corpse_inventory(bot: "Bot"):
 @strategy
 def eat_corpse_floor(bot: "Bot"):
     """
-    Eats corpse from floor.
+    Eats corpse from floor directly below us.
     """
-    bot.step(A.Command.EAT)
-    while "; eat it? [ynq]" in bot.message or "; eat one? [ynq]" in bot.message:
-        if "corpse" in bot.message:
-            bot.type_text("y")
+    bot.step(A.Command.LOOK)
 
-            while "Continue eating?" in bot.message:
-                bot.type_text("n")  # prevent choking on food
+    # only one item
+    if match := re.search(r"You see here(.*?)\.", bot.message):
+        text = match.group(1).strip()
+        item = Item.from_text(text)
+        if item.item_class == ItemClass.CORPSE:
+            return eat_from_floor(bot, item)
 
-            if "You finish eating" in bot.message or "You're finally finished." in bot.message:
-                return True
-        else:
-            bot.type_text("n")
+    # multiple items
+    elif match := re.search(r"Things that are here:(.*?)(?=\n|$)(.*)", bot.message, re.DOTALL):
+        items = []
+        lines = match.group(2).strip().split("\n")
+        for line in lines:
+            item = Item.from_text(line)
+            items.append(item)
 
-    return False
+        # check if there is an item we would like to eat
+        if corpses := [item for item in items if item.item_class == ItemClass.CORPSE]:
+            # top corpse will be the most fresh
+            return eat_from_floor(bot, corpses[0])

@@ -52,10 +52,10 @@ def look(bot: "Bot", item_class: ItemClass) -> bool:
             return True
 
     # multiple items
-    elif "Things that are here:" in bot.message:
+    elif match := re.search(r"Things that are here:(.*?)(?=\n|$)(.*)", bot.message, re.DOTALL):
         items = []
-        lines = bot.message.strip().split("\n")
-        for line in lines[1:]:
+        lines = match.group(2).strip().split("\n")
+        for line in lines:
             item = Item.from_text(line)
             items.append(item)
 
