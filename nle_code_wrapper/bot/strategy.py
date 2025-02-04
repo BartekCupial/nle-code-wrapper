@@ -1,11 +1,12 @@
 from functools import wraps
 
 import numpy as np
+from nle import nethack
 from nle_utils.glyph import G
 from scipy import ndimage
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.exceptions import BotFinished
+from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features, save_boolean_array_pillow
@@ -30,8 +31,15 @@ def strategy(func):
             bot.truncated = True
             raise BotFinished
 
-        ret = func(bot, *args, **kwargs)
-        bot.movements = None
+        try:
+            temp_movements = bot.movements
+            # default movements
+            levitating = True if bot.blstats.prop_mask & nethack.BL_MASK_LEV else False
+            bot.movements = Movements(bot, levitating=levitating)
+            ret = func(bot, *args, **kwargs)
+        except (BotPanic, BotFinished) as e:
+            bot.movements = temp_movements
+            raise e
 
         return ret
 
