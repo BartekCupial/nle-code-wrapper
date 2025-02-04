@@ -36,7 +36,7 @@ class Bot:
         self.env = env
         self.gamma = gamma
 
-        self._movements: Movements = None
+        self.movements: Movements = Movements(self)
         self.character: Character = Character(self, self.env.gym_env.unwrapped.character)
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.inventory_mangager: InventoryManager = InventoryManager(self)
@@ -45,18 +45,6 @@ class Bot:
         self.strategies: list[Callable] = []
         self.panics: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
-
-    @property
-    def movements(self):
-        if self._movements is None:
-            levitating = True if self.blstats.prop_mask & nethack.BL_MASK_LEV else False
-            self._movements = Movements(self, levitating=levitating)
-
-        return self._movements
-
-    @movements.setter
-    def movements(self, new_movements) -> None:
-        self._movements = new_movements
 
     def strategy(self, func: Callable) -> None:
         """
@@ -106,7 +94,6 @@ class Bot:
         self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         self.update()
-        self.movements = None
 
         return self.current_obs, self.last_info
 

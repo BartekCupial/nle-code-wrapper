@@ -4,6 +4,7 @@ from nle_code_wrapper.bot.strategies import (
     eat_corpse_floor,
     eat_corpse_inventory,
     eat_food_inventory,
+    goto_corpse,
     pickup_corpse,
     pickup_food,
 )
@@ -33,6 +34,7 @@ class TestEat:
         bot.reset(seed=seed)
 
         pickup_food(bot)
+        goto_corpse(bot)
         assert eat_corpse_floor(bot)
 
     @pytest.mark.parametrize(
@@ -54,8 +56,9 @@ class TestEat:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        pickup_corpse(bot)
         pickup_food(bot)
+        pickup_food(bot)
+        pickup_corpse(bot)
         assert eat_corpse_inventory(bot)
 
     @pytest.mark.parametrize(
