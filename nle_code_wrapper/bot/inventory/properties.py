@@ -84,10 +84,23 @@ class ToolClass(enum.Enum):
     WEPTOOL = 1  # tools useful as weapons
     CONTAINER = 2  # containers
     KEY = 3
+    LIGHT = 4
 
     @classmethod
-    def from_obj(cls, obj):
-        return cls()
+    def from_name(cls, name):
+        match name:
+            case "pick-axe" | "grappling hook" | "iron hook" | "unicorn horn":
+                return ToolClass.WEPTOOL
+            case (
+                "large box" | "chest" | "ice box" | "sack" | "oilskin sack" | "bag of holding" | "bag of tricks" | "bag"
+            ):
+                return ToolClass.CONTAINER
+            case "skeleton key" | "lock pick" | "credit card" | "key":
+                return ToolClass.KEY
+            case "tallow candle" | "wax candle" | "candle" | "brass lantern" | "oil lamp" | "magic lamp" | "lamp":
+                return ToolClass.LIGHT
+            case _:
+                return ToolClass.TOOL
 
     def __str__(self):
         return self.name.lower()

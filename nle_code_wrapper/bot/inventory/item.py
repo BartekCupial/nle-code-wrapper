@@ -426,11 +426,11 @@ class Item:
     @property
     def tool_class(self):
         if self.item_class == ItemClass.TOOL:
-            return ToolClass(1)
+            return ToolClass.from_name(self.nam)
 
     @property
     def is_key(self):
-        return self.item_class == ItemClass.TOOL and self.name in ["skeleton key", "lock pick", "credit card"]
+        return self.tool_class == ToolClass.KEY
 
     """
     GEMS
