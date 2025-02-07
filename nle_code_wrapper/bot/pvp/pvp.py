@@ -177,6 +177,10 @@ class Pvp:
                 return (p1[0] + dx, p1[1] + dy)
 
             # 1) Check ranged weapon and ammo
+            # Control questions:
+            # - what happens when you run out of ammo?
+            #   wield_best_ranged_set will just return False and we are out of the strategy
+            #   we could also raise BotPanic no ammo
             if not self.wield_best_ranged_set():
                 return False
 

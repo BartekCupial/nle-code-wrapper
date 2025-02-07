@@ -28,7 +28,7 @@ class TestFightRanged:
         ],
     )
     @pytest.mark.parametrize("seed", list(range(3)))
-    def test_fight_multiple_monsters_dark(self, env, seed):
+    def test_fight_ranged(self, env, seed):
         cfg = parse_minihack_args(
             argv=[
                 f"--env={env}",
@@ -44,4 +44,7 @@ class TestFightRanged:
 
         goto_item(bot)
         goto_corridor(bot)
-        fight_ranged(bot)
+        while fight_ranged(bot):
+            pass
+        with pytest.raises(BotFinished):
+            descend_stairs(bot)

@@ -8,8 +8,6 @@ from nle_code_wrapper.bot.strategy import strategy
 
 
 def eat_from_inventory(bot: "Bot", item: Item):
-    assert item in bot.inventory.items
-
     bot.step(A.Command.EAT)
 
     # 1) get out of eating stuff from the floor

@@ -223,8 +223,11 @@ class Item:
                 name = "egg"
 
             # TODO: what about monsters (python?)
+            name = Item.make_singular(name)
+            name = Item.convert_from_japanese(name)
 
-            objects = Item.parse_name(name)
+            # TODO objects
+            objects = Item.name_to_objects(name)
 
             if item_class is None:
                 item_class = ItemClass.from_oclass(ord(objects[0].oc_class))
@@ -278,10 +281,7 @@ class Item:
         return " ".join(converted_words)
 
     @staticmethod
-    def parse_name(name):
-        name = Item.make_singular(name)
-        name = Item.convert_from_japanese(name)
-
+    def name_to_objects(name):
         objects = NAME_TO_OBJECTS[name]
 
         if len(objects) == 0:
