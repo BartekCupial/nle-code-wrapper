@@ -9,6 +9,7 @@ if TYPE_CHECKING:
 class InventoryManager:
     def __init__(self, bot: "Bot"):
         self.bot = bot
+        self.inventory = Inventory()
 
     def update(self):
         # TODO: we should add items, but handle them differently
@@ -16,7 +17,7 @@ class InventoryManager:
         # when blinded (set obj to unknown)
         if not self.bot.hallucinating and not self.bot.blinded:
             last_obs = self.bot.current_obs
-            self.inventory = Inventory(
+            self.inventory.update(
                 last_obs["inv_strs"],
                 last_obs["inv_letters"],
                 last_obs["inv_oclasses"],

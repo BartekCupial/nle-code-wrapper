@@ -27,10 +27,11 @@ p = inflect.engine()
 class Item:
     def __init__(
         self,
+        text: str,
+        letter: Optional[int],
         name: str,
         objects: List,
         permonst,
-        letter: Optional[int],
         quantity: ItemQuantity,
         beatitude: ItemBeatitude,
         erosion: ItemErosion,
@@ -41,10 +42,12 @@ class Item:
         equipped: bool,
         at_ready: bool,
     ):
+        self.text = text
+        self.letter = letter
+
         self.name = name
         self.objects = objects
         self.permonst = permonst
-        self.letter = letter
 
         self.quantity = quantity
         self.beatitude = beatitude
@@ -61,6 +64,42 @@ class Item:
 
     @classmethod
     def from_text(cls, text: str, letter: Optional[int] = None):
+        properties = cls.parse_item_text(text)
+        return cls(
+            text=text,
+            letter=letter,
+            name=properties["name"],
+            objects=properties["objects"],
+            permonst=properties["permonst"],
+            quantity=properties["quantity"],
+            beatitude=properties["beatitude"],
+            erosion=properties["erosion"],
+            enchantment=properties["enchantment"],
+            shop_status=properties["shop_status"],
+            shop_price=properties["shop_price"],
+            item_class=properties["item_class"],
+            equipped=properties["equipped"],
+            at_ready=properties["at_ready"],
+        )
+
+    def update_from_text(self, text):
+        properties = Item.parse_item_text(text)
+        self.text = text
+        self.name = properties["name"]
+        self.objects = properties["objects"]
+        self.permonst = properties["permonst"]
+        self.quantity = properties["quantity"]
+        self.beatitude = properties["beatitude"]
+        self.erosion = properties["erosion"]
+        self.enchantment = properties["enchantment"]
+        self.shop_status = properties["shop_status"]
+        self.shop_price = properties["shop_price"]
+        self.item_class = properties["item_class"]
+        self.equipped = properties["equipped"]
+        self.at_ready = properties["at_ready"]
+
+    @staticmethod
+    def parse_item_text(text):
         item_pattern = (
             # Core item properties
             r"^(?P<quantity>a|an|the|\d+)"
@@ -190,11 +229,10 @@ class Item:
             if item_class is None:
                 item_class = ItemClass.from_oclass(ord(objects[0].oc_class))
 
-            return cls(
+            return dict(
                 name=name,
                 objects=objects,
                 permonst=permonst,
-                letter=letter,
                 quantity=quantity,
                 beatitude=beatitude,
                 erosion=erosion,
