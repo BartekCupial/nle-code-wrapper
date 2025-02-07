@@ -332,23 +332,14 @@ class Item:
 
     @property
     def is_weapon(self) -> bool:
-        if not self.item_class == ItemClass.WEAPON:
-            return False
-
         return self.weapon_class == WeaponClass.WEAPON
 
     @property
     def is_launcher(self):
-        if not self.item_class == ItemClass.WEAPON:
-            return False
-
         return self.weapon_class == WeaponClass.BOW
 
     @property
     def is_projectile(self) -> bool:
-        if not self.item_class == ItemClass.WEAPON:
-            return False
-
         return self.weapon_class == WeaponClass.PROJECTILE
 
     def can_shoot_projectile(self, projectile: Item):
@@ -361,8 +352,7 @@ class Item:
             return projectile.name == "crossbow bolt"
 
         if self.name == "sling":
-            # TODO: implement sling ammo validation
-            return False
+            return projectile.gem_class == GemClass.ROCK
 
         bows = ["bow", "long bow", "elven bow", "orcish bow", "yumi"]
         if self.name in bows:
@@ -370,8 +360,7 @@ class Item:
 
     @property
     def is_firing_projectile(self):
-        # TODO: sling ammo
-        return self.is_projectile
+        return self.is_projectile or self.gem_class == GemClass.ROCK
 
     @property
     def is_thrown_projectile(self):
@@ -447,11 +436,10 @@ class Item:
     GEMS
     """
 
-    # TODO:
     @property
     def gem_class(self):
         if self.item_class == ItemClass.GEM:
-            return GemClass(self.objects[0].oc_tough)
+            return GemClass.from_name(self.name)
 
     @property
     def weight(self):

@@ -101,8 +101,18 @@ class GemClass(enum.Enum):
     ROCK = 1
 
     @classmethod
-    def from_oc_tough(cls, oc_tough):
-        return cls(oc_tough)
+    def from_name(cls, name):
+        if name in [
+            "luckstone",
+            "loadstone",
+            "touchstone",
+            "rock",
+            "flint stone",
+            "gray stone",
+        ]:
+            return GemClass.ROCK
+        else:
+            return GemClass.GEM
 
     def __str__(self):
         return self.name.lower()
