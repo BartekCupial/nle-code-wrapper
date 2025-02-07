@@ -239,6 +239,9 @@ class Pvp:
             if not best_ammo.at_ready:
                 self.bot.step(A.Command.QUIVER)
                 self.bot.step(best_ammo.letter)
+                if self.bot.in_yn_function:
+                    self.bot.type_text("n")  # Your alternate weapon is {x} {item.name} Ready {x-1} of them? -> no
+                    self.bot.type_text("y")  # Ready all of them instead? -> yes
 
             # we should have ammo at ready now
             if not best_ammo.at_ready:
@@ -255,9 +258,9 @@ class Pvp:
         return best_launcher, best_ammo
 
     def get_ranged_combinations(self):
-        weapons: List[Item] = self.bot.inventory["weapons"]
-        launchers = [i for i in weapons if i.is_launcher]
-        ammo_list = [i for i in weapons if i.is_firing_projectile]
+        items: List[Item] = self.bot.inventory.items.values()
+        launchers = [i for i in items if i.is_launcher]
+        ammo_list = [i for i in items if i.is_firing_projectile]
         valid_combinations = []
 
         for launcher in launchers:
@@ -271,7 +274,7 @@ class Pvp:
         valid_combinations.extend(
             [
                 (None, i)
-                for i in weapons
+                for i in items
                 if i.is_thrown_projectile and i != best_melee_weapon and i != wielded_melee_weapon
             ]
         )
