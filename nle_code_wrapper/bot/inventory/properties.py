@@ -8,7 +8,7 @@ from nle import nethack as nh
 from nle_code_wrapper.bot.character.skill import Skill
 
 
-class ItemClass(enum.Enum):
+class ItemCategory(enum.Enum):
     RANDOM = nh.RANDOM_CLASS  # used for generating random objects
     ILLOBJ = nh.ILLOBJ_CLASS
     COIN = nh.COIN_CLASS
@@ -32,14 +32,11 @@ class ItemClass(enum.Enum):
     MONSTER = nh.MAXOCLASSES + 2
 
     @classmethod
-    def from_oclass(cls, oclass: int) -> ItemClass:
-        return cls(oclass)
+    def from_glyph(cls, glyph: int) -> ItemCategory:
+        return cls(ord(nh.objclass(nh.glyph_to_obj(glyph)).oc_class))
 
     def __str__(self):
         return self.name.lower()
-
-    def __repr__(self):
-        return str(self)
 
 
 class WeaponClass(enum.Enum):
@@ -59,9 +56,6 @@ class WeaponClass(enum.Enum):
     def __str__(self):
         return self.name.lower()
 
-    def __repr__(self):
-        return str(self)
-
 
 class ArmorClass(enum.Enum):
     SUIT = 0
@@ -74,9 +68,6 @@ class ArmorClass(enum.Enum):
 
     def __str__(self):
         return self.name.lower()
-
-    def __repr__(self):
-        return str(self)
 
 
 class ToolClass(enum.Enum):
@@ -105,9 +96,6 @@ class ToolClass(enum.Enum):
     def __str__(self):
         return self.name.lower()
 
-    def __repr__(self):
-        return str(self)
-
 
 class GemClass(enum.Enum):
     GEM = 0
@@ -130,9 +118,6 @@ class GemClass(enum.Enum):
     def __str__(self):
         return self.name.lower()
 
-    def __repr__(self):
-        return str(self)
-
 
 class ItemQuantity:
     def __init__(self, value: int, repr: str):
@@ -150,9 +135,6 @@ class ItemQuantity:
 
     def __str__(self):
         return self.repr
-
-    def __repr__(self):
-        return str(self)
 
 
 class ItemBeatitude(enum.Enum):
@@ -172,9 +154,6 @@ class ItemBeatitude(enum.Enum):
                 return ""
             case _:
                 return self.name.lower()
-
-    def __repr__(self):
-        return str(self)
 
 
 class ItemEnchantment:
@@ -196,9 +175,6 @@ class ItemEnchantment:
 
     def __str__(self):
         return "" if self.unknown else f"{'+' if self.value >= 0 else '-'}{self.value}"
-
-    def __repr__(self):
-        return str(self)
 
 
 class ItemErosion(enum.Enum):
@@ -238,9 +214,6 @@ class ItemErosion(enum.Enum):
             case ItemErosion.SEVERE:
                 return "thoroughly eroded"
 
-    def __repr__(self):
-        return str(self)
-
 
 class ShopStatus(enum.Enum):
     NOT_SHOP = 0
@@ -260,9 +233,6 @@ class ShopStatus(enum.Enum):
             case ShopStatus.UNPAID:
                 return "unpaid"
 
-    def __repr__(self):
-        return str(self)
-
 
 class ShopPrice:
     def __init__(self, value: int):
@@ -277,6 +247,3 @@ class ShopPrice:
 
     def __str__(self):
         return str(self.value)
-
-    def __repr__(self):
-        return str(self)

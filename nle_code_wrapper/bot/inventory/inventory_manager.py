@@ -1,6 +1,7 @@
 from typing import TYPE_CHECKING
 
 from nle_code_wrapper.bot.inventory.inventory import Inventory
+from nle_code_wrapper.bot.inventory.item_database import ItemDatabase
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
@@ -10,6 +11,8 @@ class InventoryManager:
     def __init__(self, bot: "Bot"):
         self.bot = bot
         self.inventory = Inventory()
+        self.item_database = ItemDatabase()
+        self.already_engraved = set()
 
     def update(self):
         # TODO: we should add items, but handle them differently
@@ -22,4 +25,5 @@ class InventoryManager:
                 last_obs["inv_letters"],
                 last_obs["inv_oclasses"],
                 last_obs["inv_glyphs"],
+                self.item_database,
             )

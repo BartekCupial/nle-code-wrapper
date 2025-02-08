@@ -1,6 +1,33 @@
 import pytest
 
-from nle_code_wrapper.bot.inventory import Item
+from nle_code_wrapper.bot.inventory import Item, ItemDatabase, ItemParser
+
+
+@pytest.fixture
+def item_parser():
+    return ItemParser()
+
+
+@pytest.fixture
+def item_database():
+    return ItemDatabase()
+
+
+@pytest.fixture
+def get_item(item_parser, item_database):
+    def _get_item(text):
+        properties = item_parser(text)
+        if properties["item_category"] is None:
+            properties["item_category"] = item_database[properties["name"]].item_category
+
+        item = Item(
+            text=text,
+            item_class=item_database.get(properties["name"]),
+            **properties,
+        )
+        return item
+
+    return _get_item
 
 
 @pytest.mark.parametrize(
@@ -14,8 +41,8 @@ from nle_code_wrapper.bot.inventory import Item
         ("a thoroughly burnt very corroded rusty small shield", 3),
     ],
 )
-def test_greatest_erosion(text, expected):
-    item = Item.from_text(text)
+def test_greatest_erosion(get_item, text, expected):
+    item = get_item(text)
     assert item.erosion.value == expected
 
 
@@ -30,8 +57,8 @@ def test_greatest_erosion(text, expected):
         "a crossbow bolt",
     ],
 )
-def test_item_firing_projectiles(text):
-    item = Item.from_text(text)
+def test_item_firing_projectiles(get_item, text):
+    item = get_item(text)
     assert item.is_firing_projectile
 
 
@@ -53,8 +80,8 @@ def test_item_firing_projectiles(text):
         "a shuriken",
     ],
 )
-def test_item_thrown_projectiles(text):
-    item = Item.from_text(text)
+def test_item_thrown_projectiles(get_item, text):
+    item = get_item(text)
     assert item.is_thrown_projectile
 
 
@@ -77,9 +104,9 @@ def test_item_thrown_projectiles(text):
         ("a Hawaiian shirt", 0, 0),  # Low AC armor
     ],
 )
-def test_arm_bonus(text, base_ac, expected_bonus):
-    item = Item.from_text(text)
-    assert item.objects[0].a_ac == base_ac
+def test_arm_bonus(get_item, text, base_ac, expected_bonus):
+    item = get_item(text)
+    assert item.object.a_ac == base_ac
     assert item.arm_bonus == expected_bonus
 
 
@@ -95,8 +122,8 @@ def test_arm_bonus(text, base_ac, expected_bonus):
         ("an uncursed +2 cloak of displacement (being worn)", 2),
     ],
 )
-def test_enchantment(text, enchantment):
-    item = Item.from_text(text)
+def test_enchantment(get_item, text, enchantment):
+    item = get_item(text)
     assert item.enchantment.value == enchantment
 
 
@@ -147,8 +174,8 @@ def test_enchantment(text, enchantment):
         ("a tin", 0),
     ],
 )
-def test_nutrition(text, nutrition):
-    item = Item.from_text(text)
+def test_nutrition(get_item, text, nutrition):
+    item = get_item(text)
     assert item.nutrition == nutrition
 
 
@@ -186,8 +213,8 @@ def test_nutrition(text, nutrition):
         ("a boulder", 6000),
     ],
 )
-def test_weight(text, weight):
-    item = Item.from_text(text)
+def test_weight(get_item, text, weight):
+    item = get_item(text)
     assert item.weight == weight
 
 
@@ -214,8 +241,8 @@ def test_weight(text, weight):
         "4 eucalyptus leaves",
     ],
 )
-def test_special(text):
-    Item.from_text(text)
+def test_special(get_item, text):
+    get_item(text)
 
 
 @pytest.mark.parametrize(
@@ -257,5 +284,5 @@ def test_special(text):
         "a amulet of ESP named The Eye of the Aethiopica",
     ],
 )
-def test_artifacts(text):
-    Item.from_text(text)
+def test_artifacts(get_item, text):
+    get_item(text)

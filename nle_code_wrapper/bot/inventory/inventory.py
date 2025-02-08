@@ -1,40 +1,44 @@
 from __future__ import annotations
 
+import re
 from typing import Dict, List
 
 from nle_code_wrapper.bot.inventory.item import Item
-from nle_code_wrapper.bot.inventory.properties import ArmorClass, ItemClass
+from nle_code_wrapper.bot.inventory.item_database import ItemDatabase
+from nle_code_wrapper.bot.inventory.item_parser import ItemParser
+from nle_code_wrapper.bot.inventory.properties import ArmorClass, ItemCategory
 
 
 class Inventory:
     def __init__(self):
         self.items: Dict[int, Item] = {}
-        self.inventory_classes = {
-            "coins": [ItemClass.COIN],
-            "amulets": [ItemClass.AMULET],
-            "weapons": [ItemClass.WEAPON],
-            "armor": [ItemClass.ARMOR],
+        self.item_parser = ItemParser()
+        self.inventory_categories = {
+            "coins": [ItemCategory.COIN],
+            "amulets": [ItemCategory.AMULET],
+            "weapons": [ItemCategory.WEAPON],
+            "armor": [ItemCategory.ARMOR],
             "comestibles": [
-                ItemClass.COMESTIBLES,
-                ItemClass.CORPSE,
+                ItemCategory.COMESTIBLES,
+                ItemCategory.CORPSE,
             ],
-            "scrolls": [ItemClass.SCROLL],
-            "spellbooks": [ItemClass.SPELLBOOK],
-            "potions": [ItemClass.POTION],
-            "rings": [ItemClass.RING],
-            "wands": [ItemClass.WAND],
+            "scrolls": [ItemCategory.SCROLL],
+            "spellbooks": [ItemCategory.SPELLBOOK],
+            "potions": [ItemCategory.POTION],
+            "rings": [ItemCategory.RING],
+            "wands": [ItemCategory.WAND],
             "tools": [
-                ItemClass.TOOL,
-                ItemClass.GEM,
-                ItemClass.ROCK,
-                ItemClass.BALL,
-                ItemClass.CHAIN,
-                ItemClass.VENOM,
-                ItemClass.STATUE,
+                ItemCategory.TOOL,
+                ItemCategory.GEM,
+                ItemCategory.ROCK,
+                ItemCategory.BALL,
+                ItemCategory.CHAIN,
+                ItemCategory.VENOM,
+                ItemCategory.STATUE,
             ],
         }
 
-    def update(self, inv_strs, inv_letters, inv_oclasses, inv_glyphs):
+    def update(self, inv_strs, inv_letters, inv_oclasses, inv_glyphs, item_database: ItemDatabase):
         old_keys = set(self.items.keys())
         new_keys = set()
         for i in range(len(inv_strs)):
@@ -47,22 +51,29 @@ class Inventory:
             new_keys.add(letter)
 
             text = bytes(inv_str).decode("latin-1").strip("\0")
+            properties = self.item_parser(text)
+
             if letter in self.items:
-                self.items[letter].update_from_text(text)
+                self.items[letter].update_properties(**properties)
             else:
-                self.items[letter] = Item.from_text(text, letter=letter)
+                self.items[letter] = Item(
+                    text=text,
+                    letter=letter,
+                    item_class=item_database.get(properties["name"]),
+                    **properties,
+                )
 
         unused_keys = old_keys.difference(new_keys)
         for key in unused_keys:
             del self.items[key]
 
     def __getitem__(self, key) -> List[Item]:
-        classes = self.inventory_classes[key]
-        return [item for item in self.items.values() if item.item_class in classes]
+        category = self.inventory_categories[key]
+        return [item for item in self.items.values() if item.item_category in category]
 
     @property
     def inventory(self):
-        return {key: self[key] for key in self.inventory_classes.keys()}
+        return {key: self[key] for key in self.inventory_categories.keys()}
 
     def __len__(self):
         return len(self.items)
@@ -140,7 +151,8 @@ if __name__ == "__main__":
         inv_strs = obs["inv_strs"]
 
         inventory = Inventory()
-        inventory.update(inv_strs, inv_letters, inv_oclasses, inv_glyphs)
+        item_database = ItemDatabase()
+        inventory.update(inv_strs, inv_letters, inv_oclasses, inv_glyphs, item_database)
         inventory.main_hand
         inventory.off_hand
         inventory.helm

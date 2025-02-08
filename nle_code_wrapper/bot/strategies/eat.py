@@ -3,7 +3,7 @@ import re
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import Item, ItemClass
+from nle_code_wrapper.bot.inventory import Item, ItemCategory
 from nle_code_wrapper.bot.strategy import strategy
 
 
@@ -88,8 +88,13 @@ def eat_corpse_floor(bot: "Bot"):
     # only one item
     if match := re.search(r"You see here(.*?)\.", bot.message):
         text = match.group(1).strip()
-        item = Item.from_text(text)
-        if item.item_class == ItemClass.CORPSE:
+        properties = bot.inventory.item_parser(text)
+        item = Item(
+            text=text,
+            item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+            **properties,
+        )
+        if item.item_category == ItemCategory.CORPSE:
             return eat_from_floor(bot, item)
 
     # multiple items
@@ -97,10 +102,15 @@ def eat_corpse_floor(bot: "Bot"):
         items = []
         lines = match.group(2).strip().split("\n")
         for line in lines:
-            item = Item.from_text(line)
+            properties = bot.inventory.item_parser(text)
+            item = Item(
+                text=line,
+                item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+                **properties,
+            )
             items.append(item)
 
         # check if there is an item we would like to eat
-        if corpses := [item for item in items if item.item_class == ItemClass.CORPSE]:
+        if corpses := [item for item in items if item.item_category == ItemCategory.CORPSE]:
             # top corpse will be the most fresh
             return eat_from_floor(bot, corpses[0])

@@ -4,12 +4,12 @@ from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
-from nle_code_wrapper.bot.inventory import Item, ItemClass
+from nle_code_wrapper.bot.inventory import Item, ItemCategory
 from nle_code_wrapper.bot.strategies.goto import goto_glyph
 from nle_code_wrapper.bot.strategy import strategy
 
 
-def pickup_multipage(bot: "Bot", item_class: ItemClass, text: str):
+def pickup_multipage(bot: "Bot", item_category: ItemCategory, text: str):
     # Pattern for items
     item_pattern = r"([a-zA-Z]) - (.+)"
 
@@ -21,8 +21,13 @@ def pickup_multipage(bot: "Bot", item_class: ItemClass, text: str):
     items = re.finditer(item_pattern, text, re.MULTILINE)
     for match in items:
         letter, item = match.group(1), match.group(2)
-        item = Item.from_text(item)
-        if item.item_class == item_class:
+        properties = bot.inventory.item_parser(item)
+        item = Item(
+            text=text,
+            item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+            **properties,
+        )
+        if item.item_category == item_category:
             bot.type_text(letter)
 
     # Check for (end)
@@ -36,18 +41,23 @@ def pickup_multipage(bot: "Bot", item_class: ItemClass, text: str):
     # Check for (n of m) - different numbers
     elif re.search(diff_page_pattern, text):
         bot.step(A.TextCharacters.SPACE)
-        pickup_multipage(bot, item_class, bot.message)
+        pickup_multipage(bot, item_category, bot.message)
 
 
-def look(bot: "Bot", item_class: ItemClass) -> bool:
+def look(bot: "Bot", item_category: ItemCategory) -> bool:
     # look below us
     bot.step(A.Command.LOOK)
 
     # only one item
     if match := re.search(r"You see here(.*?)\.", bot.message):
         text = match.group(1).strip()
-        item = Item.from_text(text)
-        if item.item_class == item_class:
+        properties = bot.inventory.item_parser(text)
+        item = Item(
+            text=text,
+            item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+            **properties,
+        )
+        if item.item_category == item_category:
             bot.step(A.Command.PICKUP)
             return True
 
@@ -56,25 +66,30 @@ def look(bot: "Bot", item_class: ItemClass) -> bool:
         items = []
         lines = match.group(2).strip().split("\n")
         for line in lines:
-            item = Item.from_text(line)
+            properties = bot.inventory.item_parser(line)
+            item = Item(
+                text=line,
+                item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+                **properties,
+            )
             items.append(item)
 
         # check if there is an item we would like to pick up
-        if any([item.item_class == item_class for item in items]):
+        if any([item.item_category == item_category for item in items]):
             bot.step(A.Command.PICKUP)
-            pickup_multipage(bot, item_class, bot.message)
+            pickup_multipage(bot, item_category, bot.message)
             return True
 
     return False
 
 
 @strategy
-def pickup_item(bot: "Bot", item_class: ItemClass):
-    if look(bot, item_class):
+def pickup_item(bot: "Bot", item_category: ItemCategory):
+    if look(bot, item_category):
         return True
 
     if goto_glyph(bot, G.ITEMS.union(G.CORPSES)):
-        if look(bot, item_class):
+        if look(bot, item_category):
             return True
 
     return False
@@ -96,35 +111,35 @@ def pickup_coin(bot: "Bot") -> bool:
     """
     Makes bot pick up coins from the floor.
     """
-    return pickup_item(bot, ItemClass.COIN)
+    return pickup_item(bot, ItemCategory.COIN)
 
 
 def pickup_amulet(bot: "Bot") -> bool:
     """
     Makes bot pick up amulets from the floor.
     """
-    return pickup_item(bot, ItemClass.AMULET)
+    return pickup_item(bot, ItemCategory.AMULET)
 
 
 def pickup_weapon(bot: "Bot") -> bool:
     """
     Makes bot pick up weapons from the floor.
     """
-    return pickup_item(bot, ItemClass.WEAPON)
+    return pickup_item(bot, ItemCategory.WEAPON)
 
 
 def pickup_armor(bot: "Bot") -> bool:
     """
     Makes bot pick up armor and shieds from the floor.
     """
-    return pickup_item(bot, ItemClass.ARMOR)
+    return pickup_item(bot, ItemCategory.ARMOR)
 
 
 def pickup_food(bot: "Bot") -> bool:
     """
     Makes bot pick up food from the floor.
     """
-    return pickup_item(bot, ItemClass.COMESTIBLES)
+    return pickup_item(bot, ItemCategory.COMESTIBLES)
 
 
 @strategy
@@ -132,56 +147,56 @@ def pickup_corpse(bot: "Bot") -> bool:
     """
     Makes bot pick up corpse from the floor.
     """
-    return pickup_item(bot, ItemClass.CORPSE)
+    return pickup_item(bot, ItemCategory.CORPSE)
 
 
 def pickup_scroll(bot: "Bot") -> bool:
     """
     Makes bot pick up scrolls from the floor.
     """
-    return pickup_item(bot, ItemClass.SCROLL)
+    return pickup_item(bot, ItemCategory.SCROLL)
 
 
 def pickup_spellbook(bot: "Bot") -> bool:
     """
     Makes bot pick up spellbooks from the floor.
     """
-    return pickup_item(bot, ItemClass.SPELLBOOK)
+    return pickup_item(bot, ItemCategory.SPELLBOOK)
 
 
 def pickup_potion(bot: "Bot") -> bool:
     """
     Makes bot pick up potions from the floor.
     """
-    return pickup_item(bot, ItemClass.POTION)
+    return pickup_item(bot, ItemCategory.POTION)
 
 
 def pickup_ring(bot: "Bot") -> bool:
     """
     Makes bot pick up rings from the floor.
     """
-    return pickup_item(bot, ItemClass.RING)
+    return pickup_item(bot, ItemCategory.RING)
 
 
 def pickup_wand(bot: "Bot") -> bool:
     """
     Makes bot pick up wands from the floor.
     """
-    return pickup_item(bot, ItemClass.WAND)
+    return pickup_item(bot, ItemCategory.WAND)
 
 
 def pickup_tool(bot: "Bot") -> bool:
     """
     Makes bot pick up tools from the floor.
     """
-    return pickup_item(bot, ItemClass.TOOL)
+    return pickup_item(bot, ItemCategory.TOOL)
 
 
 def pickup_gem(bot: "Bot") -> bool:
     """
     Makes bot pick up gems from the floor.
     """
-    return pickup_item(bot, ItemClass.GEM)
+    return pickup_item(bot, ItemCategory.GEM)
 
 
 # PICKUP TOOLS
@@ -203,7 +218,7 @@ def pickup_gem(bot: "Bot") -> bool:
 #         tool_glyphs = frozenset(
 #             glyph
 #             for glyph, obj in GLYPH_TO_OBJECT.items()
-#             if obj["obj_class"] == chr(ItemClass.TOOL.value) and obj["obj_description"] == description
+#             if obj["obj_class"] == chr(ItemCategory.TOOL.value) and obj["obj_description"] == description
 #         )
 #         return pickup_glyph(bot, tool_glyphs)
 
