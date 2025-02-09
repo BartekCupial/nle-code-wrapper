@@ -47,7 +47,7 @@ class Item:
         equipped: bool,
         at_ready: bool,
     ):
-        self.name = name
+        self._name = name
         self.permonst = permonst
         self.item_category = item_category if item_category else self.item_class.item_category
 
@@ -60,6 +60,13 @@ class Item:
 
         self.equipped = equipped
         self.at_ready = at_ready
+
+    @property
+    def name(self):
+        if self.is_identified:
+            return str(self.item_class)
+        else:
+            return self._name
 
     def __str__(self):
         text = []
@@ -82,6 +89,8 @@ class Item:
             text.append("(equipped)")
         if self.at_ready:
             text.append("(at ready)")
+        if self.item_class.engraved:
+            text.append("(engraved)")
 
         return " ".join([t for t in text if t])
 
@@ -89,12 +98,12 @@ class Item:
         return str(self)
 
     @property
-    def is_unambiguous(self):
-        return self.item_class.is_unambiguous
+    def is_identified(self):
+        return self.item_class.is_identified
 
     @property
     def object(self):
-        return nh.objclass(nh.glyph_to_obj(self.item_class.possible_items[0]))
+        return nh.objclass(nh.glyph_to_obj(self.item_class.candidate_ids[0]))
 
     """
     WEAPON

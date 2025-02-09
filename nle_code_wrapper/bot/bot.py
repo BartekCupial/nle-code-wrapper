@@ -326,6 +326,10 @@ class Bot:
         return "Blind" in bytes(self.tty_chars).decode("latin-1")
 
     @property
+    def levitating(self):
+        return True if self.blstats.prop_mask & nethack.BL_MASK_LEV else False
+
+    @property
     def polymorphed(self):
         if not nethack.glyph_is_monster(self.entity.glyph):
             return False

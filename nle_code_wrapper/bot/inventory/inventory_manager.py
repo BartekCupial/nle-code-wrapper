@@ -12,7 +12,6 @@ class InventoryManager:
         self.bot = bot
         self.inventory = Inventory()
         self.item_database = ItemDatabase()
-        self.already_engraved = set()
 
     def update(self):
         # TODO: we should add items, but handle them differently

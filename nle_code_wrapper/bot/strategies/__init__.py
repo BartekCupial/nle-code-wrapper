@@ -91,6 +91,7 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_unexplored_corridor,
     goto_unexplored_room,
 )
+from nle_code_wrapper.bot.strategies.identify import engrave_identify
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup import (
     pickup_amulet,
@@ -167,6 +168,7 @@ __all__ = [
     wear,
     wield,
     zap,
+    engrave_identify,
     loot_container,
     open_container_key,
     open_container_kick,
