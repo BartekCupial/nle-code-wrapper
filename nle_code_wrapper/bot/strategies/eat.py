@@ -102,7 +102,7 @@ def eat_corpse_floor(bot: "Bot"):
         items = []
         lines = match.group(2).strip().split("\n")
         for line in lines:
-            properties = bot.inventory.item_parser(text)
+            properties = bot.inventory.item_parser(line)
             item = Item(
                 text=line,
                 item_class=bot.inventory_mangager.item_database.get(properties["name"]),
