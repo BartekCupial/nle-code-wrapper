@@ -35,7 +35,7 @@ setup(
     project_urls={},
     install_requires=[
         "einops",
-        "transormers",
+        "transformers",
         "sortedcontainers",
         "networkx",
         "nle-progress @ git+https://github.com/BartekCupial/nle-progress.git",
