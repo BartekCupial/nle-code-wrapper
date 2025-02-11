@@ -191,8 +191,14 @@ class Bot:
 
         return self.current_obs, self.reward, self.terminated, self.truncated, self.last_info
 
-    def search(self) -> None:
+    def search(self, num_times=1) -> None:
         self.step(A.Command.SEARCH)
+
+        old_time = self.blstats.time
+        for char in str(num_times):
+            self.type_text(char)
+        self.step(A.Command.SEARCH)
+        turn_diff = self.blstats.time - old_time
 
         blstats = self.blstats
         x, y = blstats.x, blstats.y
@@ -202,7 +208,7 @@ class Bot:
             if not (0 <= y + i < height) or not (0 <= x + j < width):
                 continue
 
-            self.current_level.search_count[y + i, x + j] += 1
+            self.current_level.search_count[y + i, x + j] += turn_diff
 
     def wait(self) -> None:
         if A.Command.SEARCH in self.env.actions:

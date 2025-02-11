@@ -1,5 +1,6 @@
 import networkx as nx
 import numpy as np
+from nle.nethack import actions as A
 from nle_utils.glyph import G
 from scipy import ndimage
 
@@ -76,14 +77,7 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     best_position = search_positions[np.argmin(scores)]
     bot.pathfinder.goto(tuple(best_position))
 
-    # Begin searching the selected spot repeatedly until a change suggests a door was found.
-    initial_walls = utils.isin(bot.glyphs, G.WALL)
-    for _ in range(10):
-        current_walls = utils.isin(bot.glyphs, G.WALL)
-        if not (initial_walls == current_walls).all():
-            break
-        bot.search()
-
+    bot.search(10)
     return True
 
 
@@ -123,16 +117,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         return False
 
     goto_closest(bot, searchable_positions)
-
-    # Search the spot multiple times
-    labeled_corridors, num_labels = corridor_detection(bot)
-    for _ in range(10):
-        # break if doors are found
-        new_labeled_corridors, _ = corridor_detection(bot)
-        if not (labeled_corridors == new_labeled_corridors).all():
-            break
-        bot.search()
-
+    bot.search(10)
     return True
 
 
@@ -141,15 +126,5 @@ def search_for_traps(bot: "Bot") -> bool:
     """
     Search the current position repeatedly for traps.
     """
-    initial_traps = set(bot.current_level.object_coords(G.TRAPS))
-
-    # TODO: make use of search counter
-    for _ in range(5):
-        bot.search()
-
-        # Check if new traps were discovered
-        current_traps = set(bot.current_level.object_coords(G.TRAPS))
-        if current_traps - initial_traps:
-            return True
-
+    bot.search(10)
     return False
