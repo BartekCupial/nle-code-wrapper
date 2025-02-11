@@ -1,4 +1,5 @@
 from collections import deque
+from itertools import pairwise
 from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
 
 import networkx as nx
@@ -11,6 +12,21 @@ from nle_code_wrapper.bot.pathfinder.movements import Movements
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
+
+
+direction_to_action = {
+    "n": A.CompassDirection.N,
+    "s": A.CompassDirection.S,
+    "e": A.CompassDirection.E,
+    "w": A.CompassDirection.W,
+    "ne": A.CompassDirection.NE,
+    "se": A.CompassDirection.SE,
+    "nw": A.CompassDirection.NW,
+    "sw": A.CompassDirection.SW,
+    ">": A.MiscDirection.DOWN,
+    "<": A.MiscDirection.UP,
+    ".": A.MiscDirection.WAIT,
+}
 
 
 def calc_direction(from_y: int64, from_x: int64, to_y: int64, to_x: int64) -> str:
@@ -171,6 +187,9 @@ class Pathfinder:
 
         # Get node IDs for start and end positions
         start_node = node_to_pos[tuple(start)]
+        # TODO:
+        # if tuple(goal) in node_to_pos:
+        # TypeError: 'NoneType' object is not iterable
         if tuple(goal) in node_to_pos:
             end_node = node_to_pos[tuple(goal)]
         else:
@@ -226,22 +245,7 @@ class Pathfinder:
         """
         bot_pos = self.bot.entity.position
         dir = calc_direction(bot_pos[0], bot_pos[1], pos[0], pos[1])
-
-        action = {
-            "n": A.CompassDirection.N,
-            "s": A.CompassDirection.S,
-            "e": A.CompassDirection.E,
-            "w": A.CompassDirection.W,
-            "ne": A.CompassDirection.NE,
-            "se": A.CompassDirection.SE,
-            "nw": A.CompassDirection.NW,
-            "sw": A.CompassDirection.SW,
-            ">": A.MiscDirection.DOWN,
-            "<": A.MiscDirection.UP,
-            ".": A.MiscDirection.WAIT,
-        }[dir]
-
-        self.bot.step(action)
+        self.bot.step(direction_to_action[dir])
 
     def move(self, dir: Tuple[int64, int64]) -> None:
         """
@@ -259,7 +263,7 @@ class Pathfinder:
                 f"expected ({dir[0]}, {dir[1]}), got ({self.bot.entity.position[0]}, {self.bot.entity.position[1]})"
             )
 
-    def goto(self, goal: Tuple[int64, int64], fast: bool = False) -> bool:
+    def goto(self, goal: Tuple[int64, int64], fast: bool = True) -> bool:
         """
         Move the bot to the given goal position. If the goal is not reachable, raise BotPanic.
 
@@ -269,17 +273,19 @@ class Pathfinder:
         Returns:
             bool: True if the bot successfully reaches the goal, False otherwise.
         """
+        if fast:
+            path = self.get_path_to(goal)
+            if path is None:
+                raise BotPanic("end point is no longer accessible")
+            if len(path) > 2:
+                self.fast_goto(goal)
+
         cont = True
         while cont and self.bot.entity.position != goal:
             path = self.get_path_to(goal)
             if path is None:
                 raise BotPanic("end point is no longer accessible")
             path = path[1:]
-
-            # TODO: implement fast_goto
-            # if fast and len(path) > 2:
-            #     my_position = bot.entity.position
-            #     bot.pathfinder.fast_go_to()
 
             for point in path:
                 # TODO: check if there is peaceful monster
@@ -296,6 +302,38 @@ class Pathfinder:
                 cont = False
 
         return True
+
+    def fast_goto(self, goal):
+        self.bot.step(A.Command.TRAVEL)
+        cursor_position = self.bot.cursor
+
+        # Create list of points between current position and goal
+        points = []
+        start_y, start_x = cursor_position
+        end_y, end_x = goal
+
+        # Calculate deltas
+        dy = end_y - start_y
+        dx = end_x - start_x
+        steps = max(abs(dy), abs(dx))
+
+        if steps == 0:
+            return
+
+        # Generate points with diagonal movement when possible
+        for i in range(steps + 1):
+            y = start_y + round(dy * (i / steps))
+            x = start_x + round(dx * (i / steps))
+            points.append((y, x))
+
+        # Iterate over consecutive pairs of points
+        for p1, p2 in pairwise(points):
+            # Calculate direction between consecutive points
+            dir = calc_direction(p1[0], p1[1], p2[0], p2[1])
+            # Execute the movement
+            self.bot.step(direction_to_action[dir])
+
+        self.bot.step(A.Command.PICKUP)
 
     def neighbors(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         return self.bot.movements.neighbors(pos)

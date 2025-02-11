@@ -16,7 +16,7 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     """
     Searches the current room's walls for hidden doors by directing the bot to search walls with possible doors.
     Tips:
-    - searches spot 5 times (hidden passages might require multiple searches)
+    - searches spot 10 times (hidden passages might require multiple searches)
     - we need to be in the room to search it (`goto_room`)
     - there is a limit for searching each spot
     """
@@ -52,20 +52,35 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     search_distances = [distances.get(tuple(pos), np.inf) for pos in search_positions]
     search_counts = np.array([level.search_count[tuple(pos)] for pos in search_positions])
 
-    # Combine distance and search count into a score
-    # Prefer closer positions and less searched walls
-    scores = search_distances + search_counts  # Weight distances more heavily
+    corridors_mask, _ = corridor_detection(bot)
+    other_rooms_mask = np.logical_and(labeled_rooms > 0, labeled_rooms != labeled_rooms[my_position])
+    boundary_mask = np.ones_like(other_rooms_mask)
+    boundary_mask[1:-1, 1:-1] = False
+    other_mask = other_rooms_mask | boundary_mask | corridors_mask > 0
 
-    # Select the position with the best score
+    # Compute distance from every cell to the nearest cell in a different room.
+    # Cells that are far from other rooms yield higher values.
+    other_distance_field = ndimage.distance_transform_edt(~other_mask)
+
+    # Get the bonus values for candidate positions (higher value = farther from other rooms)
+    other_room_scores = np.array([other_distance_field[tuple(pos)] for pos in search_positions])
+
+    # Define a weight that controls the influence of the distance-from-other-rooms heuristic.
+    weight = 2.0  # adjust this factor based on desired sensitivity
+
+    # Combine distance, search count, and negative influence from proximity to other rooms.
+    # Lower scores indicate more promising search candidates.
+    scores = np.array(search_distances) + search_counts - weight * other_room_scores
+
+    # Select the candidate position with the best (lowest) score
     best_position = search_positions[np.argmin(scores)]
     bot.pathfinder.goto(tuple(best_position))
 
-    # Search the spot multiple times
-    walls = utils.isin(bot.glyphs, G.WALL)
-    for _ in range(5):
-        # break if doors are found
-        new_walls = utils.isin(bot.glyphs, G.WALL)
-        if not (walls == new_walls).all():
+    # Begin searching the selected spot repeatedly until a change suggests a door was found.
+    initial_walls = utils.isin(bot.glyphs, G.WALL)
+    for _ in range(10):
+        current_walls = utils.isin(bot.glyphs, G.WALL)
+        if not (initial_walls == current_walls).all():
             break
         bot.search()
 
@@ -77,7 +92,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     """
     Searches the current corridor for hidden doors by directing the bot to search dead ends of the corridor.
     Tips:
-    - searches spot 5 times (hidden passages might require multiple searches)
+    - searches spot 10 times (hidden passages might require multiple searches)
     - diagonal connectivity between corridor will be classified as dead end
     - we need to be in the corridor to search it (`goto_corridor`)
     - there is a limit for searching each spot
@@ -110,7 +125,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
 
     # Search the spot multiple times
     labeled_corridors, num_labels = corridor_detection(bot)
-    for _ in range(5):
+    for _ in range(10):
         # break if doors are found
         new_labeled_corridors, _ = corridor_detection(bot)
         if not (labeled_corridors == new_labeled_corridors).all():
