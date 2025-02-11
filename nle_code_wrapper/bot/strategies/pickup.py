@@ -15,8 +15,25 @@ def examine_items(bot: "Bot"):
     Moves the agent to the closest items and looks at them.
     Useful when there are multiple items lying on the floor.
     """
-    goto_glyph(bot, G.ITEMS.union(G.CORPSES))
-    bot.step(A.Command.LOOK)
+
+    def look(bot):
+        bot.step(A.Command.LOOK)
+
+        if re.search(r"You see here(.*?)\.", bot.message):
+            return True
+        elif re.search(r"Things that are here:(.*?)(?=\n|$)(.*)", bot.message, re.DOTALL):
+            return True
+        else:
+            return False
+
+    if look(bot):
+        return True
+
+    if goto_glyph(bot, G.ITEMS.union(G.CORPSES)):
+        if look(bot):
+            return True
+
+    return False
 
 
 def pickup_multipage(bot: "Bot", item_category: ItemCategory, text: str):
