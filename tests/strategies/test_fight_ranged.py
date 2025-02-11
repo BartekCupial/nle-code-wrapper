@@ -5,12 +5,12 @@ from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.strategies import (
     descend_stairs,
+    examine_items,
     explore_corridor,
     explore_room,
     fight_multiple_monsters,
     fight_ranged,
     goto_corridor,
-    goto_item,
     goto_room,
     goto_unexplored_room,
     open_doors,
@@ -42,7 +42,7 @@ class TestFightRanged:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        goto_item(bot)
+        examine_items(bot)
         goto_corridor(bot)
         while fight_ranged(bot):
             pass

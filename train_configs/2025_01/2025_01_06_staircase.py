@@ -76,7 +76,7 @@ strategies = [
     "ascend_stairs",
     "goto_unexplored_corridor",
     "goto_unexplored_room",
-    "goto_item",
+    "examine_items",
     "open_doors",
     "open_doors_kick",
     "open_doors_key",

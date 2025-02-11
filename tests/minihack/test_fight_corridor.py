@@ -22,7 +22,7 @@ class TestMazewalkMapped(object):
             "MiniHack-CorridorBattle-v0",
         ],
     )
-    @pytest.mark.parametrize("seed", [1])
+    @pytest.mark.parametrize("seed", list(range(3)))
     def test_fight_multiple_monsters(self, env, seed):
         cfg = parse_minihack_args(
             argv=[
@@ -56,7 +56,7 @@ class TestMazewalkMapped(object):
             "MiniHack-CorridorBattle-Dark-v0",
         ],
     )
-    @pytest.mark.parametrize("seed", [1])
+    @pytest.mark.parametrize("seed", list(range(3)))
     def test_fight_multiple_monsters_dark(self, env, seed):
         cfg = parse_minihack_args(
             argv=[

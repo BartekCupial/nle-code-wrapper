@@ -82,7 +82,6 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_corridor_north,
     goto_corridor_south,
     goto_corridor_west,
-    goto_item,
     goto_room,
     goto_room_east,
     goto_room_north,
@@ -94,6 +93,7 @@ from nle_code_wrapper.bot.strategies.goto import (
 from nle_code_wrapper.bot.strategies.identify import engrave_identify
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup import (
+    examine_items,
     pickup_amulet,
     pickup_armor,
     pickup_coin,
@@ -222,7 +222,7 @@ __all__ = [
     goto_unexplored_corridor,
     goto_unexplored_room,
     goto_corpse,
-    goto_item,
+    examine_items,
     open_doors,
     open_doors_kick,
     open_doors_key,

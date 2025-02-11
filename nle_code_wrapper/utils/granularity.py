@@ -77,7 +77,6 @@ goto = [
     "goto_corridor_north",
     "goto_corridor_south",
     "goto_corridor_west",
-    "goto_item",
     "goto_room",
     "goto_room_east",
     "goto_room_north",
@@ -104,6 +103,7 @@ pickup = [
     "pickup_tool",
     "pickup_wand",
     "pickup_weapon",
+    "examine_items",
 ]
 
 boulder_easy = [
@@ -603,7 +603,7 @@ nethack = [
     "goto_unexplored_corridor",
     "goto_unexplored_room",
     "goto_corpse",
-    "goto_item",
+    "examine_items",
     "open_doors",
     "open_doors_kick",
     "open_doors_key",

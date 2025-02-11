@@ -177,14 +177,6 @@ def goto_unexplored_feature(bot: "Bot", feature_detection) -> bool:
 
 
 @strategy
-def goto_item(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest item.
-    """
-    return goto_glyph(bot, G.ITEMS)
-
-
-@strategy
 def goto_corpse(bot: "Bot"):
     """
     Moves the agent to the closest corpse

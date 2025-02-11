@@ -1,7 +1,7 @@
 import pytest
 from nle.nethack import actions as A
 
-from nle_code_wrapper.bot.strategies import goto_item, pickup_armor
+from nle_code_wrapper.bot.strategies import examine_items, pickup_armor
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils.tests import create_bot
 
@@ -60,7 +60,7 @@ class TestRaySimulator:
         bot = create_bot(cfg)
         bot.reset(seed=seed)
 
-        goto_item(bot)
+        examine_items(bot)
         bot.step(A.Command.PICKUP)
         popup_message = bot.message
 

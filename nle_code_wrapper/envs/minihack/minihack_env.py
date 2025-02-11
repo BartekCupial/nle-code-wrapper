@@ -4,6 +4,7 @@ from typing import Optional
 
 import gym
 import minihack  # NOQA: F401
+from nle import nethack
 from nle.env.base import FULL_ACTIONS
 from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, NoProgressAbort, SingleSeed
 from sample_factory.utils.utils import ensure_dir_exists, experiment_dir
@@ -52,7 +53,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         penalty_mode=cfg.fn_penalty_step,
         savedir=cfg.savedir,
         save_ttyrec_every=cfg.save_ttyrec_every,
-        actions=FULL_ACTIONS,
+        actions=nethack.ACTIONS,
     )
 
     param_mapping = {

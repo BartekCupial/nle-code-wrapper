@@ -12,7 +12,6 @@ from nle_code_wrapper.bot.strategies import (
     fight_multiple_monsters,
     fight_ranged,
     goto_corridor,
-    goto_item,
     goto_room,
     goto_unexplored_room,
     open_doors,

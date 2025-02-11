@@ -9,6 +9,20 @@ from nle_code_wrapper.bot.strategies.goto import goto_glyph
 from nle_code_wrapper.bot.strategy import strategy
 
 
+def goto_item(bot: "Bot") -> bool:
+    return goto_glyph(bot, G.ITEMS)
+
+
+@strategy
+def examine_items(bot: "Bot"):
+    """
+    Moves the agent to the closest items and looks at them.
+    Useful when there are multiple items lying on the floor.
+    """
+    goto_item(bot)
+    bot.step(A.Command.LOOK)
+
+
 def pickup_multipage(bot: "Bot", item_category: ItemCategory, text: str):
     # Pattern for items
     item_pattern = r"([a-zA-Z]) - (.+)"

@@ -8,7 +8,6 @@ from nle.nethack import actions as A
 from numpy import int64
 
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.pathfinder.movements import Movements
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
@@ -263,7 +262,7 @@ class Pathfinder:
                 f"expected ({dir[0]}, {dir[1]}), got ({self.bot.entity.position[0]}, {self.bot.entity.position[1]})"
             )
 
-    def goto(self, goal: Tuple[int64, int64], fast: bool = True) -> bool:
+    def goto(self, goal: Tuple[int64, int64], fast: bool = False) -> bool:
         """
         Move the bot to the given goal position. If the goal is not reachable, raise BotPanic.
 
@@ -333,7 +332,7 @@ class Pathfinder:
             # Execute the movement
             self.bot.step(direction_to_action[dir])
 
-        self.bot.step(A.Command.PICKUP)
+        self.bot.step(A.MiscDirection.WAIT)
 
     def neighbors(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         return self.bot.movements.neighbors(pos)
