@@ -31,7 +31,7 @@ class TestEngraveIdentify:
         ],
     )
     @pytest.mark.parametrize("seed", list(range(3)))
-    def test_fight_ranged(self, env, seed):
+    def test_engrave(self, env, seed):
         cfg = parse_minihack_args(
             argv=[
                 f"--env={env}",
@@ -39,6 +39,7 @@ class TestEngraveIdentify:
                 "--no-render",
                 "--autopickup=True",
                 "--code_wrapper=False",
+                "--max_strategy_steps=1000",
             ]
         )
 

@@ -21,7 +21,7 @@ class CustomMiniHackEngraveIdentify(MiniHackSkill):
         lvl_gen.set_start_rect((1, 1), (3, 3))
         lvl_gen.add_object("cancellation", "/", (1, 1))
         lvl_gen.add_object("cold", "/", (1, 1))
-        lvl_gen.add_object("create monster", "/", (1, 1))
+        # lvl_gen.add_object("create monster", "/", (1, 1))
         lvl_gen.add_object("death", "/", (1, 1))
         lvl_gen.add_object("digging", "/", (1, 1))
         lvl_gen.add_object("enlightenment", "/", (1, 1))

@@ -3,7 +3,7 @@ from typing import Optional
 
 import gym
 import minihack  # NOQA: F401
-from nle.env.base import FULL_ACTIONS
+from nle import nethack
 from nle_utils.wrappers import (
     AutoMore,
     GymV21CompatibilityV0,
@@ -73,7 +73,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
             kwargs[param_name] = param_value
 
     if cfg.code_wrapper:
-        kwargs["actions"] = FULL_ACTIONS
+        kwargs["actions"] = nethack.ACTIONS
 
     env = gym.make(env_name, **kwargs)
     env = NoProgressAbort(env)
