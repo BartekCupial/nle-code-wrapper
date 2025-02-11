@@ -32,33 +32,34 @@ def print_boolean_array_ascii(arr):
 
 
 def save_boolean_array_pillow(arr):
-    # Normalize the array to (0, 1)
-    min_val = np.min(arr)
-    max_val = np.max(arr)
-    if min_val == max_val:
-        normalized = np.full(arr.shape, 0.5)
-    else:
-        normalized = (arr - min_val) / (max_val - min_val)
+    # Ensure array is numpy array
+    arr = np.asarray(arr)
 
-    normalized = (normalized * 255).astype(np.uint8)
-
-    # Create a random colormap (one color for each label)
+    # Get unique labels and remap them to consecutive integers
     unique_values = np.unique(arr)
-    num_colors = len(unique_values)  # +1 for background
-    colormap = np.random.randint(0, 256, size=(num_colors, 3), dtype=np.uint8)
-    # Set background (label 0) to black
-    colormap[0] = [0, 0, 0]
+    label_map = {val: idx for idx, val in enumerate(unique_values)}
+    remapped_arr = np.zeros_like(arr)
+    for val in unique_values:
+        remapped_arr[arr == val] = label_map[val]
 
-    # Convert labeled array to RGB using the colormap
+    # Create colormap
+    num_colors = len(unique_values)
+    colormap = np.random.randint(0, 256, size=(num_colors, 3), dtype=np.uint8)
+    colormap[0] = [0, 0, 0]  # Set background to black
+
+    # Create RGB image
     height, width = arr.shape
     rgb_image = np.zeros((height, width, 3), dtype=np.uint8)
-    for label in unique_values:
+    for idx, label in enumerate(unique_values):
         mask = arr == label
-        rgb_image[mask] = colormap[label]
+        rgb_image[mask] = colormap[idx]
 
-    # Create and save PIL Image
-    img = Image.fromarray(rgb_image)
-    img.save("labeled_rooms.png")
+    # Save image
+    try:
+        img = Image.fromarray(rgb_image)
+        img.save("labeled_rooms.png")
+    except Exception as e:
+        print(f"Error saving image: {e}")
 
 
 def label_dungeon_features(bot: "Bot"):
