@@ -117,6 +117,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     searchable_positions = [positions[node] for node, degree in nx.degree(graph) if degree <= 1]
     searchable_positions = [pos for pos in searchable_positions if level.search_count[pos] < 40]
     searchable_positions = [pos for pos in searchable_positions if current_corridor[pos]]
+    searchable_positions = [pos for pos in searchable_positions if level.was_on[pos]]
 
     if len(searchable_positions) == 0:
         return False
