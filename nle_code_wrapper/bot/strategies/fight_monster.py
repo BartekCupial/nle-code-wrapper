@@ -15,22 +15,43 @@ from nle_code_wrapper.bot.strategy import repeat, strategy
 def fight_melee(bot: "Bot") -> bool:
     """
     Directs the bot to fight melee the closest monster.
+    Prioritizes hostile monsters.
     """
     bot.movements = Movements(bot, monster_collision=False)
 
+    def is_peaceful(bot: "Bot", entity: Entity):
+        bot.pathfinder.glance(entity.position)
+        return "peaceful" in bot.message
+
     neigbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
     distances = bot.pathfinder.distances(bot.entity.position)
-    adjacent, entity = min(
-        ((neighbor, e) for neighbor, e in zip(neigbors, bot.entities) if neighbor is not None),
-        key=lambda pair: distances.get(pair[0], np.inf),
-        default=(None, None),
-    )
 
-    if entity:
+    # Create list of tuples (neighbor, entity, is_peaceful)
+    entities_info = [
+        (neighbor, entity, is_peaceful(bot, entity))
+        for neighbor, entity in zip(neigbors, bot.entities)
+        if neighbor is not None
+    ]
+
+    # First try to find the closest hostile monster
+    hostile_targets = [(neighbor, entity) for neighbor, entity, peaceful in entities_info if not peaceful]
+
+    if hostile_targets:
+        # Attack closest hostile monster
+        adjacent, entity = min(hostile_targets, key=lambda pair: distances.get(pair[0], np.inf))
         bot.pvp.attack_melee(entity)
         return True
-    else:
-        return False
+
+    # If no hostile monsters, try peaceful ones
+    peaceful_targets = [(neighbor, entity) for neighbor, entity, peaceful in entities_info if peaceful]
+
+    if peaceful_targets:
+        # Attack closest peaceful monster
+        adjacent, entity = min(peaceful_targets, key=lambda pair: distances.get(pair[0], np.inf))
+        bot.pvp.attack_melee(entity)
+        return True
+
+    return False
 
 
 @strategy

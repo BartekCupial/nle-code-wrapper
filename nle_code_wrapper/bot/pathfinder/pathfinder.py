@@ -302,9 +302,8 @@ class Pathfinder:
 
         return True
 
-    def fast_goto(self, goal):
-        self.bot.step(A.Command.TRAVEL)
-        cursor_position = self.bot.cursor
+    def move_cursor(self, goal):
+        cursor_position = self.bot.entity.position
 
         # Create list of points between current position and goal
         points = []
@@ -332,7 +331,15 @@ class Pathfinder:
             # Execute the movement
             self.bot.step(direction_to_action[dir])
 
+    def fast_goto(self, goal):
+        self.bot.step(A.Command.TRAVEL)
+        self.move_cursor(goal)
         self.bot.step(A.MiscDirection.WAIT)
+
+    def glance(self, goal):
+        self.bot.step(A.Command.GLANCE)
+        self.move_cursor(goal)
+        self.bot.step(A.Command.GLANCE)
 
     def neighbors(self, pos: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         return self.bot.movements.neighbors(pos)
