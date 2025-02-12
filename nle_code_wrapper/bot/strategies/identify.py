@@ -184,7 +184,7 @@ def engrave_single_wand(bot, item):
 
 @strategy
 def engrave_identify(bot: "Bot"):
-    if bot.polymorphed:
+    if bot.poly:
         return False  # TODO: only for handless monsters (which cannot write)
 
     if bot.blind or bot.lev:

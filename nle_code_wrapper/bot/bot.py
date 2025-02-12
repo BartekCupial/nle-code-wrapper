@@ -192,8 +192,6 @@ class Bot:
         return self.current_obs, self.reward, self.terminated, self.truncated, self.last_info
 
     def search(self, num_times=1) -> None:
-        self.step(A.Command.SEARCH)
-
         old_time = self.blstats.time
         for char in str(num_times):
             self.type_text(char)
@@ -381,6 +379,7 @@ class Bot:
         return True if self.blstats.prop_mask & nethack.BL_MASK_RIDE else False
 
     @property
-    def polymorphed(self):
+    def poly(self):
+        """Polymorphed"""
         if not nethack.glyph_is_monster(self.entity.glyph):
             return False

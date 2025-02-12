@@ -8,13 +8,13 @@ from nle_utils.wrappers import (
     AutoMore,
     GymV21CompatibilityV0,
     NLETimeLimit,
-    NLETokenizer,
     NoProgressAbort,
     ObservationFilterWrapper,
     PrevActionsWrapper,
     SingleSeed,
     TileTTY,
 )
+from nle_utils.wrappers.nle_tokenizer import NLETokenizer
 from sample_factory.utils.utils import ensure_dir_exists, experiment_dir
 
 from nle_code_wrapper.utils.utils import get_function_by_name
