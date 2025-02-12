@@ -316,24 +316,69 @@ class Bot:
         return utils.isin(self.glyphs, G.SWALLOW).any()
 
     @property
-    def confused(self):
-        return "Conf" in bytes(self.tty_chars).decode("latin-1")
+    def stone(self):
+        """Stoned"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_STONE else False
 
     @property
-    def stunned(self):
-        return "Stun" in bytes(self.tty_chars).decode("latin-1")
+    def slime(self):
+        """Slimed"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_SLIME else False
 
     @property
-    def hallucinating(self):
-        return "Hallu" in bytes(self.tty_chars).decode("latin-1")
+    def strngl(self):
+        """Strangled"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_STRNGL else False
 
     @property
-    def blinded(self):
-        return "Blind" in bytes(self.tty_chars).decode("latin-1")
+    def foodpois(self):
+        """Food Poisoning"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_FOODPOIS else False
 
     @property
-    def levitating(self):
+    def termill(self):
+        """Terminally Ill"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_TERMILL else False
+
+    @property
+    def blind(self):
+        """Blind"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_BLIND else False
+
+    @property
+    def deaf(self):
+        """Deaf"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_DEAF else False
+
+    @property
+    def stun(self):
+        """Stunned"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_STUN else False
+
+    @property
+    def conf(self):
+        """Confused"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_CONF else False
+
+    @property
+    def hallu(self):
+        """Hallucinating"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_HALLU else False
+
+    @property
+    def lev(self):
+        """Levitating"""
         return True if self.blstats.prop_mask & nethack.BL_MASK_LEV else False
+
+    @property
+    def fly(self):
+        """Flying"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_FLY else False
+
+    @property
+    def ride(self):
+        """Riding"""
+        return True if self.blstats.prop_mask & nethack.BL_MASK_RIDE else False
 
     @property
     def polymorphed(self):

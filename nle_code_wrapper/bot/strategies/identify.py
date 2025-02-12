@@ -187,7 +187,7 @@ def engrave_identify(bot: "Bot"):
     if bot.polymorphed:
         return False  # TODO: only for handless monsters (which cannot write)
 
-    if bot.blinded or bot.levitating:
+    if bot.blind or bot.lev:
         return False
 
     if bot.current_level.objects[bot.entity.position] not in G.FLOOR:

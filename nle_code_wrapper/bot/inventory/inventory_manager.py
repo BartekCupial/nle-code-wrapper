@@ -17,7 +17,7 @@ class InventoryManager:
         # TODO: we should add items, but handle them differently
         # when hallucinating inv_glyphs change (set glyph=None)
         # when blinded (set obj to unknown)
-        if not self.bot.hallucinating and not self.bot.blinded:
+        if not self.bot.hallu and not self.bot.blind:
             last_obs = self.bot.current_obs
             self.inventory.update(
                 last_obs["inv_strs"],
