@@ -12,13 +12,14 @@ from nle_code_wrapper.bot.strategy import strategy
 @strategy
 def examine_items(bot: "Bot"):
     """
-    Moves the agent to the closest items and looks at them.
-    Useful when there are multiple items lying on the floor.
+    Navigates to and examines items on the dungeon floor.
+
+    Notes:
+    - we check the current location for items first,
+    - if no items are found, moves to the nearest visible item or corpse and examines it.
     """
 
-    def look(bot):
-        bot.step(A.Command.LOOK)
-
+    def items_here(bot):
         if re.search(r"You see here(.*?)\.", bot.message):
             return True
         elif re.search(r"Things that are here:(.*?)(?=\n|$)(.*)", bot.message, re.DOTALL):
@@ -26,11 +27,14 @@ def examine_items(bot: "Bot"):
         else:
             return False
 
-    if look(bot):
-        return True
+    if not items_here(bot):
+        bot.step(A.Command.LOOK)
+        if items_here(bot):
+            return True
 
     if goto_glyph(bot, G.ITEMS.union(G.CORPSES)):
-        if look(bot):
+        bot.step(A.Command.LOOK)
+        if items_here(bot):
             return True
 
     return False
