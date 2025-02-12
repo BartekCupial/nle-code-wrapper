@@ -19,9 +19,12 @@ def fight_melee(bot: "Bot") -> bool:
     """
     bot.movements = Movements(bot, monster_collision=False)
 
+    # def is_peaceful(bot: "Bot", entity: Entity):
+    #     bot.pathfinder.glance(entity.position)
+    #     return "peaceful" in bot.message
+
     def is_peaceful(bot: "Bot", entity: Entity):
-        bot.pathfinder.glance(entity.position)
-        return "peaceful" in bot.message
+        return False
 
     neigbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
     distances = bot.pathfinder.distances(bot.entity.position)
