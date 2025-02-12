@@ -55,7 +55,12 @@ def eat_food_inventory(bot: "Bot"):
     """
     Eats food from inventory.
     """
-    food_items = [(item.nutrition / item.weight, item) for item in bot.inventory["comestibles"] if item.is_food]
+    # TODO: handle tins
+    food_items = [
+        (item.nutrition / item.weight, item)
+        for item in bot.inventory["comestibles"]
+        if item.is_food and item.name != "tin"
+    ]
 
     if food_items:
         food = min(food_items, key=lambda x: x[0])[1]
