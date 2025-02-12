@@ -135,6 +135,10 @@ class Inventory:
     def shirt(self):
         return self.worn_armor_by_type[ArmorClass.SHIRT]
 
+    @property
+    def weight(self):
+        return sum([item.weight for item in self.items.values()])
+
 
 if __name__ == "__main__":
     import gym

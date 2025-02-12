@@ -50,8 +50,20 @@ class Movements:
 
     @property
     def walkable_diagonally(self) -> bool:
+
+        # https://nethackwiki.com/wiki/Movement_tactics
+        # ---
+        #     ----.--
+        # ---|.....---
+        # --..|@......|
+        # |....--.--..|
+        # -. ----------
+        # In the following mine level, the character can only move southwest
+        # if his or her total inventory weight is 600 or less.
+        # Otherwise, "You are carrying too much to get through."
         level = self.bot.current_level
-        return level.dungeon_number != DungeonLevel.SOKOBAN.value
+        total_weight = self.bot.inventory.weight
+        return level.dungeon_number != DungeonLevel.SOKOBAN.value and total_weight < 600
 
     def walkable_cardinal(self, pos: Tuple[int64, int64], new_pos: Tuple[int64, int64]) -> bool:
         level = self.bot.current_level
