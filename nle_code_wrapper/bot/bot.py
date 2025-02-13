@@ -21,6 +21,7 @@ from nle_code_wrapper.bot.inventory import InventoryManager
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Movements, Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
+from nle_code_wrapper.bot.trap_tracker import TrapTracker
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
@@ -41,6 +42,7 @@ class Bot:
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.inventory_mangager: InventoryManager = InventoryManager(self)
         self.pvp: Pvp = Pvp(self)
+        self.trap_tracker: TrapTracker = TrapTracker(self)
 
         self.strategies: list[Callable] = []
         self.panics: list[Callable] = []
@@ -246,6 +248,7 @@ class Bot:
         self.movements.update()
         self.pathfinder.update()
         self.pvp.update()
+        self.trap_tracker.update()
 
     def get_blstats(self, last_obs) -> BLStats:
         return BLStats(*last_obs["blstats"])
@@ -383,3 +386,8 @@ class Bot:
         """Polymorphed"""
         if not nethack.glyph_is_monster(self.entity.glyph):
             return False
+
+    @property
+    def trap(self) -> bool:
+        """Trapped"""
+        return self.trap_tracker.trapped

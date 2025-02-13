@@ -672,4 +672,5 @@ nethack = [
     "eat_food_inventory",
     # "wield_melee_weapon",
     # "wield_ranged_set",
+    "escape_trap",
 ]

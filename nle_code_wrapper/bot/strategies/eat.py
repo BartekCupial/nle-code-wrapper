@@ -55,7 +55,7 @@ def eat_food_inventory(bot: "Bot"):
     """
     Eats food from inventory.
     """
-    # TODO: handle tins
+    # TODO: handle tins better
     food_items = [
         (item.nutrition / item.weight, item)
         for item in bot.inventory["comestibles"]

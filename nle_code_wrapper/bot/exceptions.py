@@ -8,6 +8,10 @@ class BotPanic(BaseException):
     pass
 
 
+class UnexpectedPotion(BotPanic):
+    pass
+
+
 class EnemyAppeared(BotPanic):
     pass
 

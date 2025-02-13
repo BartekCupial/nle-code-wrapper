@@ -132,6 +132,7 @@ from nle_code_wrapper.bot.strategies.takeoff import (
     takeoff_shirt,
     takeoff_suit,
 )
+from nle_code_wrapper.bot.strategies.trap import escape_trap
 from nle_code_wrapper.bot.strategies.wear import (
     puton_amulet,
     puton_ring,
@@ -282,4 +283,5 @@ __all__ = [
     eat_food_inventory,
     wield_melee_weapon,
     wield_ranged_set,
+    escape_trap,
 ]

@@ -7,7 +7,7 @@ import numpy as np
 from nle.nethack import actions as A
 from numpy import int64
 
-from nle_code_wrapper.bot.exceptions import BotPanic
+from nle_code_wrapper.bot.exceptions import BotPanic, UnexpectedPotion
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
@@ -257,7 +257,7 @@ class Pathfinder:
         self.direction(dir)
 
         if self.bot.entity.position != dir:
-            raise BotPanic(
+            raise UnexpectedPotion(
                 f'agent position do not match after "move": '
                 f"expected ({dir[0]}, {dir[1]}), got ({self.bot.entity.position[0]}, {self.bot.entity.position[1]})"
             )
