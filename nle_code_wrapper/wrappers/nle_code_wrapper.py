@@ -73,6 +73,7 @@ class NLECodeWrapper(gym.Wrapper):
             for char in ascii_lowercase + ascii_uppercase:
                 strategy_func = partial(letter_strategy, letter=char)
                 strategy_func.__name__ = char
+                strategy_func.__doc__ = ""
                 self.bot.strategy(strategy_func)
 
         directions = {
@@ -94,6 +95,7 @@ class NLECodeWrapper(gym.Wrapper):
             for direction, action in directions.items():
                 strategy_func = partial(direction_strategy, direction=action)
                 strategy_func.__name__ = direction
+                strategy_func.__doc__ = ""
                 self.bot.strategy(strategy_func)
 
         if add_more_strategy:
