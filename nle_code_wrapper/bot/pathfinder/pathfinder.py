@@ -5,6 +5,7 @@ from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
 import networkx as nx
 import numpy as np
 from nle.nethack import actions as A
+from nle_utils.glyph import G
 from numpy import int64
 
 from nle_code_wrapper.bot.exceptions import BotPanic, UnexpectedPotion
@@ -57,6 +58,7 @@ class Pathfinder:
 
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
+        self.trap_cost = 10
         self._graph_cache = {}
 
     @property
@@ -125,7 +127,11 @@ class Pathfinder:
                 if nbr_node is not None:
                     # If neighbor already exists, just add edge if not present
                     if not graph.has_edge(current_node, nbr_node):
-                        graph.add_edge(current_node, nbr_node)
+                        # Calculate edge weight based on trap presence
+                        weight = 1  # Default weight
+                        if self.bot.current_level.objects[nbr] in G.TRAPS:
+                            weight += self.trap_cost
+                        graph.add_edge(current_node, nbr_node, weight=weight)
                     continue
 
                 if nbr in seen:
@@ -135,8 +141,11 @@ class Pathfinder:
                 pos_to_node[nbr] = node_counter
                 graph.add_node(node_counter)
 
-                # Add edge to previous position
-                graph.add_edge(pos_to_node[current_pos], node_counter)
+                # Add weighted edge
+                weight = 1
+                if self.bot.current_level.objects[nbr] in G.TRAPS:
+                    weight += self.trap_cost
+                graph.add_edge(pos_to_node[current_pos], node_counter, weight=weight)
 
                 # Add to BFS queue
                 queue.append(nbr)
