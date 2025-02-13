@@ -145,6 +145,8 @@ class Pvp:
         return best_item
 
     def attack_ranged(self, entity: Entity):
+        # TODO: you should be able to attack monsters which are not reachable
+
         def attack_action():
             def move_attack_position(attack_positions):
                 current_position = self.bot.entity.position
@@ -203,7 +205,8 @@ class Pvp:
             self.bot.step(A.Command.FIRE)
             if "In what direction?" in self.bot.message:
                 self.bot.pathfinder.direction(direction)
-            return True
+                return True
+            return False
 
         self.handle_combat(entity, attack_action)
 

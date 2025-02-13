@@ -50,7 +50,7 @@ class Movements:
 
     @property
     def walkable_diagonally(self) -> bool:
-
+        # TODO: this should only include passing between small gaps
         # https://nethackwiki.com/wiki/Movement_tactics
         # ---
         #     ----.--
@@ -111,7 +111,6 @@ class Movements:
         """
         level = self.bot.current_level
         # we restrict diagonal movements in the doors
-        # TODO: handle moving diagonally when heavy
         # the character can only move diagonally if his or her total inventory weight is 600 or less.
         # Otherwise, "You are carrying too much to get through."
         glyph_walkable = level.safe_walkable[new_pos]
