@@ -107,13 +107,14 @@ def eat_corpse_floor(bot: "Bot"):
         items = []
         lines = match.group(2).strip().split("\n")
         for line in lines:
-            properties = bot.inventory.item_parser(line)
-            item = Item(
-                text=line,
-                item_class=bot.inventory_mangager.item_database.get(properties["name"]),
-                **properties,
-            )
-            items.append(item)
+            # since we are parsing multiple lines, not all lines have to be items (--more-- could happen)
+            if properties := bot.inventory.item_parser(line):
+                item = Item(
+                    text=line,
+                    item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+                    **properties,
+                )
+                items.append(item)
 
         # check if there is an item we would like to eat
         if corpses := [item for item in items if item.item_category == ItemCategory.CORPSE]:

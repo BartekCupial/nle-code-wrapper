@@ -97,13 +97,14 @@ def look(bot: "Bot", item_category: ItemCategory) -> bool:
         items = []
         lines = match.group(2).strip().split("\n")
         for line in lines:
-            properties = bot.inventory.item_parser(line)
-            item = Item(
-                text=line,
-                item_class=bot.inventory_mangager.item_database.get(properties["name"]),
-                **properties,
-            )
-            items.append(item)
+            # since we are parsing multiple lines, not all lines have to be items (--more-- could happen)
+            if properties := bot.inventory.item_parser(line):
+                item = Item(
+                    text=line,
+                    item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+                    **properties,
+                )
+                items.append(item)
 
         # check if there is an item we would like to pick up
         if any([item.item_category == item_category for item in items]):
