@@ -84,20 +84,21 @@ class Bot:
         self.strategy_steps = 0
         self.current_discount = 1.0
 
-        self.current_obs, self.last_info = self.env.reset(**kwargs)
+        self.current_obs, self.current_info = self.env.reset(**kwargs)
         self.last_obs = self.current_obs
+        self.last_info = self.current_info
 
-        extra_stats = self.last_info.get("episode_extra_stats", {})
+        extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
             "env_steps": self.steps,
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
-        self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
+        self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         self.update()
 
-        return self.current_obs, self.last_info
+        return self.current_obs, self.current_info
 
     def step(self, action: int) -> None:
         """
@@ -107,8 +108,9 @@ class Bot:
             action: action to take
         """
         self.last_obs = copy.deepcopy(self.current_obs)
+        self.last_info = copy.deepcopy(self.current_info)
         try:
-            self.current_obs, reward, self.terminated, self.truncated, self.last_info = self.env.step(
+            self.current_obs, reward, self.terminated, self.truncated, self.current_info = self.env.step(
                 self.env.actions.index(action)
             )
         except ValueError as e:
@@ -144,7 +146,7 @@ class Bot:
         self.current_discount = 1.0
         self.terminated = False
         self.truncated = False
-        self.last_info = {}
+        self.current_info = {}
 
         try:
             if self.current_strategy is None:
@@ -174,24 +176,24 @@ class Bot:
             self.current_strategy = None
             self.current_args = None
 
-        extra_stats = self.last_info.get("episode_extra_stats", {})
+        extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
             "env_steps": self.steps,
             "strategy_reward": self.reward,
             "strategy_usefull": self.steps > 0,
         }
 
-        if "end_status" not in self.last_info:
+        if "end_status" not in self.current_info:
             # this will happen when we exceed max_strategy_steps
-            self.last_info["end_status"] = NLE.StepStatus.ABORTED
+            self.current_info["end_status"] = NLE.StepStatus.ABORTED
 
         if self.terminated or self.truncated:
-            new_extra_stats["success_rate"] = self.last_info["end_status"].name == "TASK_SUCCESSFUL"
+            new_extra_stats["success_rate"] = self.current_info["end_status"].name == "TASK_SUCCESSFUL"
             new_extra_stats["strategy_steps"] = self.strategy_steps
 
-        self.last_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
+        self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
-        return self.current_obs, self.reward, self.terminated, self.truncated, self.last_info
+        return self.current_obs, self.reward, self.terminated, self.truncated, self.current_info
 
     def search(self, num_times=1) -> None:
         old_time = self.blstats.time

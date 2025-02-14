@@ -5,6 +5,7 @@ from pathlib import Path
 
 import gymnasium as gym
 from nle import nethack
+from nle.env.base import NLE
 from nle_utils.utils.utils import log
 
 from nle_code_wrapper.utils.seed import get_unique_seed
@@ -29,7 +30,12 @@ class SaveOnException(gym.Wrapper):
             log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
             self.save_to_file()
 
-            return self.observation_space.sample(), {}
+            bot = self.env.get_wrapper_attr("bot")
+            obs = bot.last_obs
+            info = bot.last_info
+            info["end_status"] = NLE.StepStatus.ABORTED
+
+            return obs, info
 
     def step(self, action):
         try:
@@ -39,7 +45,12 @@ class SaveOnException(gym.Wrapper):
             log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
             self.save_to_file()
 
-            return self.observation_space.sample(), 0, True, False, {}
+            bot = self.env.get_wrapper_attr("bot")
+            obs = bot.last_obs
+            info = bot.last_info
+            info["end_status"] = NLE.StepStatus.ABORTED
+
+            return obs, bot.reward, True, False, info
 
     def save_to_file(self):
         dat = {
