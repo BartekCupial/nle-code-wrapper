@@ -55,6 +55,8 @@ class SaveOnException(gym.Wrapper):
             ttyrec_version = f".ttyrec{nethack.TTYREC_VERSION}.bz2"
             ttyrec = ttyrec_prefix + ttyrec_version
 
+        if not os.path.exists(self.failed_game_path):
+            os.makedirs(self.failed_game_path, exist_ok=True)
         fname = os.path.join(self.failed_game_path, f"{ttyrec}.demo")
         with open(fname, "wb") as f:
             log.debug(f"Saving demo to {fname}...")

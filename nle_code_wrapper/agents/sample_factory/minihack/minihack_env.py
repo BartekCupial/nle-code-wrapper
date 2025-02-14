@@ -15,7 +15,7 @@ from nle_utils.wrappers import (
     TileTTY,
 )
 from nle_utils.wrappers.nle_tokenizer import NLETokenizer
-from sample_factory.utils.utils import ensure_dir_exists, experiment_dir
+from sample_factory.utils.utils import experiment_dir
 
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback, SaveOnException
@@ -130,7 +130,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     if cfg.save_on_exception:
         failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
-        ensure_dir_exists(failed_game_path)
         env = SaveOnException(env, failed_game_path=failed_game_path)
 
     return env

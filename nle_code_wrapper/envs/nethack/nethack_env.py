@@ -17,7 +17,7 @@ from nle_utils.wrappers import (
     SingleSeed,
     TaskRewardsInfoWrapper,
 )
-from sample_factory.utils.utils import ensure_dir_exists, experiment_dir
+from sample_factory.utils.utils import experiment_dir
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
@@ -133,7 +133,6 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
 
     # if cfg.save_on_exception:
     #     failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
-    #     ensure_dir_exists(failed_game_path)
     #     env = SaveOnException(env, failed_game_path=failed_game_path)
 
     return env
