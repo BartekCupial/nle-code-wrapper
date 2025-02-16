@@ -2,7 +2,7 @@ import re
 
 import inflect
 
-from nle_code_wrapper.bot.inventory.objects import name_to_monsters
+from nle_code_wrapper.bot.inventory.objects import artifacts, name_to_monsters, novels, scrolls
 from nle_code_wrapper.bot.inventory.properties import (
     ItemBeatitude,
     ItemCategory,
@@ -14,6 +14,7 @@ from nle_code_wrapper.bot.inventory.properties import (
 )
 
 p = inflect.engine()
+proper_names = list(list(zip(*artifacts))[0]) + novels + scrolls
 
 
 class ItemParser:
@@ -148,8 +149,18 @@ class ItemParser:
         if plural_word.startswith("scrolls"):
             plural_word = plural_word.replace("scrolls", "scroll", 1)
 
-        if "DAIYEN FOOELS" in plural_word:
-            return plural_word
+        # Handle items with proper names
+        for name in proper_names:
+            if name in plural_word:
+                # Split into main item and proper name
+                parts = plural_word.split(f"named {name}")
+                if len(parts) > 1:
+                    # Convert the main item part to singular
+                    main_item = parts[0].strip()
+                    singular_main = p.singular_noun(main_item)
+                    main_item = singular_main if singular_main else main_item
+                    # Reconstruct with the proper name
+                    return f"{main_item} named {name}"
 
         # Attempt to convert the plural word to singular
         singular = p.singular_noun(plural_word)

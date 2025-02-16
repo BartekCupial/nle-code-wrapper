@@ -320,6 +320,59 @@ for artifact, appearance in artifacts:
                     add_obj(artifact, obj, glyph, prefixes=[f"{obj_description} named "])
 
 
+novels = [
+    "The Colour of Magic",
+    "The Light Fantastic",
+    "Equal Rites",
+    "Mort",
+    "Sourcery",
+    "Wyrd Sisters",
+    "Pyramids",
+    "Guards! Guards!",
+    "Eric",
+    "Moving Pictures",
+    "Reaper Man",
+    "Witches Abroad",
+    "Small Gods",
+    "Lords and Ladies",
+    "Men at Arms",
+    "Soul Music",
+    "Interesting Times",
+    "Maskerade",
+    "Feet of Clay",
+    "Hogfather",
+    "Jingo",
+    "The Last Continent",
+    "Carpe Jugulum",
+    "The Fifth Elephant",
+    "The Truth",
+    "Thief of Time",
+    "The Last Hero",
+    "The Amazing Maurice and His Educated Rodents",
+    "Night Watch",
+    "The Wee Free Men",
+    "Monstrous Regiment",
+    "A Hat Full of Sky",
+    "Going Postal",
+    "Thud!",
+    "Wintersmith",
+    "Making Money",
+    "Unseen Academicals",
+    "I Shall Wear Midnight",
+    "Snuff",
+    "Raising Steam",
+    "The Shepherd's Crown",
+]
+appearance = "paperback book"
+assert len(NAME_TO_OBJECTS[appearance]) == 1
+for novel in novels:
+    for obj, glyph in NAME_TO_OBJECTS[appearance]:
+        add_obj(novel, obj, glyph, prefixes=["", f"{appearance} named "])
+
+
+scrolls = [name.removeprefix("scroll labeled ") for name in NAME_TO_OBJECTS.keys() if "scroll labeled" in name]
+
+
 name_to_monsters = {}
 for glyph in range(nh.GLYPH_MON_OFF, nh.GLYPH_MON_OFF + nh.NUMMONS):
     permonst = nh.permonst(glyph)
