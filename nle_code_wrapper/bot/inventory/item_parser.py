@@ -133,10 +133,6 @@ class ItemParser:
             parsed_item["at_ready"] = False
         else:
             equipped, at_ready = self.EQUIPPED_STATES.get(info, (None, None))
-
-            if "foreclaw" in info:
-                print(1)
-
             if equipped is None:
                 raise ValueError(f"Unknown equipment status: {info}")
             parsed_item["equipped"] = equipped
@@ -149,6 +145,9 @@ class ItemParser:
 
         if plural_word.startswith("scrolls"):
             plural_word = plural_word.replace("scrolls", "scroll", 1)
+
+        if "DAIYEN FOOELS" in plural_word:
+            return plural_word
 
         # Attempt to convert the plural word to singular
         singular = p.singular_noun(plural_word)
