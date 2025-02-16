@@ -97,6 +97,7 @@ class Bot:
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         self.update()
+        self.start_glyph = self.entity.glyph
 
         return self.current_obs, self.current_info
 
@@ -386,8 +387,7 @@ class Bot:
     @property
     def poly(self):
         """Polymorphed"""
-        if not nethack.glyph_is_monster(self.entity.glyph):
-            return False
+        return self.start_glyph != self.entity.glyph
 
     @property
     def trap(self) -> bool:
