@@ -34,6 +34,10 @@ class ItemParser:
         "chained to you": (True, False),
         "on right hand": (True, False),
         "on left hand": (True, False),
+        "on right foreclaw": (True, False),
+        "on left foreclaw": (True, False),
+        "on right forehoof": (True, False),
+        "on left forehoof": (True, False),
         "at the ready": (False, True),
         "in quiver": (False, True),
         "in quiver pouch": (False, True),
@@ -129,6 +133,10 @@ class ItemParser:
             parsed_item["at_ready"] = False
         else:
             equipped, at_ready = self.EQUIPPED_STATES.get(info, (None, None))
+
+            if "foreclaw" in info:
+                print(1)
+
             if equipped is None:
                 raise ValueError(f"Unknown equipment status: {info}")
             parsed_item["equipped"] = equipped
