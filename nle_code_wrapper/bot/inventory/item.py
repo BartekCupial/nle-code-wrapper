@@ -36,6 +36,7 @@ class Item:
     def update_properties(
         self,
         name: str,
+        named: str,
         permonst,
         item_category: ItemCategory,
         quantity: ItemQuantity,
@@ -48,6 +49,7 @@ class Item:
         at_ready: bool,
     ):
         self._name = name
+        self.named = named
         self.permonst = permonst
         self.item_category = item_category if item_category else self.item_class.item_category
 
@@ -80,6 +82,9 @@ class Item:
             text.append(f"{self.permonst.mname} {self.name}")
         else:
             text.append(self.name)
+
+        if self.named:
+            text.append(f"named {self.named}")
 
         text.append(str(self.shop_status))
         if self.shop_status in [ShopStatus.UNPAID, ShopStatus.FOR_SALE]:

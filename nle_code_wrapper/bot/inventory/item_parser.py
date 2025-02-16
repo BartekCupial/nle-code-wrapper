@@ -2,7 +2,7 @@ import re
 
 import inflect
 
-from nle_code_wrapper.bot.inventory.objects import artifacts, name_to_monsters, novels, scrolls
+from nle_code_wrapper.bot.inventory.objects import name_to_monsters, scrolls
 from nle_code_wrapper.bot.inventory.properties import (
     ItemBeatitude,
     ItemCategory,
@@ -14,7 +14,6 @@ from nle_code_wrapper.bot.inventory.properties import (
 )
 
 p = inflect.engine()
-proper_names = list(list(zip(*artifacts))[0]) + novels + scrolls
 
 
 class ItemParser:
@@ -109,8 +108,17 @@ class ItemParser:
         return {key: value.strip() if value else "" for key, value in match_dict.items()}
 
     def _parse_basic_properties(self, item_info):
+        if "named" in item_info["name"]:
+            parts = item_info["name"].split(" named ")
+            assert len(parts) == 2
+            name, named = parts
+        else:
+            name = item_info["name"]
+            named = ""
+
         return {
-            "name": item_info["name"],
+            "name": name,
+            "named": named,
             "quantity": ItemQuantity.from_str(item_info["quantity"]),
             "beatitude": ItemBeatitude.from_str(item_info["beatitude"]),
             "erosion": ItemErosion.from_str(item_info["erosion"]),
@@ -149,18 +157,18 @@ class ItemParser:
         if plural_word.startswith("scrolls"):
             plural_word = plural_word.replace("scrolls", "scroll", 1)
 
-        # Handle items with proper names
-        for name in proper_names:
+        # Handle scrolls
+        for name in scrolls:
             if name in plural_word:
                 # Split into main item and proper name
-                parts = plural_word.split(f"named {name}")
+                parts = plural_word.split(f"labeled {name}")
                 if len(parts) > 1:
                     # Convert the main item part to singular
                     main_item = parts[0].strip()
                     singular_main = p.singular_noun(main_item)
                     main_item = singular_main if singular_main else main_item
                     # Reconstruct with the proper name
-                    return f"{main_item} named {name}"
+                    return f"{main_item} labeled {name}"
 
         # Attempt to convert the plural word to singular
         singular = p.singular_noun(plural_word)
