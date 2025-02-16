@@ -34,6 +34,8 @@ class ItemParser:
         "chained to you": (True, False),
         "on right hand": (True, False),
         "on left hand": (True, False),
+        "on right paw": (True, False),
+        "on left paw": (True, False),
         "on right foreclaw": (True, False),
         "on left foreclaw": (True, False),
         "on right forehoof": (True, False),
