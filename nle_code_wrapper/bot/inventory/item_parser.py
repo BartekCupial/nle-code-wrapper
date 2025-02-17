@@ -116,6 +116,13 @@ class ItemParser:
             name = item_info["name"]
             named = ""
 
+        if "containing" in item_info["name"]:
+            parts = item_info["name"].split(" containing ")
+            assert len(parts) == 2
+            # discard containing
+            # TODO: handle contents of containers
+            name = parts[0]
+
         return {
             "name": name,
             "named": named,
