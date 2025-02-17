@@ -598,7 +598,7 @@ nethack = [
     # "approach_and_zap_monster",
     "zap_monster",
     "approach_monster",
-    # "fight_multiple_monsters",
+    "fight_multiple_monsters",
     "goto_choke_point",
     "wait_for_monster",
     "goto_corridor",
