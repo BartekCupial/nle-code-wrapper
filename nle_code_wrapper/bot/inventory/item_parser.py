@@ -36,6 +36,8 @@ class ItemParser:
         "on left hand": (True, False),
         "on right paw": (True, False),
         "on left paw": (True, False),
+        "on right claw": (True, False),
+        "on left claw": (True, False),
         "on right foreclaw": (True, False),
         "on left foreclaw": (True, False),
         "on right forehoof": (True, False),
