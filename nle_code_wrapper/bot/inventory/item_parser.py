@@ -212,6 +212,15 @@ class ItemParser:
         name = name.removeprefix("a ")
         parsed_item.update({"permonst": name_to_monsters[name], "item_category": ItemCategory.CORPSE, "name": "corpse"})
 
+    def _handle_ooze(self, parsed_item):
+        """Handle ooze"""
+        name = parsed_item["name"]
+        name = self._make_singular(name)
+        parts = name.split(" glob of ")
+        assert len(parts) == 2
+        name = parts[1]
+        parsed_item.update({"permonst": name_to_monsters[name], "item_category": ItemCategory.CORPSE, "name": name})
+
     def _handle_statue(self, parsed_item):
         """Handle statue items"""
         name = parsed_item["name"]
@@ -258,6 +267,7 @@ class ItemParser:
 
         creature_item_handlers = {
             (" corpse", " corpses"): self._handle_corpse,
+            (" ooze",): self._handle_ooze,
             ("statue of ", "statues of "): self._handle_statue,
             ("figurine of ", "figurines of "): self._handle_figurine,
             ("tin of ", "tins of "): self._handle_tin,
