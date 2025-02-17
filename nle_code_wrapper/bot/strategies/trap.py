@@ -16,6 +16,9 @@ def escape_trap(bot: "Bot"):
         for i in range(10):
             neighbors = bot.pathfinder.neighbors(bot.entity.position)
 
+            if len(neighbors) == 0:
+                return False
+
             # Separate diagonal and cardinal neighbors
             diagonal_neighbors = [
                 n for n in neighbors if (n[0] - bot.entity.position[0]) != 0 and (n[1] - bot.entity.position[1]) != 0
