@@ -13,6 +13,7 @@ from nle_code_wrapper.envs.minihack.envs import (
     oracle,
     premapped_corridor,
     ray,
+    scroll,
     skills_quest,
     skills_simple,
     skills_wod,
