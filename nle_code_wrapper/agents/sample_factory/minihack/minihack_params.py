@@ -1,33 +1,60 @@
 import ast
 
-from sample_factory.utils.utils import str2bool
+from nle_utils.utils.utils import str2bool
 
 
-def add_extra_params_model(parser):
-    """
-    Specify any additional command line arguments for NetHack models.
-    """
-    # TODO: add help
+def add_extra_params_language_encoder(parser):
     p = parser
-    p.add_argument("--use_tty_only", type=str2bool, default=True)
-    p.add_argument("--use_prev_action", type=str2bool, default=False)
-    p.add_argument("--h_dim", type=int, default=1738)
-    p.add_argument("--msg_hdim", type=int, default=64)
-    p.add_argument("--color_edim", type=int, default=16)
-    p.add_argument("--char_edim", type=int, default=16)
-    p.add_argument("--use_crop", type=str2bool, default=True)
-    p.add_argument("--use_crop_norm", type=str2bool, default=True)
-    p.add_argument("--screen_kernel_size", type=int, default=3)
-    p.add_argument("--no_max_pool", type=str2bool, default=False)
-    p.add_argument("--screen_conv_blocks", type=int, default=2)
-    p.add_argument("--blstats_hdim", type=int, default=512)
-    p.add_argument("--fc_after_cnn_hdim", type=int, default=512)
-    p.add_argument("--use_resnet", type=str2bool, default=False)
-    p.add_argument("--inv_edim", type=int, default=16)
-    p.add_argument("--inv_hdim", type=int, default=64)
-    p.add_argument("--use_inventory", type=str2bool, default=True)
-    p.add_argument("--use_topline", type=str2bool, default=True)
-    p.add_argument("--use_bottomline", type=str2bool, default=True)
+    p.add_argument(
+        "--transformer_hidden_size",
+        type=int,
+        default=64,
+        help="size of transformer hidden layers",
+    )
+    p.add_argument(
+        "--transformer_hidden_layers",
+        type=int,
+        default=2,
+        help="number of transformer hidden layers",
+    )
+    p.add_argument(
+        "--transformer_attention_heads",
+        type=int,
+        default=2,
+        help="number of transformer attention heads",
+    )
+    p.add_argument(
+        "--max_token_length",
+        type=int,
+        default=512,
+        help="Maximum token input length before truncation",
+    )
+
+
+def add_extra_params_terminal_encoder(parser):
+    p = parser
+    p.add_argument("--char_edim", type=int, default=16, help="Char Embedding Dim. Defaults to `16`")
+    p.add_argument("--color_edim", type=int, default=16, help="Color Embedding Dim. Defaults to `16`")
+    p.add_argument("--hidden_dim", type=int, default=128)
+    p.add_argument("--depth", type=int, default=1)
+    p.add_argument(
+        "--use_learned_embeddings",
+        type=str2bool,
+        default=True,
+        help="Do we want to learn the embeddings for chars and colors",
+    )
+    p.add_argument(
+        "--use_max_pool",
+        type=str2bool,
+        default=True,
+        help="Do we want to use max pool in conv net",
+    )
+    p.add_argument(
+        "--expansion",
+        type=int,
+        default=2,
+        help="how much bigger hidden dimention in conv block",
+    )
 
 
 def add_extra_params_general(parser):

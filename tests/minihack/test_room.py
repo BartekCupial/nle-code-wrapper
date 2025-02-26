@@ -3,7 +3,7 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore, fight_closest_monster, goto_stairs, run_away
+from nle_code_wrapper.bot.strategies import descend_stairs, explore_room, fight_melee, run_away
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 
 
@@ -21,20 +21,25 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_room_explore(self, env):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+            ]
+        )
 
-        def general_explore(bot: "Bot"):
+        def solve(bot: "Bot"):
             while True:
                 try:
-                    if goto_stairs(bot):
+                    if descend_stairs(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
-        cfg.strategies = [general_explore]
-        status = play(cfg)
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -46,22 +51,28 @@ class TestMazewalkMapped(object):
     )
     @pytest.mark.parametrize("seed", [4])
     def test_solve_room_fight_easy(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_fight(bot: "Bot"):
             while True:
                 try:
-                    if fight_closest_monster(bot):
+                    if fight_melee(bot):
                         pass
-                    elif goto_stairs(bot):
+                    elif descend_stairs(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
         cfg.strategies = [general_fight]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -72,20 +83,26 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_room_teleport_traps(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_traps(bot: "Bot"):
             while True:
                 try:
-                    if goto_stairs(bot):
+                    if descend_stairs(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
         cfg.strategies = [general_traps]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"
 
     @pytest.mark.parametrize(
@@ -96,22 +113,26 @@ class TestMazewalkMapped(object):
         ],
     )
     def test_solve_room_fight_hard(self, env, seed):
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
 
         def general_smart_fight(bot: "Bot"):
             while True:
                 try:
-                    if run_away(bot):
+                    if fight_melee(bot):
                         pass
-                    elif fight_closest_monster(bot):
-                        pass
-                    elif goto_stairs(bot):
+                    elif descend_stairs(bot):
                         pass
                     else:
-                        explore(bot)
+                        explore_room(bot)
                 except BotPanic:
                     pass
 
         cfg.strategies = [general_smart_fight]
-        status = play(cfg)
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

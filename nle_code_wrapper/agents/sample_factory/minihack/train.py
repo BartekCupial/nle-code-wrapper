@@ -1,6 +1,5 @@
 import sys
 
-from nle_utils.envs.minihack.minihack_env import MINIHACK_ENVS
 from nle_utils.envs.minihack.minihack_params import add_extra_params_minihack_env
 from sample_factory.algo.utils.context import global_model_factory
 from sample_factory.cfg.arguments import parse_full_cfg, parse_sf_args
@@ -9,10 +8,11 @@ from sample_factory.model.encoder import Encoder
 from sample_factory.train import run_rl
 from sample_factory.utils.typing import Config, ObsSpace
 
-from nle_code_wrapper.agents.sample_factory.minihack.minihack_env import make_minihack_env
+from nle_code_wrapper.agents.sample_factory.minihack.minihack_env import CUSTOM_ENVS, MINIHACK_ENVS, make_minihack_env
 from nle_code_wrapper.agents.sample_factory.minihack.minihack_params import (
     add_extra_params_general,
-    add_extra_params_model,
+    add_extra_params_language_encoder,
+    add_extra_params_terminal_encoder,
     minihack_override_defaults,
 )
 from nle_code_wrapper.agents.sample_factory.minihack.models import MODELS_LOOKUP
@@ -20,7 +20,7 @@ from nle_code_wrapper.cfg.cfg import add_code_wrapper_cli_args, add_skill_wrappe
 
 
 def register_minihack_envs():
-    for env_name in MINIHACK_ENVS:
+    for env_name in MINIHACK_ENVS + CUSTOM_ENVS:
         register_env(env_name, make_minihack_env)
 
 
@@ -42,7 +42,8 @@ def register_minihack_components():
 def parse_minihack_args(argv=None, evaluation=False):
     parser, partial_cfg = parse_sf_args(argv=argv, evaluation=evaluation)
     add_extra_params_minihack_env(parser)
-    add_extra_params_model(parser)
+    add_extra_params_terminal_encoder(parser)
+    add_extra_params_language_encoder(parser)
     add_extra_params_general(parser)
     add_code_wrapper_cli_args(parser)
     add_skill_wrapper_cli_args(parser)

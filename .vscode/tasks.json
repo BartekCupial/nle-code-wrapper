@@ -44,6 +44,8 @@
             "description": "Select mrunner context",   
             "options": [
                 "pc_gpu",
+                "lumi_gpu",
+                "athena_gpu",
             ],
         },
     ]

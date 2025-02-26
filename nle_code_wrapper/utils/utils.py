@@ -1,10 +1,11 @@
 import functools
 import importlib
 from itertools import chain
-from typing import Any, Callable, Generator, Iterator
+from typing import Any, Callable, Generator, Iterator, List, Tuple, Union
 
 import numba as nb
 import numpy as np
+from numpy import int64, ndarray
 
 # general Python utilities
 
@@ -21,7 +22,7 @@ def _isin_kernel(array, mi, ma, mask):
 
 
 @functools.lru_cache(1024)
-def _isin_mask(elems):
+def _isin_mask(elems: Any) -> Tuple[int, int, ndarray]:
     elems = np.array(list(chain(*elems)), np.int16)
     return _isin_mask_kernel(elems)
 
@@ -41,7 +42,7 @@ def _isin_mask_kernel(elems):
     return mi, ma, ret
 
 
-def isin(array, *elems):
+def isin(array: ndarray, *elems) -> ndarray:
     assert array.dtype == np.int16
 
     # for memoization
@@ -53,11 +54,7 @@ def isin(array, *elems):
                 else (
                     e
                     if isinstance(e, frozenset)
-                    else tuple(e)
-                    if isinstance(e, list)
-                    else frozenset(e)
-                    if isinstance(e, set)
-                    else e
+                    else tuple(e) if isinstance(e, list) else frozenset(e) if isinstance(e, set) else e
                 )
             )
             for e in elems
@@ -84,7 +81,7 @@ def infinite_iterator(func: Callable[[Any], Generator]) -> Iterator:
         yield data
 
 
-def coords(glyphs, obj):
+def coords(glyphs: ndarray, obj: frozenset) -> List[Union[Any, Tuple[int64, int64]]]:
     return list(zip(*isin(glyphs, obj).nonzero()))
 
 

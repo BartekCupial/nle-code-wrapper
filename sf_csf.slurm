@@ -66,8 +66,7 @@ python3 -m nle_code_wrapper.agents.sample_factory.minihack.train --env $env \
     --te_learning_rate $te_lr \
     --learning_rate $lr \
     --max_grad_norm $max_grad_norm \
-    --skill_method $skill_method \
-    --exploration_loss_coeff $exploration_loss_coeff
+    --skill_method $skill_method
 
 
 exit 0

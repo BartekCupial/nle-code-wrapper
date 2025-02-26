@@ -1,0 +1,27 @@
+MAZE: "mylevel", ' '
+FLAGS:hardfloor
+INIT_MAP: solidfill,' '
+GEOMETRY:center,center
+MAP
+.....
+.....
+.....
+.....
+.....
+ENDMAP
+REGION:(0,0,4,4),lit,"ordinary"
+OBJECT:('(',"skeleton key"),random,blessed,0
+OBJECT:('%',"corpse"),(3,3),montype:"lichen"
+OBJECT:('%',"corpse"),(3,3),montype:"lichen"
+OBJECT:('%',"food ration"),(3,3)
+
+
+OBJECT:('%',"lump of royal jelly"),(3,4)
+OBJECT:('%',"lump of royal jelly"),(3,4)
+OBJECT:('%',"lump of royal jelly"),(3,4)
+OBJECT:('%',"lump of royal jelly"),(3,4)
+OBJECT:('%',"lump of royal jelly"),(3,4)
+OBJECT:('%',"lump of royal jelly"),(3,4)
+
+OBJECT:('%',"corpse"),(4,4),montype:"gray dragon"
+OBJECT:('%',"corpse"),(4,4),montype:"gray dragon"

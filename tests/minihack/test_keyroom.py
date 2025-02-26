@@ -5,12 +5,19 @@ from nle_utils.play import play
 
 from nle_code_wrapper.bot.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotPanic
-from nle_code_wrapper.bot.strategies import explore, goto_stairs, open_doors_key
+from nle_code_wrapper.bot.strategies import (
+    descend_stairs,
+    explore_corridor_systematically,
+    explore_room,
+    goto_unexplored_corridor,
+    goto_unexplored_room,
+    open_doors_key,
+)
 from nle_code_wrapper.envs.minihack.play_minihack import parse_minihack_args
 from nle_code_wrapper.utils import utils
 
 
-def position_of_closest_object(bot, obj):
+def position_of_object(bot, obj):
     coords = utils.coords(bot.glyphs, obj)
     distances = bot.pathfinder.distances(bot.entity.position)
 
@@ -27,7 +34,7 @@ def position_of_reachable_adjacent_object(bot: "Bot", obj):
     coords = utils.coords(bot.glyphs, obj)
 
     reachable = min(
-        (e for e in coords if bot.pathfinder.reachable_adjacent(bot.entity.position, e)),
+        (e for e in coords if bot.pathfinder.reachable(bot.entity.position, e, adjacent=True)),
         key=lambda e: bot.pathfinder.distance(bot.entity.position, e),
         default=None,
     )
@@ -36,7 +43,7 @@ def position_of_reachable_adjacent_object(bot: "Bot", obj):
 
 
 def pickup_key(bot: "Bot"):
-    position = position_of_closest_object(bot, G.TOOL_CLASS)
+    position = position_of_object(bot, G.TOOL_CLASS)
 
     if position:
         bot.pathfinder.goto(position)
@@ -46,20 +53,27 @@ def pickup_key(bot: "Bot"):
         return False
 
 
-def general_key(bot: "Bot"):
+def solve(bot: "Bot"):
     has_key = False
     while True:
         try:
             closed_doors = position_of_reachable_adjacent_object(bot, G.DOOR_CLOSED)
 
-            if goto_stairs(bot):
+            if descend_stairs(bot):
                 pass
             elif has_key and closed_doors:
                 open_doors_key(bot)
             elif pickup_key(bot):
                 has_key = True
+            elif explore_room(bot):
+                pass
+            elif explore_corridor_systematically(bot):
+                pass
+            elif goto_unexplored_room(bot):
+                pass
             else:
-                explore(bot)
+                goto_unexplored_corridor(bot)
+
         except BotPanic:
             pass
 
@@ -78,7 +92,13 @@ class TestMazewalkMapped(object):
     )
     def test_keyroom_hard(self, env, seed):
         # TODO: this is quite weak strategy for general exploration of the levels
-        cfg = parse_minihack_args(argv=[f"--env={env}", "--no-render", f"--seed={seed}"])
-        cfg.strategies = [general_key]
-        status = play(cfg)
+        cfg = parse_minihack_args(
+            argv=[
+                f"--env={env}",
+                "--no-render",
+                f"--seed={seed}",
+            ]
+        )
+        cfg.strategies = [solve]
+        status = play(cfg, get_action=lambda *_: 0)
         assert status["end_status"].name == "TASK_SUCCESSFUL"

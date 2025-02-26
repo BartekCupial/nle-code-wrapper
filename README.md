@@ -11,10 +11,22 @@ MINOR=$(python3 -c 'import sys; print(f"cp{sys.version_info.major}{sys.version_i
 pip install "https://github.com/BartekCupial/nle/releases/download/fair/nle-0.9.0-${MINOR}-${MINOR}-manylinux_2_17_$(uname -m).manylinux2014_$(uname -m).whl"
 pip install -e external/nle_utils
 pip install -e external/sample_factory
-pip install -e .[dev,mrunner,minihack]
+pip install -e .[dev,mrunner]
 ```
 
 ### post-installation setup
 ```bash
 pre-commit install
+```
+
+### How to play nethack/minihack with skills?
+
+NetHack
+```bash
+python -m nle_code_wrapper.envs.nethack.play_nethack --env NetHackChallenge-v0 --code_wrapper True
+```
+
+MiniHack
+```bash
+python -m nle_code_wrapper.envs.minihack.play_minihack --env MiniHack-Corridor-R3-v0 --code_wrapper True
 ```

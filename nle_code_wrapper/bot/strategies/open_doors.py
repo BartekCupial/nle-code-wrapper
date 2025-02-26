@@ -1,88 +1,115 @@
+import numpy as np
 from nle.nethack import actions as A
 from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
+from nle_code_wrapper.bot.strategy import strategy
+from nle_code_wrapper.utils import utils
 
 
-def open_doors(bot: "Bot"):
-    """
-    Attempts to open the nearest reachable closed door for the given bot.
-    This function identifies all closed doors on the current level and determines
-    the nearest one that the bot can reach. If a reachable closed door is found,
-    the bot will move to an adjacent position and attempt to open the door.
-    Args:
-        bot (Bot): The bot instance attempting to open doors.
-    Yields:
-        bool: True if a reachable closed door was found and the bot attempted to open it,
-              False if no reachable closed doors were found.
-    """
-
-    level = bot.current_level()
-    closed_doors = level.object_coords(G.DOOR_CLOSED)
-
-    reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
-        key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
+def find_nearest_door(bot: "Bot"):
+    closed_doors = np.argwhere(utils.isin(bot.glyphs, G.DOOR_CLOSED))
+    neigbors = [bot.pathfinder.reachable(bot.entity.position, tuple(door), adjacent=True) for door in closed_doors]
+    distances = bot.pathfinder.distances(bot.entity.position)
+    return min(
+        ((neighbor, tuple(door)) for neighbor, door in zip(neigbors, closed_doors) if neighbor is not None),
+        key=lambda pair: distances.get(pair[0], np.inf),
         default=None,
     )
 
-    if reachable_door:
-        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
-        bot.pathfinder.goto(adjacent)
-        bot.pathfinder.direction(reachable_door)
+
+@strategy
+def open_doors(bot: "Bot") -> bool:
+    """
+    Attempts to open closed doors.
+    Tips:
+    - prioritizes doors by distance (where distance is calculated as number of agent steps)
+    - tries to open the door up to 5 times
+    - stop attempts if doors are locked
+    """
+
+    adjacent_door = find_nearest_door(bot)
+    if adjacent_door:
+        bot.pathfinder.goto(adjacent_door[0])
+
+        # open the door multiple times
+        doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+        for _ in range(5):
+            # break when we open the doors
+            # break if doors are closed
+            new_doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+            if not (doors == new_doors).all() or "door is locked" in bot.message:
+                break
+            bot.pathfinder.direction(adjacent_door[1])
 
         return True
     else:
         return False
 
 
-def open_doors_kick(bot: "Bot"):
+@strategy
+def open_doors_kick(bot: "Bot") -> bool:
     """
-    Attempts to open closed doors by kicking them if they are reachable.
-    This function finds the nearest closed door that is reachable from the bot's current position.
-    If such a door is found, the bot moves to an adjacent position, kicks the door, and then
-    determines the direction of the door to complete the action.
-    Args:
-        bot (Bot): The bot instance that will perform the action.
-    Yields:
-        bool: True if a reachable closed door was found and kicked, False otherwise.
+    Attempts to open closed doors by kicking them.
+    Tips:
+    - prioritizes doors by distance (where distance is calculated as number of agent steps)
+    - kicks the door up to 5 times
     """
 
-    level = bot.current_level()
-    closed_doors = level.object_coords(G.DOOR_CLOSED)
-
-    reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
-        key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
-        default=None,
-    )
-
-    if reachable_door:
-        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
-        bot.pathfinder.goto(adjacent)
-        bot.step(A.Command.KICK)
-        bot.pathfinder.direction(reachable_door)
+    adjacent_door = find_nearest_door(bot)
+    if adjacent_door:
+        # kick the door multiple times
+        doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+        for _ in range(5):
+            bot.pathfinder.goto(adjacent_door[0])
+            # break when we break the doors
+            # break when we injure our leg
+            new_doors = utils.isin(bot.glyphs, G.DOOR_CLOSED)
+            if not (doors == new_doors).all() or "no shape for kicking" in bot.message:
+                break
+            bot.step(A.Command.KICK)
+            bot.pathfinder.direction(adjacent_door[1])
 
         return True
     else:
         return False
 
 
-def open_doors_key(bot: "Bot"):
-    level = bot.current_level()
-    closed_doors = level.object_coords(G.DOOR_CLOSED)
+@strategy
+def open_doors_key(bot: "Bot") -> bool:
+    """
+    Attempts to open closed doors with key.
+    Tips:
+    - prioritizes doors by distance (where distance is calculated as number of agent steps)
+    - needs a key to open the doors
+    - if no key, nothing happens
+    """
+    key_letter = None
+    for tool in bot.inventory["tools"]:
+        if tool.is_key:
+            key_letter = tool.letter
+            break
 
-    reachable_door = min(
-        (door for door in closed_doors if bot.pathfinder.reachable_adjacent(bot.entity.position, door)),
-        key=lambda door: bot.pathfinder.distance(bot.entity.position, door),
-        default=None,
-    )
+    if key_letter is None:
+        return False
 
-    if reachable_door:
-        adjacent = bot.pathfinder.reachable_adjacent(bot.entity.position, reachable_door)
-        bot.pathfinder.goto(adjacent)
+    adjacent_door = find_nearest_door(bot)
+    if adjacent_door:
+        old_opened_doors = utils.isin(bot.glyphs, G.DOOR_OPENED)
+        bot.pathfinder.goto(adjacent_door[0])
         bot.step(A.Command.APPLY)
+        if "What do you want to use or apply?" in bot.message:
+            bot.step(key_letter)
 
-        return True
+            if "In what direction?" in bot.message:
+                bot.pathfinder.direction(adjacent_door[1])
+
+                if "Unlock it?" in bot.message:
+                    bot.type_text("y")
+                    bot.pathfinder.direction(adjacent_door[1])
+
+        # return True if we opened the door
+        opened_doors = utils.isin(bot.glyphs, G.DOOR_OPENED)
+        return not (old_opened_doors == opened_doors).all()
     else:
         return False

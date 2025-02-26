@@ -4,9 +4,9 @@ for skill_method in CSF
 do
     for env in MiniHack-Corridor-R5-v0
     do 
-        for skill_dim in 4 8
+        for skill_dim in 2 4 8
         do
-            for normalize_returns in False
+            for normalize_returns in True
             do
                 for csf_lam in 1.0
                 do
@@ -14,7 +14,7 @@ do
                     do
                         for env_seed in 0
                         do
-                            for skill_type in discrete
+                            for skill_type in continuous
                             do
                                 for num_epochs in 1
                                 do
