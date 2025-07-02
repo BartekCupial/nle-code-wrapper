@@ -2,19 +2,17 @@ import inspect
 from os.path import join
 from typing import Optional, Tuple
 
-import gym
+import gymnasium as gym
 import nle  # NOQA: F401
 import nle_progress  # NOQA: F401
+from gymnasium import registry
 from nle import nethack
 from nle.nethack import NETHACKOPTIONS
 from nle_progress import NLEProgressWrapper
 from nle_utils.wrappers import (
     AutoMore,
     FinalStatsWrapper,
-    GymV21CompatibilityV0,
-    NLETimeLimit,
     NoProgressAbort,
-    SingleSeed,
     TaskRewardsInfoWrapper,
 )
 from sample_factory.utils.utils import experiment_dir
@@ -24,11 +22,7 @@ import nle_code_wrapper.bot.strategies as strategy_module
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback, SaveOnException
 
-NETHACK_ENVS = []
-for env_spec in gym.envs.registry.all():
-    id = env_spec.id
-    if "NetHack" in id:
-        NETHACK_ENVS.append(id)
+NETHACK_ENVS = [env_spec.id for env_spec in registry.values() if "NetHack" in env_spec.id]
 
 
 def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = None):
@@ -82,20 +76,12 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
         if param_value is not None:
             kwargs[param_name] = param_value
 
-    env = gym.make(env_name, **kwargs)
+    env = gym.make(env_name, render_mode=render_mode, **kwargs)
     env = NoProgressAbort(env)
     env = NLEProgressWrapper(env)
     env = TaskRewardsInfoWrapper(env)
     env = FinalStatsWrapper(env)
     env = AutoMore(env)
-
-    # wrap NLE with timeout
-    env = NLETimeLimit(env)
-
-    env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
-
-    if cfg.single_seed:
-        env = SingleSeed(env, cfg.single_seed)
 
     if len(cfg.strategies) > 0:
         if isinstance(cfg.strategies[0], str):

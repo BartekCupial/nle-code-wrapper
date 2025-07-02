@@ -130,8 +130,8 @@ class RNDModel(Encoder):
 
 
 if __name__ == "__main__":
-    import gym
+    import gymnasium as gym
     import nle
 
     env = gym.make("NetHackScore-v0")
-    obs = env.reset()
+    obs, _ = env.reset()

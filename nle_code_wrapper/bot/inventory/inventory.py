@@ -141,13 +141,13 @@ class Inventory:
 
 
 if __name__ == "__main__":
-    import gym
+    import gymnasium as gym
     import nle
 
     env = gym.make("NetHackScore-v0", character="@")
     for i in range(100):
         env.seed(i)
-        obs = env.reset()
+        obs, info = env.reset()
 
         inv_glyphs = obs["inv_glyphs"]
         inv_letters = obs["inv_letters"]

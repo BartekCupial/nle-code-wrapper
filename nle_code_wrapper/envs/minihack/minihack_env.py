@@ -2,11 +2,12 @@ import inspect
 from os.path import join
 from typing import Optional
 
-import gym
+import gymnasium as gym
 import minihack  # NOQA: F401
+from gymnasium import registry
 from nle import nethack
 from nle.env.base import FULL_ACTIONS
-from nle_utils.wrappers import AutoMore, GymV21CompatibilityV0, NLETimeLimit, NoProgressAbort, SingleSeed
+from nle_utils.wrappers import AutoMore, NoProgressAbort
 from sample_factory.utils.utils import experiment_dir
 
 import nle_code_wrapper.bot.panics as panic_module
@@ -15,17 +16,8 @@ import nle_code_wrapper.envs.minihack.envs  # noqa: E402
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback, SaveOnException
 
-MINIHACK_ENVS = []
-for env_spec in gym.envs.registry.all():
-    id = env_spec.id
-    if id.split("-")[0] == "MiniHack":
-        MINIHACK_ENVS.append(id)
-
-CUSTOM_ENVS = []
-for env_spec in gym.envs.registry.all():
-    id = env_spec.id
-    if id.split("-")[0] == "CustomMiniHack":
-        CUSTOM_ENVS.append(id)
+MINIHACK_ENVS = [env_spec.id for env_spec in registry.values() if env_spec.id.startswith("MiniHack")]
+CUSTOM_ENVS = [env_spec.id for env_spec in registry.values() if env_spec.id.startswith("CustomMiniHack")]
 
 
 def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = None):
@@ -68,16 +60,9 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         if param_value is not None:
             kwargs[param_name] = param_value
 
-    env = gym.make(env_name, **kwargs)
+    env = gym.make(env_name, render_mode=render_mode, **kwargs)
     env = NoProgressAbort(env)
     env = AutoMore(env)
-
-    env = NLETimeLimit(env)
-
-    env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
-
-    if cfg.single_seed:
-        env = SingleSeed(env, cfg.single_seed)
 
     if len(cfg.strategies) > 0:
         if isinstance(cfg.strategies[0], str):

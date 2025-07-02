@@ -26,7 +26,7 @@ from nle_code_wrapper.utils.tests import create_bot
 #         bot = create_bot(cfg)
 #         bot.reset(seed=seed)
 
-#         inner_env = bot.env.gym_env.unwrapped
+#         inner_env = bot.env.unwrapped
 #         assert 0 == task.reward(inner_env, None, inner_env.last_observation, None)
 #         goto_room(bot)
 #         # oracle detection

@@ -5,13 +5,13 @@ from argparse import Namespace
 from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
 
+import gymnasium as gym
 import numpy as np
 from nle import nethack
 from nle.env.base import NLE
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
 from nle_utils.glyph import G
-from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
 from nle_code_wrapper.bot.character import Character
@@ -27,9 +27,7 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 
 
 class Bot:
-    def __init__(
-        self, env: Union[GymV21CompatibilityV0, Namespace], max_strategy_steps: int = 1000, gamma: float = 0.99
-    ) -> None:
+    def __init__(self, env: gym.Env, max_strategy_steps: int = 1000, gamma: float = 0.99) -> None:
         """
         Gym environment or Namespace with the same attributes as the gym environment
         """
@@ -38,7 +36,7 @@ class Bot:
         self.gamma = gamma
 
         self.movements: Movements = Movements(self)
-        self.character: Character = Character(self, self.env.gym_env.unwrapped.character)
+        self.character: Character = Character(self, self.env.unwrapped.character)
         self.pathfinder: Pathfinder = Pathfinder(self)
         self.inventory_mangager: InventoryManager = InventoryManager(self)
         self.pvp: Pvp = Pvp(self)
@@ -230,7 +228,7 @@ class Bot:
             panic(self)
 
     def update(self) -> None:
-        internal = self.env.gym_env.unwrapped.last_observation[self.env.gym_env.unwrapped._internal_index]
+        internal = self.env.unwrapped.last_observation[self.env.unwrapped._internal_index]
         self.in_yn_function = internal[1]
         self.in_getlin = internal[2]
         self.xwaitingforspace = internal[3]

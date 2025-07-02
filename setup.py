@@ -40,7 +40,7 @@ setup(
         "networkx",
         "nle-progress @ git+https://github.com/BartekCupial/nle-progress.git",
         "minihack @ git+https://github.com/samvelyan/minihack",
-        "gym-minigrid",
+        "minigrid",
     ],
     extras_require={
         # some tests require Atari and Mujoco so let's make sure dev environment has that

@@ -5,7 +5,6 @@ from typing import Any, Callable, Dict, List, Tuple, Union
 import gymnasium as gym
 import numpy as np
 from nle.nethack import actions as A
-from nle_utils.wrappers.gym_compatibility import GymV21CompatibilityV0
 from numpy import int64, ndarray
 
 from nle_code_wrapper.bot import Bot
@@ -48,7 +47,7 @@ def direction_strategy(
 class NLECodeWrapper(gym.Wrapper):
     def __init__(
         self,
-        env: GymV21CompatibilityV0,
+        env: gym.Env,
         strategies: List[Callable],
         panics: List[Callable],
         max_strategy_steps: int = 1000,
@@ -59,7 +58,7 @@ class NLECodeWrapper(gym.Wrapper):
     ) -> None:
         super().__init__(env)
         if max_strategy_steps is None:
-            max_strategy_steps = env.gym_env.unwrapped._max_episode_steps
+            max_strategy_steps = env.unwrapped._max_episode_steps
         self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma)
 
         for panic_func in panics:

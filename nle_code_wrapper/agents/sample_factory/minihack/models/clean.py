@@ -45,11 +45,11 @@ class CleanNet(Encoder):
 
 
 if __name__ == "__main__":
-    import gym
+    import gymnasium as gym
     import nle
 
     env = gym.make("NetHackChallenge-v0")
-    x = env.reset()
+    x, _ = env.reset()
     blstats = torch.from_numpy(x["blstats"]).unsqueeze(0)
     chars = torch.from_numpy(x["tty_chars"]).unsqueeze(0)[..., 1:-2, :-1]
 

@@ -1,36 +1,26 @@
 from os.path import join
 from typing import Optional
 
-import gym
+import gymnasium as gym
 import minihack  # NOQA: F401
+from gymnasium import registry
 from nle import nethack
 from nle_utils.wrappers import (
     AutoMore,
-    GymV21CompatibilityV0,
-    NLETimeLimit,
     NoProgressAbort,
     ObservationFilterWrapper,
     PrevActionsWrapper,
-    SingleSeed,
     TileTTY,
 )
 from nle_utils.wrappers.nle_tokenizer import NLETokenizer
 from sample_factory.utils.utils import experiment_dir
 
+import nle_code_wrapper.envs.minihack.envs  # noqa: E402
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback, SaveOnException
 
-MINIHACK_ENVS = []
-for env_spec in gym.envs.registry.all():
-    id = env_spec.id
-    if id.split("-")[0] == "MiniHack":
-        MINIHACK_ENVS.append(id)
-
-CUSTOM_ENVS = []
-for env_spec in gym.envs.registry.all():
-    id = env_spec.id
-    if id.split("-")[0] == "CustomMiniHack":
-        CUSTOM_ENVS.append(id)
+MINIHACK_ENVS = [env_spec.id for env_spec in registry.values() if env_spec.id.startswith("MiniHack")]
+CUSTOM_ENVS = [env_spec.id for env_spec in registry.values() if env_spec.id.startswith("CustomMiniHack")]
 
 
 def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = None):
@@ -75,7 +65,7 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
     if cfg.code_wrapper:
         kwargs["actions"] = nethack.ACTIONS
 
-    env = gym.make(env_name, **kwargs)
+    env = gym.make(env_name, render_mode=render_mode, **kwargs)
     env = NoProgressAbort(env)
 
     if cfg.code_wrapper:
@@ -90,14 +80,6 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
 
     if cfg.use_prev_action:
         env = PrevActionsWrapper(env)
-
-    # wrap NLE with timeout
-    env = NLETimeLimit(env)
-
-    env = GymV21CompatibilityV0(env=env, render_mode=render_mode)
-
-    if cfg.single_seed:
-        env = SingleSeed(env, cfg.single_seed)
 
     strategies = []
     for strategy_name in cfg.strategies:
