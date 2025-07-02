@@ -6,7 +6,7 @@ class NoProgressFeedback(gym.Wrapper):
         super().__init__(env)
 
     def step(self, action):
-        obs, reward, terminated, truncated, info = super().step(action)
+        obs, reward, terminated, truncated, info = self.env.step(action)
 
         extra_stats = info.get("episode_extra_stats", {})
         if "env_steps" in extra_stats:

@@ -199,9 +199,13 @@ class Item:
         """Calculate base nutrition of a food object."""
 
         # Determine base nutrition value based on object type
-        # NOTE: skipped globby and special cases for certain food types
+        # NOTE: skipped special cases for certain food types
         if self.item_category == ItemCategory.CORPSE:
-            nut = self.permonst.cnutrit
+            globby = "ooze" in self._name
+            if globby:
+                nut = self.weight
+            else:
+                nut = self.permonst.cnutrit
         else:
             nut = self.object.oc_nutrition
 
@@ -234,7 +238,7 @@ class Item:
     def weight(self):
         wt = self.object.oc_weight
 
-        # NOTE: we ignore globby, partly_eaten (food, corpses), candelabrum
+        # NOTE: partly_eaten (food, corpses), candelabrum
 
         # container or statue
         # if (Is_container(obj) || obj->otyp == STATUE) {
@@ -278,7 +282,17 @@ class Item:
         #     return wt;
         # long_wt = obj.quan * mons[obj.corpsenm].cwt
         if self.item_category == ItemCategory.CORPSE:
-            return self.quantity.value * self.permonst.cwt
+            # handle globby
+            globby = "ooze" in self._name
+            if globby:
+                if "very large" in self.text:
+                    return 500
+                elif "large" in self.text:
+                    return 300
+                else:
+                    return 100
+            else:
+                return self.quantity.value * self.permonst.cwt
             # NOTE: we ignore partly eaten
 
         # coin

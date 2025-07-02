@@ -34,13 +34,15 @@ setup(
     keywords="reinforcement learning ai nlp llm code",
     project_urls={},
     install_requires=[
+        "gymnasium==0.29.0",
+        "inflect",
         "einops",
         "transformers",
         "sortedcontainers",
         "networkx",
         "nle-progress @ git+https://github.com/BartekCupial/nle-progress.git",
-        "minihack @ git+https://github.com/samvelyan/minihack",
-        "minigrid",
+        "minihack @ git+https://github.com/BartekCupial/minihack.git",
+        "minigrid @ git+https://github.com/Farama-Foundation/Minigrid",
     ],
     extras_require={
         # some tests require Atari and Mujoco so let's make sure dev environment has that

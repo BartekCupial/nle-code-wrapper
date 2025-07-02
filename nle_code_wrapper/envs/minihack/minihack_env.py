@@ -7,7 +7,7 @@ import minihack  # NOQA: F401
 from gymnasium import registry
 from nle import nethack
 from nle.env.base import FULL_ACTIONS
-from nle_utils.wrappers import AutoMore, NoProgressAbort
+from nle_utils.wrappers import AutoMore, AutoRender, AutoSeed, NoProgressAbort
 from sample_factory.utils.utils import experiment_dir
 
 import nle_code_wrapper.bot.panics as panic_module
@@ -61,6 +61,8 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
             kwargs[param_name] = param_value
 
     env = gym.make(env_name, render_mode=render_mode, **kwargs)
+    env = AutoRender(env)
+    env = AutoSeed(env)
     env = NoProgressAbort(env)
     env = AutoMore(env)
 

@@ -216,10 +216,10 @@ class ItemParser:
         """Handle ooze"""
         name = parsed_item["name"]
         name = self._make_singular(name)
-        parts = name.split(" glob of ")
+        parts = name.split("glob of ")
         assert len(parts) == 2
-        name = parts[1]
-        parsed_item.update({"permonst": name_to_monsters[name], "item_category": ItemCategory.CORPSE, "name": name})
+        name = "glob of " + parts[1]
+        parsed_item.update({"permonst": name_to_monsters[parts[1]], "item_category": ItemCategory.CORPSE, "name": name})
 
     def _handle_statue(self, parsed_item):
         """Handle statue items"""

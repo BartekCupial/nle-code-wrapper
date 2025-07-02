@@ -7,6 +7,8 @@ from gymnasium import registry
 from nle import nethack
 from nle_utils.wrappers import (
     AutoMore,
+    AutoRender,
+    AutoSeed,
     NoProgressAbort,
     ObservationFilterWrapper,
     PrevActionsWrapper,
@@ -66,6 +68,8 @@ def make_minihack_env(env_name, cfg, env_config, render_mode: Optional[str] = No
         kwargs["actions"] = nethack.ACTIONS
 
     env = gym.make(env_name, render_mode=render_mode, **kwargs)
+    env = AutoRender(env)
+    env = AutoSeed(env)
     env = NoProgressAbort(env)
 
     if cfg.code_wrapper:

@@ -89,6 +89,7 @@ class ItemDatabase:
         if key in self.item_classes:
             return self[key]
         else:
+            print("Warining: Item not found in database:", key)
             return default
 
     def __str__(self) -> str:

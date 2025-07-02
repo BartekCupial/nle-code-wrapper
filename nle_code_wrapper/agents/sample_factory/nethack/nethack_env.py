@@ -10,6 +10,8 @@ from nle.nethack import NETHACKOPTIONS
 from nle_progress import NLEProgressWrapper
 from nle_utils.wrappers import (
     AutoMore,
+    AutoRender,
+    AutoSeed,
     FinalStatsWrapper,
     NoProgressAbort,
     ObservationFilterWrapper,
@@ -78,6 +80,8 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
             kwargs[param_name] = param_value
 
     env = gym.make(env_name, render_mode=render_mode, **kwargs)
+    env = AutoRender(env)
+    env = AutoSeed(env)
     env = NoProgressAbort(env)
     env = NLEProgressWrapper(env)
     env = TaskRewardsInfoWrapper(env)

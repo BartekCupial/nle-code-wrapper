@@ -137,7 +137,9 @@ def test_enchantment(get_item, text, enchantment):
         ("2 lizard corpses", 80),
         ("a mastodon corpse", 800),
         ("a killer bee corpse", 5),
-        ("a glob of gray ooze", 20),
+        ("a glob of gray ooze", 100),
+        ("a large glob of gray ooze", 300),
+        ("a very large glob of gray ooze", 500),
         # /* meat */
         ("a tripe ration", 200),
         ("a newt corpse", 20),

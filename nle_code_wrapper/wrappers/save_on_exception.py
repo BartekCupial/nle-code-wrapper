@@ -25,7 +25,7 @@ class SaveOnException(gym.Wrapper):
         self.episode_number += 1
 
         try:
-            return super().reset(seed=self.recorded_seed, **kwargs)
+            return self.env.reset(seed=self.recorded_seed, **kwargs)
         except Exception as e:
             log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
             self.save_to_file()
@@ -40,7 +40,7 @@ class SaveOnException(gym.Wrapper):
     def step(self, action):
         try:
             self.recorded_actions.append(action)
-            return super().step(action)
+            return self.env.step(action)
         except Exception as e:
             log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
             self.save_to_file()
