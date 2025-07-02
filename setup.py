@@ -39,7 +39,7 @@ setup(
         "sortedcontainers",
         "networkx",
         "nle-progress @ git+https://github.com/BartekCupial/nle-progress.git",
-        "minihack @ git+https://github.com/BartekCupial/minihack.git",
+        "minihack @ git+https://github.com/samvelyan/minihack",
         "gym-minigrid",
     ],
     extras_require={
