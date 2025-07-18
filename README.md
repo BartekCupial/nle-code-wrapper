@@ -23,7 +23,7 @@ pre-commit install
 
 NetHack
 ```bash
-python -m nle_code_wrapper.envs.nethack.play_nethack --env NetHackChallenge-v0 --code_wrapper True
+python -m nle_code_wrapper.envs.nethack.play_nethack --env NetHackScore-v0 --code_wrapper True
 ```
 
 MiniHack
