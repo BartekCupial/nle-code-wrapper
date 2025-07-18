@@ -15,15 +15,16 @@ def get_revelable_positions(bot: "Bot", labeled_features):
     """
     # get current feature
     level = bot.current_level
-    current_feature = labeled_features == labeled_features[bot.entity.position]
+    # current_feature = labeled_features == labeled_features[bot.entity.position]
 
     # get unexplored positions of the room
     structure = ndimage.generate_binary_structure(2, 2)
     unexplored_edges = np.logical_and(ndimage.binary_dilation(~level.seen, structure), level.seen)
     walkable_edges = np.logical_and(unexplored_edges, level.walkable)  # we use level.walkable to exclude walls etc.
     discovery_potential = np.logical_and(walkable_edges, ~level.was_on)
-    feature_unexplored = np.logical_and(current_feature, discovery_potential)
-    unexplored_positions = np.argwhere(feature_unexplored)
+    # feature_unexplored = np.logical_and(current_feature, discovery_potential)
+    # unexplored_positions = np.argwhere(feature_unexplored)
+    unexplored_positions = np.argwhere(discovery_potential)
 
     return unexplored_positions
 
@@ -66,8 +67,8 @@ def explore_once(
     feature_labels, num_labels = feature_detection(bot)
 
     # Check if we are in the feature
-    if feature_labels[bot.entity.position] == 0:
-        return False
+    # if feature_labels[bot.entity.position] == 0:
+    #     return False
 
     unexplored_positions = get_positions(bot, feature_labels)
 
@@ -112,7 +113,6 @@ def explore_room(bot: "Bot") -> bool:
     Explores undiscovered tiles of the room we are in, starting from the closest ones.
     Tips:
     - we will explore until something appears (monster, item, etc) or until there is nothing to explore in current room
-    - we need to be in the room to explore it (`goto_room`)
     - doors are not treated as part of the room
     - corridors and rooms are labeled using connected components without diagonal connectivity
     """
@@ -152,7 +152,6 @@ def explore_corridor(bot: "Bot") -> bool:
     Explores undiscovered tiles of the corridor we are in, starting from the closest ones.
     Tips:
     - we will explore until something appears (monster, item, etc) or until there is nothing to explore in current corridor
-    - we need to be in the corridor to explore it (`goto_corridor`)
     - doors are treated as part of the corridor
     - corridors and rooms are labeled using connected components without diagonal connectivity
     """
