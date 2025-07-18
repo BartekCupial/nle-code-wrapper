@@ -124,6 +124,7 @@ def read_scroll(bot: "Bot"):
 
 @strategy
 def pray_altar(bot: "Bot"):
+    """Prays at an altar if it is available."""
     if goto_glyph(bot, G.ALTAR):
         bot.step(A.Command.PRAY)
         if "Are you sure you want to pray? [yn] (n)" in bot.message:
@@ -134,6 +135,7 @@ def pray_altar(bot: "Bot"):
 
 @strategy
 def quaff_sink(bot: "Bot"):
+    """Quaffs from a sink if it is available."""
     if goto_glyph(bot, G.SINK):
         bot.step(A.Command.QUAFF)
         if "Drink from the sink? [yn] (n)" in bot.message:
@@ -143,7 +145,8 @@ def quaff_sink(bot: "Bot"):
 
 
 @strategy
-def quaff_fouintain(bot: "Bot"):
+def quaff_fountain(bot: "Bot"):
+    """Quaffs from a fountain if it is available."""
     if goto_glyph(bot, G.FOUNTAIN):
         bot.step(A.Command.QUAFF)
         if "Drink from the fountain? [yn] (n)" in bot.message:

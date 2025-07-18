@@ -80,31 +80,37 @@ def _wear_with_dependencies(bot: "Bot", dependencies: List[ArmorClass], armor_cl
 
 @strategy
 def wear_shield(bot: "Bot") -> bool:
+    """Wears a shield from inventory."""
     return _simple_wear(bot, ArmorClass.SHIELD)
 
 
 @strategy
 def wear_helm(bot: "Bot") -> bool:
+    """Wears a helm from inventory."""
     return _simple_wear(bot, ArmorClass.HELM)
 
 
 @strategy
 def wear_boots(bot: "Bot") -> bool:
+    """Wears boots from inventory."""
     return _simple_wear(bot, ArmorClass.BOOTS)
 
 
 @strategy
 def wear_gloves(bot: "Bot") -> bool:
+    """Wears gloves from inventory."""
     return _simple_wear(bot, ArmorClass.GLOVES)
 
 
 @strategy
 def wear_cloak(bot: "Bot") -> bool:
+    """Wears a cloak from inventory."""
     return _simple_wear(bot, ArmorClass.CLOAK)
 
 
 @strategy
 def wear_suit(bot: "Bot") -> bool:
+    """Wears a suit from inventory."""
     # Note: To wear a suit, we need to remove the cloak first
     return _wear_with_dependencies(
         bot,
@@ -115,6 +121,7 @@ def wear_suit(bot: "Bot") -> bool:
 
 @strategy
 def wear_shirt(bot: "Bot") -> bool:
+    """Wears a shirt from inventory."""
     # To wear a shirt, we need to remove both cloak and suit
     return _wear_with_dependencies(
         bot,

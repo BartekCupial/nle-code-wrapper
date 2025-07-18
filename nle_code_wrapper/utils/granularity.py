@@ -636,7 +636,7 @@ nethack = [
     "puton_ring",
     "puton_amulet",
     "quaff_potion",
-    "quaff_fouintain",
+    "quaff_fountain",
     "quaff_sink",
     "read_scroll",
     "pray_altar",

@@ -117,7 +117,7 @@ from nle_code_wrapper.bot.strategies.search import (
 )
 from nle_code_wrapper.bot.strategies.skills_simple import (
     pray_altar,
-    quaff_fouintain,
+    quaff_fountain,
     quaff_potion,
     quaff_sink,
     read_scroll,
@@ -243,7 +243,7 @@ __all__ = [
     puton_ring,
     puton_amulet,
     quaff_potion,
-    quaff_fouintain,
+    quaff_fountain,
     quaff_sink,
     read_scroll,
     pray_altar,
