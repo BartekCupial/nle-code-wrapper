@@ -220,8 +220,7 @@ def find_intersections(pos1, pos2):
 @strategy
 def align_boulder_for_bridge(bot: "Bot") -> bool:
     """
-    Moves and positions the boulder with an open spot in a river
-    where it can close the gap and contribute to forming a bridge.
+    Moves and positions the boulder with an open spot in a river where it can close the gap and contribute to forming a bridge.
     Tips:
     - bot needs to stand near boulder first
     """

@@ -11,7 +11,7 @@ from nle_code_wrapper.bot.strategy import repeat, strategy
 @repeat
 def run_away(bot: "Bot") -> bool:
     """
-    Moves away the bot in the opposite direction of nearby monsters,
+    Moves away the bot in the opposite direction of nearby monsters.
     """
 
     # Get all nearby monsters

@@ -92,8 +92,7 @@ def cross_lava_river(bot: "Bot"):
 @strategy
 def levitate_over_lava_river(bot: "Bot"):
     """
-    Full lava river crossing strategy by detecting lava, collecting levitation
-    items, using them and attempting to levitate over a lava river.
+    Full lava river crossing strategy by detecting lava, collecting levitation items, using them and attempting to levitate over a lava river.
     """
     # 1) detect lava river
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
@@ -186,8 +185,7 @@ def approach_lava_river(bot: "Bot"):
 @strategy
 def freeze_lava_river(bot: "Bot"):
     """
-    Full lava river crossing strategy by detecting lava, collecting freezing
-    items, approaching lava edge, and attempting to freeze it.
+    Full lava river crossing strategy by detecting lava, collecting freezing items, approaching lava edge, and attempting to freeze it.
     """
     # 1) detect lava river
     features, num_features, features_lava, num_lava_features = lava_river_detection(bot)
