@@ -22,9 +22,8 @@ def get_revelable_positions(bot: "Bot", labeled_features):
     unexplored_edges = np.logical_and(ndimage.binary_dilation(~level.seen, structure), level.seen)
     walkable_edges = np.logical_and(unexplored_edges, level.walkable)  # we use level.walkable to exclude walls etc.
     discovery_potential = np.logical_and(walkable_edges, ~level.was_on)
-    # feature_unexplored = np.logical_and(current_feature, discovery_potential)
-    # unexplored_positions = np.argwhere(feature_unexplored)
-    unexplored_positions = np.argwhere(discovery_potential)
+    feature_unexplored = np.logical_and(labeled_features, discovery_potential)
+    unexplored_positions = np.argwhere(feature_unexplored)
 
     return unexplored_positions
 
