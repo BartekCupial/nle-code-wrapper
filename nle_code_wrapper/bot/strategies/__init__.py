@@ -91,6 +91,7 @@ from nle_code_wrapper.bot.strategies.goto import (
     goto_unexplored_room,
 )
 from nle_code_wrapper.bot.strategies.identify import engrave_identify
+from nle_code_wrapper.bot.strategies.misc import cancel, more, no, yes
 from nle_code_wrapper.bot.strategies.open_doors import open_doors, open_doors_key, open_doors_kick
 from nle_code_wrapper.bot.strategies.pickup import (
     examine_items,
@@ -284,4 +285,8 @@ __all__ = [
     wield_melee_weapon,
     wield_ranged_set,
     escape_trap,
+    yes,
+    no,
+    cancel,
+    more,
 ]
