@@ -117,7 +117,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         return False
 
     goto_closest(bot, searchable_positions)
-    bot.search(10)
+    bot.search(40)
     return True
 
 
