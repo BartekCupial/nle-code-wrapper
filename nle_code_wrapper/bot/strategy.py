@@ -1,3 +1,4 @@
+import itertools
 from functools import wraps
 
 import numpy as np
@@ -143,9 +144,47 @@ def repeat_until_discovery(func):
             # 3) if we have dead new end break
             new_dead_ends = get_dead_ends(new_features)
             if new_dead_ends.difference(dead_ends):
-                return True
+                from nle_code_wrapper.bot.strategies.search import search_corridor_for_hidden_doors
 
-            # 4) if we have new item break
+                bot_pos = bot.entity.position
+                height, width = bot.glyphs.shape
+                kernel = []
+                for dx, dy in itertools.product([-1, 0, 1], repeat=2):
+                    if dx == 0 and dy == 0:
+                        continue
+
+                    # make sure we don't have out of bounds
+                    new_x, new_y = bot_pos[0] + dx, bot_pos[1] + dy
+                    if not (0 <= new_x < height) or not (0 <= new_y < width):
+                        continue
+
+                    p = (bot_pos[0] + dx, bot_pos[1] + dy)
+                    kernel.append(bot.glyphs[p])
+
+                kernel = np.array([kernel])
+
+                # but you shouldn't search if there is a boulder
+                if np.any(utils.isin(kernel, G.BOULDER)):
+                    return True
+
+                # but you shouldn't search if there are doors
+                elif np.any(utils.isin(kernel, G.DOOR_CLOSED)):
+                    return True
+
+                else:
+                    # otherwise search corridor for hidden doors
+                    search_corridor_for_hidden_doors(bot)
+
+                    # if we found a hidden passage continue exploring
+                    if "find a hidden passage" in bot.message:
+                        pass
+                    else:
+                        # otherwise stop exploring
+                        # we either found a hidden door
+                        # or we are in a dead end
+                        return True
+
+            # 4) if we have new items break
             new_items = get_items()
             for item in new_items.difference(items).intersection(new_seen):
                 if bot.pathfinder.get_path_to(item):

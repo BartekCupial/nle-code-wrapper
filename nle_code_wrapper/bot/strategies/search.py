@@ -118,7 +118,10 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
 
     goto_closest(bot, searchable_positions)
     bot.search(40)
-    return True
+    if "find a hidden door" in bot.message or "find a hidden passage" in bot.message:
+        return True
+
+    return False
 
 
 @strategy
