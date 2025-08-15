@@ -2,18 +2,128 @@ import networkx as nx
 import numpy as np
 from nle.nethack import actions as A
 from nle_utils.glyph import G
-from scipy import ndimage
+from scipy import ndimage, spatial
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 from nle_code_wrapper.bot.strategies.goto import goto_closest
 from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.utils import utils
-from nle_code_wrapper.utils.strategies import corridor_detection, room_detection, save_boolean_array_pillow
+from nle_code_wrapper.utils.strategies import (
+    corridor_detection,
+    label_dungeon_features,
+    room_detection,
+    save_boolean_array_pillow,
+)
+
+
+def find_largest_rectangle(background):
+    distances = ndimage.distance_transform_cdt(background)
+
+    # Find the center and radius of the largest inscribed square
+    max_distance = distances.max()
+    center_coords = np.unravel_index(distances.argmax(), distances.shape)
+
+    center_row, center_col = center_coords
+    radius = int(max_distance)
+
+    # Create slices (ensure they're within image bounds)
+    top = max(0, center_row - radius)
+    bottom = min(background.shape[0], center_row + radius)
+    left = max(0, center_col - radius)
+    right = min(background.shape[1], center_col + radius)
+
+    row_slice = slice(top, bottom, None)
+    col_slice = slice(left, right, None)
+
+    return (row_slice, col_slice)
+
+
+def find_empty_spaces(bot: "Bot"):
+    labels, num_rooms, num_corridors = label_dungeon_features(bot)
+
+    background = labels == 0
+    empty_spaces = []
+
+    while True:
+        rectangle = find_largest_rectangle(background)
+        row_slice, col_slice = rectangle
+
+        # rectangle has to be at least 6x6
+        if row_slice.stop - row_slice.start < 6 or col_slice.stop - col_slice.start < 6:
+            break
+
+        background[rectangle] = False
+        center_of_mass_x = row_slice.start + (row_slice.stop - row_slice.start) // 2
+        center_of_mass_y = col_slice.start + (col_slice.stop - col_slice.start) // 2
+
+        empty_spaces.append((center_of_mass_x, center_of_mass_y))
+
+    return np.array(empty_spaces)
+
+
+def find_unsearched_walls(bot: "Bot"):
+    labeled_rooms, num_rooms = room_detection(bot)
+    labeled_corridors, num_corridors = corridor_detection(bot)
+
+    level = bot.current_level
+
+    # Find walls adjacent to walkable tiles in current room
+    room_walkable = np.logical_and(labeled_rooms > 0, level.walkable)
+    walls = utils.isin(bot.glyphs, G.WALL)
+    positions = np.logical_and(room_walkable, ndimage.binary_dilation(walls))
+
+    # Exclude positions near openings
+    structure = ndimage.generate_binary_structure(2, 2)
+    openings = np.logical_or(labeled_corridors > 0, utils.isin(bot.glyphs, G.DOOR_CLOSED))
+    positions = np.logical_and(positions, np.logical_not(ndimage.binary_dilation(openings, structure=structure)))
+
+    # Exclude already thoroughly searched walls
+    unsearched_walls = np.logical_and(positions, level.search_count < 10)  # Assume walls need 40 searches
+
+    return unsearched_walls
 
 
 @strategy
 def search_room_for_hidden_doors(bot: "Bot") -> bool:
+    """
+    Searches the rooms for possible hidden doors, will automatically go to the best room and search multiple spots for doors.
+    """
+
+    unsearched_walls = find_unsearched_walls(bot)
+    empty_spaces = find_empty_spaces(bot)
+
+    unsearched_walls_indices = np.argwhere(unsearched_walls)
+    distances = spatial.distance.cdist(unsearched_walls_indices, empty_spaces, metric="cityblock")
+    min_dist_per_wall = distances.min(axis=1)
+
+    best_wall_idx = min_dist_per_wall.argmin()
+    best_wall = unsearched_walls_indices[best_wall_idx]
+
+    labeled_room, num_rooms = room_detection(bot)
+    labeled_room_idx = labeled_room[tuple(best_wall)]
+    unsearched_walls_indices_room = np.argwhere(np.logical_and(unsearched_walls, labeled_room == labeled_room_idx))
+
+    # take every third element bacause when searching we do also search for neighbors automatically
+    unsearched_walls_indices_room = unsearched_walls_indices_room[::3]
+
+    distances_room = spatial.distance.cdist(unsearched_walls_indices_room, empty_spaces, metric="cityblock")
+    min_dist_per_wall_room = distances_room.min(axis=1)
+
+    for wall_idx in unsearched_walls_indices_room[min_dist_per_wall_room.argsort()]:
+        bot.pathfinder.goto(tuple(wall_idx))
+        bot.search(10)
+        if "find a hidden door" in bot.message:
+            return True
+
+        if "stop" in bot.message:
+            return False
+
+    return False
+
+
+@strategy
+def search_room_for_hidden_doors_old(bot: "Bot") -> bool:
     """
     Searches the current room's walls for hidden doors by directing the bot to search walls with possible doors.
     Tips:
