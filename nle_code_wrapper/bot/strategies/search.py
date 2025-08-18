@@ -56,10 +56,11 @@ def find_empty_spaces(bot: "Bot"):
         background[rectangle] = False
         center_of_mass_x = row_slice.start + (row_slice.stop - row_slice.start) // 2
         center_of_mass_y = col_slice.start + (col_slice.stop - col_slice.start) // 2
+        area = (row_slice.stop - row_slice.start) * (col_slice.stop - col_slice.start)
 
-        empty_spaces.append((center_of_mass_x, center_of_mass_y))
+        empty_spaces.append(((center_of_mass_x, center_of_mass_y), area))
 
-    return np.array(empty_spaces)
+    return empty_spaces
 
 
 def find_unsearched_walls(bot: "Bot"):
@@ -96,27 +97,35 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     unsearched_walls = find_unsearched_walls(bot)
     empty_spaces = find_empty_spaces(bot)
 
-    if not np.any(unsearched_walls):
-        return False
-
-    if len(empty_spaces) == 0:
+    if not np.any(unsearched_walls) or len(empty_spaces) == 0:
         return False
 
     unsearched_walls_indices = np.argwhere(unsearched_walls)
-    distances = spatial.distance.cdist(unsearched_walls_indices, empty_spaces, metric="cityblock")
-    min_dist_per_wall = distances.min(axis=1)
 
+    # Separate positions & areas
+    empty_positions = np.array([pos for pos, area in empty_spaces])
+    empty_areas = np.array([area for pos, area in empty_spaces])
+
+    # Compute Manhattan distances
+    distances = spatial.distance.cdist(unsearched_walls_indices, empty_positions, metric="cityblock")
+
+    # Adjust distances by area: larger spaces are better
+    # (using sqrt(area) to avoid making area too dominant)
+    weighted_distances = distances / np.sqrt(empty_areas)[None, :]
+
+    min_dist_per_wall = weighted_distances.min(axis=1)
     best_wall_idx = min_dist_per_wall.argmin()
     best_wall = unsearched_walls_indices[best_wall_idx]
 
+    # Restrict search to the wall’s room
     labeled_room, num_rooms = room_detection(bot)
     labeled_room_idx = labeled_room[tuple(best_wall)]
     unsearched_walls_indices_room = np.argwhere(np.logical_and(unsearched_walls, labeled_room == labeled_room_idx))
 
-    # take every third element bacause when searching we do also search for neighbors automatically
+    # take every third wall (heuristic)
     unsearched_walls_indices_room = unsearched_walls_indices_room[::3]
 
-    distances_room = spatial.distance.cdist(unsearched_walls_indices_room, empty_spaces, metric="cityblock")
+    distances_room = spatial.distance.cdist(unsearched_walls_indices_room, empty_positions, metric="cityblock")
     min_dist_per_wall_room = distances_room.min(axis=1)
 
     for wall_idx in unsearched_walls_indices_room[min_dist_per_wall_room.argsort()]:
