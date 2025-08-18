@@ -122,20 +122,26 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     labeled_room_idx = labeled_room[tuple(best_wall)]
     unsearched_walls_indices_room = np.argwhere(np.logical_and(unsearched_walls, labeled_room == labeled_room_idx))
 
-    # take every third wall (heuristic)
-    unsearched_walls_indices_room = unsearched_walls_indices_room[::3]
-
     distances_room = spatial.distance.cdist(unsearched_walls_indices_room, empty_positions, metric="cityblock")
     min_dist_per_wall_room = distances_room.min(axis=1)
 
-    for wall_idx in unsearched_walls_indices_room[min_dist_per_wall_room.argsort()]:
+    places_to_search = unsearched_walls_indices_room[min_dist_per_wall_room.argsort()]
+
+    while len(places_to_search) > 0:
+        wall_idx = places_to_search[0]
+
         bot.pathfinder.goto(tuple(wall_idx))
+
+        before_search_time = bot.blstats.time
+
         bot.search(10)
         if "find a hidden door" in bot.message:
             return True
 
-        if "stop" in bot.message:
+        if bot.blstats.time - before_search_time < 10:
             return False
+
+        places_to_search = np.array([p for p in places_to_search if bot.current_level.search_count[tuple(p)] < 10])
 
     return False
 
