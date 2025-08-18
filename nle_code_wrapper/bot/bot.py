@@ -101,9 +101,6 @@ class Bot:
         }
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
-        self.update()
-        self.start_glyph = self.entity.glyph
-
         return self.current_obs, self.current_info
 
     def step(self, action: int) -> None:
@@ -205,7 +202,7 @@ class Bot:
             new_extra_stats["strategy_steps"] = self.strategy_steps
 
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
-
+        print(self.get_map_description())
         return self.current_obs, self.reward, self.terminated, self.truncated, self.current_info
 
     def search(self, num_times=1) -> None:
