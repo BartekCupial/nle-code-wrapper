@@ -82,10 +82,16 @@ class Bot:
         self.current_args = None
         self.strategy_steps = 0
         self.current_discount = 1.0
+        self.overview = None
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
         self.last_obs = self.current_obs
         self.last_info = self.current_info
+
+        self.update()
+        self.start_glyph = self.entity.glyph
+
+        self.cache_overview()
 
         extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -120,6 +126,11 @@ class Bot:
                 raise BotPanic(f"action not allowed, err: {e}")
             else:
                 raise e
+
+        # TODO:
+        # # if we were teleported or the map changed, we need to update the overview
+        # if self.teleported or self.map_changed:
+        #     self.cache_overview()
 
         self.steps += 1
         self.reward += reward * self.current_discount
@@ -334,12 +345,29 @@ class Bot:
                 return "here"
             return " ".join(dirs)
 
-        directions = defaultdict(int)
+        distance_order = {
+            "very far to the": 24,
+            "far to the": 12,
+            "to the": 6,
+            "a short distance to the": 3,
+            "immediately": 1,
+            "": 0,
+        }
+
+        def get_distance_name(distance):
+            for name, dist in distance_order.items():
+                if distance >= dist:
+                    return name
+            return "unknown"
+
+        rooms_info = defaultdict(int)
         for room_id in range(1, num_rooms + 1):
             room = labeled_rooms == room_id
             room_coords = np.argwhere(room)
             room_distances = np.sum(np.abs(np.array(self.entity.position) - room_coords), axis=1)
             idx = np.argmin(room_distances)
+
+            distance_name = get_distance_name(room_distances[idx])
 
             in_this_room = room_distances[idx] == 0
             if in_this_room:
@@ -347,32 +375,40 @@ class Bot:
             else:
                 direction = direction_to((py, px), room_coords[idx])
 
-            directions[direction] += 1
+            rooms_info[(distance_name, direction)] += 1
 
         desc = []
+        overview = self.get_cached_overview()
+        if overview:
+            desc.extend(overview.split("\n"))
 
-        map_number_to_description = {
-            0: "the main dungeon.",
-            1: "hell.",
-            2: "the Mines.",
-            3: "the Quest.",
-            4: "the Sokoban.",
-            5: "the Vlad's tower.",
-        }
-
-        desc.append(f"You are in {map_number_to_description[self.blstats.dungeon_number]}")
-
-        if "here" in directions:
-            desc.append("You are in one of the rooms.")
-            directions.pop("here")
-
-        for direction, count in directions.items():
-            if count == 1:
-                desc.append(f"There is {count} room to the {direction}.")
+        desc.append("Local map:")
+        for (distance_name, direction), count in sorted(rooms_info.items()):
+            if distance_name == "" and direction == "here":
+                desc.append("You are in a room.")
             else:
-                desc.append(f"There are {count} rooms to the {direction}.")
+                dir_text = f"{direction}" if direction != "here" else ""
+                if distance_name:
+                    room_text = f"{distance_name} {dir_text}".strip()
+                else:
+                    room_text = dir_text
+                if count == 1:
+                    desc.append(f"There is a room {room_text}.")
+                else:
+                    desc.append(f"There are {count} rooms {room_text}.")
+        desc.append("")
 
         return "\n".join(desc)
+
+    def cache_overview(self):
+        self.step(A.Command.OVERVIEW)
+        self.overview = self.message
+
+    def get_cached_overview(self):
+        """
+        Returns the cached overview of the bot's current state.
+        """
+        return self.overview
 
     @property
     def inventory(self):
