@@ -96,7 +96,7 @@ def eat_corpse_floor(bot: "Bot"):
         properties = bot.inventory.item_parser(text)
         item = Item(
             text=text,
-            item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+            item_class=bot.inventory_manager.item_database.get(properties["name"]),
             **properties,
         )
         if item.item_category == ItemCategory.CORPSE:
@@ -111,7 +111,7 @@ def eat_corpse_floor(bot: "Bot"):
             if properties := bot.inventory.item_parser(line):
                 item = Item(
                     text=line,
-                    item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+                    item_class=bot.inventory_manager.item_database.get(properties["name"]),
                     **properties,
                 )
                 items.append(item)

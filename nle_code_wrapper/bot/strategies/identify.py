@@ -206,5 +206,5 @@ def engrave_identify(bot: "Bot"):
             # there is a problem with engraving on this tile
             continue
 
-        bot.inventory_mangager.item_database.update_item_candidates(appearance, wand_types)
-        bot.inventory_mangager.item_database[appearance.name].engraved = True
+        bot.inventory_manager.item_database.update_item_candidates(appearance, wand_types)
+        bot.inventory_manager.item_database[appearance.name].engraved = True

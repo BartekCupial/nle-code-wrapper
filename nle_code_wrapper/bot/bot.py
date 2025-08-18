@@ -38,7 +38,7 @@ class Bot:
         self.movements: Movements = Movements(self)
         self.character: Character = Character(self, self.env.unwrapped.character)
         self.pathfinder: Pathfinder = Pathfinder(self)
-        self.inventory_mangager: InventoryManager = InventoryManager(self)
+        self.inventory_manager: InventoryManager = InventoryManager(self)
         self.pvp: Pvp = Pvp(self)
         self.trap_tracker: TrapTracker = TrapTracker(self)
 
@@ -244,7 +244,7 @@ class Bot:
         self.current_level = self.get_current_level(self.current_obs)
 
         self.current_level.update(self.glyphs, self.blstats)
-        self.inventory_mangager.update()
+        self.inventory_manager.update()
         self.character.update()
         self.movements.update()
         self.pathfinder.update()
@@ -311,7 +311,7 @@ class Bot:
 
     @property
     def inventory(self):
-        return self.inventory_mangager.inventory
+        return self.inventory_manager.inventory
 
     @property
     def engulfed(self):

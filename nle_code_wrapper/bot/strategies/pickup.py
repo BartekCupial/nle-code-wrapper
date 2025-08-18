@@ -55,7 +55,7 @@ def pickup_multipage(bot: "Bot", item_category: ItemCategory, text: str):
         properties = bot.inventory.item_parser(item)
         item = Item(
             text=text,
-            item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+            item_class=bot.inventory_manager.item_database.get(properties["name"]),
             **properties,
         )
         if item.item_category == item_category:
@@ -85,7 +85,7 @@ def look(bot: "Bot", item_category: ItemCategory) -> bool:
         properties = bot.inventory.item_parser(text)
         item = Item(
             text=text,
-            item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+            item_class=bot.inventory_manager.item_database.get(properties["name"]),
             **properties,
         )
         if item.item_category == item_category:
@@ -101,7 +101,7 @@ def look(bot: "Bot", item_category: ItemCategory) -> bool:
             if properties := bot.inventory.item_parser(line):
                 item = Item(
                     text=line,
-                    item_class=bot.inventory_mangager.item_database.get(properties["name"]),
+                    item_class=bot.inventory_manager.item_database.get(properties["name"]),
                     **properties,
                 )
                 items.append(item)
