@@ -82,7 +82,7 @@ class Bot:
         self.current_args = None
         self.strategy_steps = 0
         self.current_discount = 1.0
-        self.overview = None
+        self.overview = {}
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
         self.last_obs = self.current_obs
@@ -126,11 +126,6 @@ class Bot:
                 raise BotPanic(f"action not allowed, err: {e}")
             else:
                 raise e
-
-        # TODO:
-        # # if we were teleported or the map changed, we need to update the overview
-        # if self.teleported or self.map_changed:
-        #     self.cache_overview()
 
         self.steps += 1
         self.reward += reward * self.current_discount
@@ -186,6 +181,13 @@ class Bot:
         except (BotPanic, BotFinished):
             self.current_strategy = None
             self.current_args = None
+
+        # if we changed the dungeon_number we need to update the overview
+        if (self.blstats.dungeon_number, self.blstats.depth) != (
+            self.overview.get("dungeon_number", -1),
+            self.overview.get("depth", -1),
+        ):
+            self.cache_overview()
 
         extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -346,10 +348,10 @@ class Bot:
             return " ".join(dirs)
 
         distance_order = {
-            "very far to the": 24,
-            "far to the": 12,
-            "to the": 6,
-            "a short distance to the": 3,
+            "very far to the": 32,
+            "far to the": 16,
+            "to the": 8,
+            "a short distance to the": 4,
             "immediately": 1,
             "": 0,
         }
@@ -402,13 +404,17 @@ class Bot:
 
     def cache_overview(self):
         self.step(A.Command.OVERVIEW)
-        self.overview = self.message
+        self.overview = {
+            "message": self.message,
+            "dungeon_number": self.blstats.dungeon_number,
+            "depth": self.blstats.depth,
+        }
 
     def get_cached_overview(self):
         """
         Returns the cached overview of the bot's current state.
         """
-        return self.overview
+        return self.overview["message"] if self.overview else ""
 
     @property
     def inventory(self):
