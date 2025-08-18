@@ -2,6 +2,7 @@ import copy
 import itertools
 import re
 from argparse import Namespace
+from collections import defaultdict
 from functools import partial
 from typing import Any, Callable, Dict, List, Tuple, Union
 
@@ -308,6 +309,70 @@ class Bot:
         if key not in self.levels:
             self.levels[key] = Level(*key)
         return self.levels[key]
+
+    def get_map_description(self):
+        from nle_code_wrapper.utils.strategies import room_detection
+
+        labeled_rooms, num_rooms = room_detection(self)
+
+        # Player position
+        py, px = self.entity.position
+
+        # Cardinal directions utility
+        def direction_to(from_xy, to_xy):
+            dy, dx = to_xy[0] - from_xy[0], to_xy[1] - from_xy[1]
+            dirs = []
+            if dy < 0:
+                dirs.append("north")
+            elif dy > 0:
+                dirs.append("south")
+            if dx < 0:
+                dirs.append("west")
+            elif dx > 0:
+                dirs.append("east")
+            if not dirs:
+                return "here"
+            return " ".join(dirs)
+
+        directions = defaultdict(int)
+        for room_id in range(1, num_rooms + 1):
+            room = labeled_rooms == room_id
+            room_coords = np.argwhere(room)
+            room_distances = np.sum(np.abs(np.array(self.entity.position) - room_coords), axis=1)
+            idx = np.argmin(room_distances)
+
+            in_this_room = room_distances[idx] == 0
+            if in_this_room:
+                direction = "here"
+            else:
+                direction = direction_to((py, px), room_coords[idx])
+
+            directions[direction] += 1
+
+        desc = []
+
+        map_number_to_description = {
+            0: "the main dungeon.",
+            1: "hell.",
+            2: "the Mines.",
+            3: "the Quest.",
+            4: "the Sokoban.",
+            5: "the Vlad's tower.",
+        }
+
+        desc.append(f"You are in {map_number_to_description[self.blstats.dungeon_number]}")
+
+        if "here" in directions:
+            desc.append("You are in one of the rooms.")
+            directions.pop("here")
+
+        for direction, count in directions.items():
+            if count == 1:
+                desc.append(f"There is {count} room to the {direction}.")
+            else:
+                desc.append(f"There are {count} rooms to the {direction}.")
+
+        return "\n".join(desc)
 
     @property
     def inventory(self):
