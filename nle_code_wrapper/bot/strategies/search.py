@@ -93,6 +93,12 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     unsearched_walls = find_unsearched_walls(bot)
     empty_spaces = find_empty_spaces(bot)
 
+    if not np.any(unsearched_walls):
+        return False
+
+    if len(empty_spaces) == 0:
+        return False
+
     unsearched_walls_indices = np.argwhere(unsearched_walls)
     distances = spatial.distance.cdist(unsearched_walls_indices, empty_spaces, metric="cityblock")
     min_dist_per_wall = distances.min(axis=1)
