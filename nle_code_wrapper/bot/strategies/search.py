@@ -68,15 +68,18 @@ def find_unsearched_walls(bot: "Bot"):
 
     level = bot.current_level
 
-    # Find walls adjacent to walkable tiles in current room
-    room_walkable = np.logical_and(labeled_rooms > 0, level.walkable)
+    rooms = labeled_rooms > 0
+    corridors = labeled_corridors > 0
+    door_closed = utils.isin(bot.glyphs, G.DOOR_CLOSED)
     walls = utils.isin(bot.glyphs, G.WALL)
-    positions = np.logical_and(room_walkable, ndimage.binary_dilation(walls))
 
-    # Exclude positions near openings
-    structure = ndimage.generate_binary_structure(2, 2)
-    openings = np.logical_or(labeled_corridors > 0, utils.isin(bot.glyphs, G.DOOR_CLOSED))
-    positions = np.logical_and(positions, np.logical_not(ndimage.binary_dilation(openings, structure=structure)))
+    # Find walls adjacent to walkable tiles in current room
+    room_walkable = np.logical_and(rooms, level.walkable)
+
+    openings = np.logical_or(corridors, door_closed)
+    positions = np.logical_and(
+        room_walkable, ndimage.binary_dilation(np.logical_and(walls, np.logical_not(ndimage.binary_dilation(openings))))
+    )
 
     # Exclude already thoroughly searched walls
     unsearched_walls = np.logical_and(positions, level.search_count < 10)  # Assume walls need 40 searches
