@@ -44,6 +44,7 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
 from nle_code_wrapper.bot.strategies.eat import eat_corpse_floor, eat_corpse_inventory, eat_food_inventory
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.explore import (
+    explore,
     explore_corridor,
     explore_corridor_east,
     explore_corridor_north,
@@ -54,6 +55,8 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_corridor_systematically_south,
     explore_corridor_systematically_west,
     explore_corridor_west,
+    explore_east,
+    explore_north,
     explore_room,
     explore_room_east,
     explore_room_north,
@@ -64,6 +67,8 @@ from nle_code_wrapper.bot.strategies.explore import (
     explore_room_systematically_south,
     explore_room_systematically_west,
     explore_room_west,
+    explore_south,
+    explore_west,
 )
 from nle_code_wrapper.bot.strategies.fight_monster import (
     fight_engulfed,
@@ -203,6 +208,11 @@ __all__ = [
     explore_room_systematically_south,
     explore_room_systematically_west,
     explore_room_west,
+    explore,
+    explore_east,
+    explore_north,
+    explore_south,
+    explore_west,
     fight_engulfed,
     fight_melee,
     fight_ranged,

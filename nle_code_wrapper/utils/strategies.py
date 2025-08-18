@@ -150,3 +150,12 @@ def corridor_detection(bot: "Bot") -> Tuple[np.ndarray, int]:
     labeled_features[labeled_features < 0] = 0
 
     return labeled_features, num_corridors
+
+
+def features_detection(bot: "Bot") -> Tuple[np.ndarray, int, int]:
+    """
+    Detects all features in the dungeon, including rooms, corridors, and doors.
+    """
+    labeled_features, num_rooms, num_corridors = label_dungeon_features(bot)
+
+    return labeled_features, num_rooms + num_corridors
