@@ -184,6 +184,7 @@ class Pvp:
             #   wield_best_ranged_set will just return False and we are out of the strategy
             #   we could also raise BotPanic no ammo
             if not self.wield_best_ranged_set():
+                self.bot.message = self.bot.get_message(self.bot.last_obs) + "\nNo ranged weapon or ammo available."
                 return False
 
             # 2) Get into range
@@ -243,8 +244,11 @@ class Pvp:
                 self.bot.step(A.Command.QUIVER)
                 self.bot.step(best_ammo.letter)
                 if self.bot.in_yn_function:
-                    self.bot.type_text("n")  # Your alternate weapon is {x} {item.name} Ready {x-1} of them? -> no
-                    self.bot.type_text("y")  # Ready all of them instead? -> yes
+                    if "Ready it instead?" in self.bot.message:
+                        self.bot.type_text("y")
+                    elif "Ready" in self.bot.message and "of them?" in self.bot.message:
+                        self.bot.type_text("n")  # Your alternate weapon is {x} {item.name} Ready {x-1} of them? -> no
+                        self.bot.type_text("y")  # Ready all of them instead? -> yes
 
             # we should have ammo at ready now
             if not best_ammo.at_ready:
