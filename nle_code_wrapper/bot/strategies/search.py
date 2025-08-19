@@ -235,8 +235,8 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     current_corridor = labeled_corridors == labeled_corridors[my_position]
 
     # Check if we are in the corridor
-    if labeled_corridors[my_position] == 0:
-        return False
+    # if labeled_corridors[my_position] == 0:
+    #     return False
 
     # look at dead ends, i.e. positions with only one neighbor
     graph = bot.pathfinder.create_movements_graph(my_position)
