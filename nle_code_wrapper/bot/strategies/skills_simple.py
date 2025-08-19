@@ -126,10 +126,9 @@ def read_scroll(bot: "Bot"):
 def pray_altar(bot: "Bot"):
     """Prays at an altar if it is available."""
     if goto_glyph(bot, G.ALTAR):
-        bot.step(A.Command.PRAY)
-        if "Are you sure you want to pray? [yn] (n)" in bot.message:
-            bot.type_text("y")
-            return True
+        bot.safely_pray()
+        return True
+
     return False
 
 

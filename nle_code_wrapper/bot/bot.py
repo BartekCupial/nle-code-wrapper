@@ -84,6 +84,7 @@ class Bot:
         self.strategy_steps = 0
         self.current_discount = 1.0
         self.overview = {}
+        self.last_prayer = None
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
         self.last_obs = self.current_obs
@@ -239,6 +240,33 @@ class Bot:
             self.step(A.MiscDirection.WAIT)
         else:
             self.pathfinder.random_move()
+
+    def pray(self) -> None:
+        self.step(A.Command.PRAY)
+        if "Are you sure you want to pray? [yn] (n)" in self.message:
+            self.type_text("y")
+            self.last_prayer = self.blstats.time
+
+            return True
+
+        return False
+
+    def safely_pray(self):
+        # The initial prayer timeout is set to 300 turns https://nethackwiki.com/wiki/Prayer_timeout
+        if self.last_prayer is None or self.blstats.time > 300:
+            self.pray()
+
+            return True
+
+        # safe to pray if the bot has not prayed for a while
+        elif self.last_prayer is not None and self.blstats.time - self.last_prayer > 500:
+            self.pray()
+
+            return True
+
+        # if the bot has prayed recently, it should not pray again
+        else:
+            return False
 
     def type_text(self, text: str) -> None:
         for char in text:
