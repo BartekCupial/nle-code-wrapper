@@ -202,7 +202,7 @@ class Bot:
             new_extra_stats["strategy_steps"] = self.strategy_steps
 
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
-        print(self.get_map_description())
+
         return self.current_obs, self.reward, self.terminated, self.truncated, self.current_info
 
     def add_message(self, message: str) -> None:
