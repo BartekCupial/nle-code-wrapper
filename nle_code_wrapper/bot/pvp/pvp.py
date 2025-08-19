@@ -184,7 +184,7 @@ class Pvp:
             #   wield_best_ranged_set will just return False and we are out of the strategy
             #   we could also raise BotPanic no ammo
             if not self.wield_best_ranged_set():
-                self.bot.message = self.bot.get_message(self.bot.last_obs) + "\nNo ranged weapon or ammo available."
+                self.bot.add_message("No ranged weapon or ammo available.")
                 return False
 
             # 2) Get into range

@@ -205,6 +205,17 @@ class Bot:
         print(self.get_map_description())
         return self.current_obs, self.reward, self.terminated, self.truncated, self.current_info
 
+    def add_message(self, message: str) -> None:
+        """
+        Adds a message to the bot's message log.
+
+        Args:
+            message: message to add
+        """
+        if not hasattr(self, "message"):
+            self.message = ""
+        self.message += "\n" + message
+
     def search(self, num_times=1) -> None:
         old_time = self.blstats.time
         for char in str(num_times):
