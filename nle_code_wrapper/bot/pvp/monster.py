@@ -66,7 +66,8 @@ class MonsterClassTypes(enum.Enum):
 
     MAXMCLASSES = 61  # /* number of monster classes */
 
-    def always_peaceful(self, monster_name: str):
+    @staticmethod
+    def always_peaceful(monster_name: str):
         always_peaceful = [
             "shopkeeper",
             "guard",
@@ -113,7 +114,8 @@ class MonsterClassTypes(enum.Enum):
 
         return monster_name in always_peaceful + quest_leaders + quest_guardians
 
-    def sometimes_peaceful_lawful(self, monster_name: str):
+    @staticmethod
+    def sometimes_peaceful_lawful(monster_name: str):
         sometimes_peaceful = [
             "hobbit",
             "dwarf",
@@ -138,7 +140,8 @@ class MonsterClassTypes(enum.Enum):
 
         return monster_name in sometimes_peaceful
 
-    def sometimes_peaceful_neutral(self, monster_name: str):
+    @staticmethod
+    def sometimes_peaceful_neutral(monster_name: str):
         sometimes_peaceful = [
             "acid blob",
             "little dog",
@@ -176,7 +179,8 @@ class MonsterClassTypes(enum.Enum):
 
         return monster_name in sometimes_peaceful
 
-    def sometimes_peaceful_chaotic(self, monster_name: str):
+    @staticmethod
+    def sometimes_peaceful_chaotic(monster_name: str):
         sometimes_peaceful = [
             "gremlin",
             "bugbear",

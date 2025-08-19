@@ -25,22 +25,22 @@ def fight_melee(bot: "Bot") -> bool:
         check = False
 
         # always peaceful
-        if entity.name in MonsterClassTypes.always_peaceful(entity.name):
+        if MonsterClassTypes.always_peaceful(entity.name):
             check = True
 
         # sometimes peaceful lawful
         if bot.character.alignment == Alignment.LAWFUL:
-            if entity.name in MonsterClassTypes.sometimes_peaceful_lawful(entity.name):
+            if MonsterClassTypes.sometimes_peaceful_lawful(entity.name):
                 check = True
 
         # sometimes peaceful neutral
         if bot.character.alignment == Alignment.NEUTRAL:
-            if entity.name in MonsterClassTypes.sometimes_peaceful_neutral(entity.name):
+            if MonsterClassTypes.sometimes_peaceful_neutral(entity.name):
                 check = True
 
         # sometimes peaceful chaotic
         if bot.character.alignment == Alignment.CHAOTIC:
-            if entity.name in MonsterClassTypes.sometimes_peaceful_chaotic(entity.name):
+            if MonsterClassTypes.sometimes_peaceful_chaotic(entity.name):
                 check = True
 
         # check humans, elves, dwarves, humans and gnomes
