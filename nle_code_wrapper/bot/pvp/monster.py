@@ -65,3 +65,148 @@ class MonsterClassTypes(enum.Enum):
     S_MIMIC_DEF = 60  # /* ] */
 
     MAXMCLASSES = 61  # /* number of monster classes */
+
+    def always_peaceful(self, monster_name: str):
+        always_peaceful = [
+            "shopkeeper",
+            "guard",
+            "prisoner",
+            "Oracle",
+            "aligned priest",
+            "watchman",
+            "watch captain",
+            "mail daemon",
+            "Charon",
+        ]
+
+        quest_leaders = [
+            "Lord Carnarvon",
+            "Pelias",
+            "Shaman Karnov",
+            "Hippocrates",
+            "King Arthur",
+            "Grand Master",
+            "Arch Priest",
+            "Orion",
+            "Master of Thieves",
+            "Lord Sato",
+            "Twoflower",
+            "Norn",
+            "Neferet the Green",
+        ]
+
+        quest_guardians = [
+            "student",
+            "chieftain",
+            "neanderthal",
+            "attendant",
+            "page",
+            "abbot",
+            "acolyte",
+            "hunter",
+            "thug",
+            "roshi",
+            "guide",
+            "warrior",
+            "apprentice",
+        ]
+
+        return monster_name in always_peaceful + quest_leaders + quest_guardians
+
+    def sometimes_peaceful_lawful(self, monster_name: str):
+        sometimes_peaceful = [
+            "hobbit",
+            "dwarf",
+            "dwarf leader",
+            "dwarf ruler",
+            "tengu",
+            "white unicorn",
+            "couatl",
+            "Aleax",
+            "Angel",
+            "ki-rin",
+            "Archon",
+            "giant",
+            "stone giant",
+            "fire giant",
+            "titan",
+            "black naga",
+            "golden naga",
+            "guardian naga",
+            "sasquatch",
+        ]
+
+        return monster_name in sometimes_peaceful
+
+    def sometimes_peaceful_neutral(self, monster_name: str):
+        sometimes_peaceful = [
+            "acid blob",
+            "little dog",
+            "dog",
+            "large dog",
+            "kitten",
+            "housecat",
+            "large cat",
+            "pony",
+            "gray unicorn",
+            "horse",
+            "warhorse",
+            "bat",
+            "plains centaur",
+            "air elemental",
+            "fire elemental",
+            "earth elemental",
+            "water elemental",
+            "gnome",
+            "gnome leader",
+            "gnomish wizard",
+            "gnome ruler",
+            "red naga hatchling",
+            "black naga hatchling",
+            "golden naga hatchling",
+            "guardian naga hatchling",
+            "garter snake",
+            "umber hulk",
+            "monkey",
+            "ape",
+            "human",
+            "high cleric",
+            "djinni",
+        ]
+
+        return monster_name in sometimes_peaceful
+
+    def sometimes_peaceful_chaotic(self, monster_name: str):
+        sometimes_peaceful = [
+            "gremlin",
+            "bugbear",
+            "homunculus",
+            "imp",
+            "quasit",
+            "goblin",
+            "hobgoblin",
+            "orc",
+            "hill orc",
+            "Mordor orc",
+            "Uruk-hai",
+            "orc shaman",
+            "orc-captain",
+            "black unicorn",
+            "forest centaur",
+            "mountain centaur",
+            "hill giant",
+            "frost giant",
+            "storm giant",
+            "red naga",
+            "ogre",
+            "ogre leader",
+            "ogre tyrant",
+            "elf",
+            "Woodland-elf",
+            "Green-elf",
+            "Grey-elf",
+            "elf-noble",
+            "elven monarch",
+        ]
+
+        return monster_name in sometimes_peaceful

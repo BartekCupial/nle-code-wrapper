@@ -5,8 +5,10 @@ import numpy as np
 from nle.nethack import actions as A
 
 from nle_code_wrapper.bot.bot import Bot
+from nle_code_wrapper.bot.character.properties import Alignment, Race
 from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.pathfinder.movements import Movements
+from nle_code_wrapper.bot.pvp.monster import MonsterClassTypes
 from nle_code_wrapper.bot.strategies.goto import goto_closest
 from nle_code_wrapper.bot.strategy import repeat, strategy
 
@@ -19,20 +21,59 @@ def fight_melee(bot: "Bot") -> bool:
     """
     bot.movements = Movements(bot, monster_collision=False)
 
-    # def is_peaceful(bot: "Bot", entity: Entity):
-    #     bot.pathfinder.glance(entity.position)
-    #     return "peaceful" in bot.message
-
     def is_peaceful(bot: "Bot", entity: Entity):
-        return False
+        check = False
 
-    neigbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
+        # always peaceful
+        if entity.name in MonsterClassTypes.always_peaceful(entity.name):
+            check = True
+
+        # sometimes peaceful lawful
+        if bot.character.alignment == Alignment.LAWFUL:
+            if entity.name in MonsterClassTypes.sometimes_peaceful_lawful(entity.name):
+                check = True
+
+        # sometimes peaceful neutral
+        if bot.character.alignment == Alignment.NEUTRAL:
+            if entity.name in MonsterClassTypes.sometimes_peaceful_neutral(entity.name):
+                check = True
+
+        # sometimes peaceful chaotic
+        if bot.character.alignment == Alignment.CHAOTIC:
+            if entity.name in MonsterClassTypes.sometimes_peaceful_chaotic(entity.name):
+                check = True
+
+        # check humans, elves, dwarves, humans and gnomes
+        if bot.character.race == Race.HUMAN:
+            pass
+        elif bot.character.race == Race.ELF:
+            if ord(entity.permonst.mlet) in [MonsterClassTypes.S_ELF]:
+                check = True
+        elif bot.character.race == Race.DWARF:
+            if ord(entity.permonst.mlet) in [MonsterClassTypes.S_DWARF, MonsterClassTypes.S_GNOME]:
+                check = True
+        elif bot.character.race == Race.GNOME:
+            if ord(entity.permonst.mlet) in [MonsterClassTypes.S_DWARF, MonsterClassTypes.S_GNOME]:
+                check = True
+        elif bot.character.race == Race.ORC:
+            pass
+
+        if check:
+            bot.pathfinder.glance(entity.position)
+            return "peaceful" in bot.message
+        else:
+            return False
+
+    # def is_peaceful(bot: "Bot", entity: Entity):
+    #     return False
+
+    neighbors = [bot.pathfinder.reachable(bot.entity.position, e.position, adjacent=True) for e in bot.entities]
     distances = bot.pathfinder.distances(bot.entity.position)
 
     # Create list of tuples (neighbor, entity, is_peaceful)
     entities_info = [
         (neighbor, entity, is_peaceful(bot, entity))
-        for neighbor, entity in zip(neigbors, bot.entities)
+        for neighbor, entity in zip(neighbors, bot.entities)
         if neighbor is not None
     ]
 
