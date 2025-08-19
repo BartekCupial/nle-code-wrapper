@@ -118,11 +118,27 @@ def repeat_until_discovery(func):
             """
             return set(map(tuple, np.argwhere(utils.isin(bot.glyphs, G.ITEMS))))
 
+        def get_specials():
+            """
+            return positions of the special objects in the dungeon
+            """
+            return set(
+                map(
+                    tuple,
+                    np.argwhere(
+                        utils.isin(
+                            bot.glyphs, G.BARS, G.THRONE, G.GRAVE, G.STAIR_DOWN, G.STAIR_UP, G.ALTAR, G.FOUNTAIN, G.SINK
+                        )
+                    ),
+                )
+            )
+
         features, num_rooms, num_corridors = label_dungeon_features(bot)
         labels = get_labels(features)
         doors = get_doors()
         dead_ends = get_dead_ends(features)
         items = get_items()
+        specials = get_specials()
         seen = bot.current_level.seen.copy()
 
         while func(bot, *args, **kwargs):
@@ -133,7 +149,8 @@ def repeat_until_discovery(func):
             new_features, new_num_rooms, new_num_corridors = label_dungeon_features(bot)
             new_labels = get_labels(new_features)
             if len(labels) < len(new_labels):
-                return True
+                pass
+                # return True
 
             # 2) if we have new door break
             new_doors = get_doors()
@@ -188,6 +205,12 @@ def repeat_until_discovery(func):
             new_items = get_items()
             for item in new_items.difference(items).intersection(new_seen):
                 if bot.pathfinder.get_path_to(item):
+                    return True
+
+            # 5) if we have new special objects break
+            new_specials = get_specials()
+            for special in new_specials.difference(specials).intersection(new_seen):
+                if bot.pathfinder.get_path_to(special):
                     return True
 
             seen = bot.current_level.seen.copy()
