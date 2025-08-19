@@ -63,7 +63,7 @@ def find_empty_spaces(bot: "Bot"):
     return empty_spaces
 
 
-def find_unsearched_walls(bot: "Bot"):
+def find_unsearched_walls(bot: "Bot", search_count_threshold=10):
     labeled_rooms, num_rooms = room_detection(bot)
     labeled_corridors, num_corridors = corridor_detection(bot)
 
@@ -83,7 +83,7 @@ def find_unsearched_walls(bot: "Bot"):
     )
 
     # Exclude already thoroughly searched walls
-    unsearched_walls = np.logical_and(positions, level.search_count < 10)  # Assume walls need 40 searches
+    unsearched_walls = np.logical_and(positions, level.search_count < search_count_threshold)
 
     return unsearched_walls
 
@@ -93,8 +93,17 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     """
     Searches the rooms for possible hidden doors, will automatically go to the best room and search multiple spots for doors.
     """
+    # Dynamic search threshold
+    search_count_threshold = 10
 
-    unsearched_walls = find_unsearched_walls(bot)
+    while True:
+        unsearched_walls = find_unsearched_walls(bot, search_count_threshold=search_count_threshold)
+
+        if np.any(unsearched_walls) or search_count_threshold > 40:
+            break
+
+        search_count_threshold += 10
+
     empty_spaces = find_empty_spaces(bot)
 
     if not np.any(unsearched_walls) or len(empty_spaces) == 0:
@@ -129,19 +138,20 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
 
     while len(places_to_search) > 0:
         wall_idx = places_to_search[0]
-
         bot.pathfinder.goto(tuple(wall_idx))
 
         before_search_time = bot.blstats.time
-
         bot.search(10)
+
         if "find a hidden door" in bot.message:
             return True
 
         if bot.blstats.time - before_search_time < 10:
             return False
 
-        places_to_search = np.array([p for p in places_to_search if bot.current_level.search_count[tuple(p)] < 10])
+        places_to_search = np.array(
+            [p for p in places_to_search if bot.current_level.search_count[tuple(p)] < search_count_threshold]
+        )
 
     return False
 
