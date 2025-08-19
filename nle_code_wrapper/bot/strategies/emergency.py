@@ -276,7 +276,10 @@ def cure_disease(bot: "Bot"):
 
     # hallucination
     elif bot.hallu:
-        pass
+        if apply_unicorn_horn(bot):
+            return True
+        else:
+            return wait_it_out(bot, "hallu")
 
     # blindness
     elif bot.blind:
