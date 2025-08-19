@@ -406,6 +406,8 @@ class Bot:
             "dungeon_number": self.blstats.dungeon_number,
             "depth": self.blstats.depth,
         }
+        # clear message, because it is redundant
+        self.message = ""
 
     def get_cached_overview(self):
         """
