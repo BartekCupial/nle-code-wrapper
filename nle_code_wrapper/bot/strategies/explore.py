@@ -69,6 +69,7 @@ def explore_once(
         - Directs the bot to the closest unexplored position using pathfinding
     """
     feature_labels, num_labels = feature_detection(bot)
+    labeled_rooms, num_rooms = room_detection(bot)
 
     # Check if we are in the feature
     # if feature_labels[bot.entity.position] == 0:
@@ -87,8 +88,20 @@ def explore_once(
     filter_func = direction_filters.get(direction.lower())
     if filter_func:
         unexplored_positions = np.array([position for position in unexplored_positions if filter_func(position)])
+
+        # if we are in the room, prioritize positions in the room
+        if labeled_rooms[bot.entity.position] > 0:
+            room_mask = labeled_rooms == labeled_rooms[bot.entity.position]
+            unexplored_positions_room = np.array(
+                [position for position in unexplored_positions if room_mask[tuple(position)]]
+            )
+
+            if len(unexplored_positions_room) > 0:
+                unexplored_positions = unexplored_positions_room
+
         return goto_closest(bot, unexplored_positions)
-    return False
+    else:
+        return False
 
 
 @strategy
