@@ -14,6 +14,7 @@ from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
 from nle_utils.glyph import G
 from numpy import int64, ndarray
+from scipy import ndimage
 
 from nle_code_wrapper.bot.character import Character
 from nle_code_wrapper.bot.entity import Entity
@@ -331,16 +332,11 @@ class Bot:
             self.levels[key] = Level(*key)
         return self.levels[key]
 
-    def get_map_description(self):
-        from nle_code_wrapper.utils.strategies import room_detection
-
-        labeled_rooms, num_rooms = room_detection(self)
-
-        # Player position
-        py, px = self.entity.position
-
-        # Cardinal directions utility
+    def describe_room(self, room_mask, dilated_corridors, dilated_doors, revelable_positions):
         def direction_to(from_xy, to_xy):
+            """
+            Returns a string describing the direction.
+            """
             dy, dx = to_xy[0] - from_xy[0], to_xy[1] - from_xy[1]
             dirs = []
             if dy < 0:
@@ -355,37 +351,90 @@ class Bot:
                 return "here"
             return " ".join(dirs)
 
-        distance_order = {
-            "very far to the": 32,
-            "far to the": 16,
-            "to the": 8,
-            "a short distance to the": 4,
-            "immediately": 1,
-            "": 0,
-        }
-
         def get_distance_name(distance):
+            """
+            Returns a string describing the distance.
+            """
+            distance_order = {
+                "very far to the": 32,
+                "far to the": 16,
+                "to the": 8,
+                "a short distance to the": 4,
+                "immediately": 1,
+                "": 0,
+            }
+
             for name, dist in distance_order.items():
                 if distance >= dist:
                     return name
             return "unknown"
 
-        rooms_info = defaultdict(int)
+        room_coords = np.argwhere(room_mask)
+        py, px = self.entity.position
+
+        # Describe the exploration status, first check for revelable positions
+        if len(revelable_positions) > 0 and np.any(
+            np.all(room_coords[:, None] == revelable_positions[None, :], axis=-1)
+        ):
+            # Visited the room
+            if np.any(np.logical_and(self.current_level.was_on, room_mask)):
+                explored = "partially explored"
+            else:
+                explored = "unexplored"
+        else:
+            explored = "explored"
+
+        # Compute the number of exits
+        corridor_exits = np.argwhere(np.logical_and(dilated_corridors, room_mask))
+        door_exits = np.argwhere(np.logical_and(dilated_doors, room_mask))
+        num_exits = len(corridor_exits) + len(door_exits)
+        num_closed_doors = len(door_exits)
+
+        # TODO: Add info about features: stairs, fountains, sinks, altars, shops
+        features = []
+
+        # Compute distance from the player to the room
+        room_distances = np.sum(np.abs(np.array(self.entity.position) - room_coords), axis=1)
+        idx = np.argmin(room_distances)
+
+        # Describe the distance
+        distance = get_distance_name(room_distances[idx])
+
+        # Describe the direction
+        in_this_room = room_distances[idx] == 0
+        if in_this_room:
+            direction = "here"
+        else:
+            direction = direction_to((py, px), room_coords[idx])
+
+        return {
+            "explored": explored,
+            "distance": distance,
+            "direction": direction,
+            "num_exits": num_exits,
+            "num_closed_doors": num_closed_doors,
+            "features": features,
+        }
+
+    def get_map_description(self):
+        from nle_code_wrapper.bot.strategies.explore import get_revelable_positions
+        from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
+
+        labeled_rooms, num_rooms = room_detection(self)
+        labeled_corridors, num_corridors = corridor_detection(self)
+        revelable_positions = get_revelable_positions(self, labeled_rooms)
+
+        dilated_corridors = ndimage.binary_dilation(labeled_corridors)
+        dilated_doors = ndimage.binary_dilation(utils.isin(self.glyphs, G.DOOR_CLOSED))
+
+        rooms_info = []
         for room_id in range(1, num_rooms + 1):
             room = labeled_rooms == room_id
-            room_coords = np.argwhere(room)
-            room_distances = np.sum(np.abs(np.array(self.entity.position) - room_coords), axis=1)
-            idx = np.argmin(room_distances)
 
-            distance_name = get_distance_name(room_distances[idx])
+            room_info = self.describe_room(room, dilated_corridors, dilated_doors, revelable_positions)
+            room_info["room_id"] = room_id
 
-            in_this_room = room_distances[idx] == 0
-            if in_this_room:
-                direction = "here"
-            else:
-                direction = direction_to((py, px), room_coords[idx])
-
-            rooms_info[(distance_name, direction)] += 1
+            rooms_info.append(room_info)
 
         desc = []
         overview = self.get_cached_overview()
@@ -393,20 +442,29 @@ class Bot:
             desc.extend(overview.split("\n"))
 
         desc.append("Local map:")
-        for (distance_name, direction), count in sorted(rooms_info.items()):
-            if distance_name == "" and direction == "here":
-                desc.append("You are in a room.")
-            else:
-                dir_text = f"{direction}" if direction != "here" else ""
-                if distance_name:
-                    room_text = f"{distance_name} {dir_text}".strip()
-                else:
-                    room_text = dir_text
-                if count == 1:
-                    desc.append(f"There is a room {room_text}.")
-                else:
-                    desc.append(f"There are {count} rooms {room_text}.")
-        desc.append("")
+
+        for room_info in rooms_info:
+            room_id = room_info["room_id"]
+            explored = room_info["explored"]
+            distance = room_info["distance"]
+            direction = room_info["direction"]
+            num_exits = room_info["num_exits"]
+            num_closed_doors = room_info["num_closed_doors"]
+            features = ", ".join(room_info["features"])
+
+            if direction == "here":
+                direction = "<- You are here"
+
+            detail_text = f"{explored} room"
+            if num_exits:
+                exits_text = f"with {num_exits} {'exit' if num_exits == 1 else 'exits'}"
+                if num_closed_doors > 0:
+                    exits_text += f" ({num_closed_doors} closed doors)"
+                detail_text += " " + exits_text
+            if features:
+                detail_text += " containing " + ", ".join(features)
+
+            desc.append(f"{detail_text} {distance} {direction}.")
 
         return "\n".join(desc)
 
