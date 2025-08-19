@@ -213,9 +213,7 @@ class Bot:
         Args:
             message: message to add
         """
-        if not hasattr(self, "message"):
-            self.message = ""
-        self.message += "\n" + message
+        self.last_obs["text_message"] += "\n" + message
 
     def search(self, num_times=1) -> None:
         old_time = self.blstats.time
@@ -471,12 +469,14 @@ class Bot:
     def cache_overview(self):
         self.step(A.Command.OVERVIEW)
         self.overview = {
-            "message": self.message,
+            "message": self.last_obs["text_message"],
             "dungeon_number": self.blstats.dungeon_number,
             "depth": self.blstats.depth,
         }
+
         # clear message, because it is redundant
-        self.message = ""
+        self.last_obs["text_message"] = ""
+        self.message = self.get_message(self.last_obs)
 
     def get_cached_overview(self):
         """

@@ -13,6 +13,6 @@ class NoProgressFeedback(gym.Wrapper):
             env_steps = extra_stats["env_steps"]
 
             if env_steps == 0:
-                obs["text_message"] = "Your strategy did not result in any progress. Try a different one."
+                self.bot.add_message("Your strategy did not result in any progress. Try a different one.")
 
         return obs, reward, terminated, truncated, info
