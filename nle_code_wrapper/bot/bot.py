@@ -465,14 +465,14 @@ class Bot:
                     room_features[feature_name] += 1
 
         name_plural = {
-            "stairs down": ("A stairs down", "stairs down"),
-            "stairs up": ("A stairs up", "stairs up"),
-            "altar": ("An altar", "altars"),
-            "fountain": ("A fountain", "fountains"),
-            "throne": ("A throne", "thrones"),
-            "sink": ("A sink", "sinks"),
-            "trap": ("A trap", "traps"),
-            "grave": ("A grave", "graves"),
+            "stairs down": ("stairs down", "stairs down"),
+            "stairs up": ("stairs up", "stairs up"),
+            "altar": ("an altar", "altars"),
+            "fountain": ("a fountain", "fountains"),
+            "throne": ("a throne", "thrones"),
+            "sink": ("a sink", "sinks"),
+            "trap": ("a trap", "traps"),
+            "grave": ("a grave", "graves"),
         }
 
         features = []
@@ -540,7 +540,7 @@ class Bot:
             direction = room_info["direction"]
             num_exits = room_info["num_exits"]
             num_closed_doors = room_info["num_closed_doors"]
-            features = ", ".join(room_info["features"])
+            features = "  Objects: " + ", ".join(room_info["features"]) + "." if room_info["features"] else ""
 
             if direction == "here":
                 here = "<- You are here."
@@ -565,7 +565,7 @@ class Bot:
             desc.append(text)
 
             if features:
-                desc.append(f"  {features}.")
+                desc.append(features)
 
         return "\n".join(desc)
 
