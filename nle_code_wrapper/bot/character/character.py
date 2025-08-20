@@ -98,10 +98,10 @@ class Character:
         # 2) we failed to init from welcome init from attributes
         if not self.init:
             # TODO: fix nle so it doesn't skip at the reset
-            obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.ATTRIBUTES))
+            obs, *_ = self.bot.internal_step(A.Command.ATTRIBUTES)
             message = "\n".join([bytes(line).decode("latin-1") for line in obs["tty_chars"]])
             self.parse_welcome(message)
-            obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.ESC))
+            obs, *_ = self.bot.internal_step(A.Command.ESC)
 
         if len(self.known_spells) == 0 and self.role in [Role.WIZARD, Role.PRIEST, Role.MONK, Role.HEALER]:
             # If we are a spellcaster, we should have spells
@@ -354,7 +354,7 @@ class Character:
 
     def update_spells(self):
         self.known_spells = {}
-        obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.CAST))
+        obs, *_ = self.bot.internal_step(A.Command.CAST)
         text = obs["text_message"]
         self.parse_spellcast_view(text)
 
@@ -374,15 +374,15 @@ class Character:
 
         # Check for (end)
         if re.search(end_pattern, text):
-            self.bot.env.step(self.bot.env.actions.index(A.MiscAction.MORE))
+            self.bot.internal_step(A.MiscAction.MORE)
 
         # Check for (n of n) - same number
         elif re.search(page_pattern, text):
-            self.bot.env.step(self.bot.env.actions.index(A.MiscAction.MORE))
+            self.bot.internal_step(A.MiscAction.MORE)
 
         # Check for (n of m) - different numbers
         elif re.search(diff_page_pattern, text):
-            obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.TextCharacters.SPACE))
+            obs, *_ = self.bot.internal_step(A.TextCharacters.SPACE)
             text = obs["text_message"]
             self.parse_spellcast_view(text)
 

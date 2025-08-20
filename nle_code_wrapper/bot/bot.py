@@ -84,6 +84,7 @@ class Bot:
         self.strategy_steps = 0
         self.current_discount = 1.0
         self.overview = {}
+        self.terrain_features = defaultdict(dict)
         self.last_prayer = None
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
@@ -94,6 +95,7 @@ class Bot:
         self.start_glyph = self.entity.glyph
 
         self.cache_overview()
+        self.cache_terrain()
 
         extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -104,6 +106,9 @@ class Bot:
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         return self.current_obs, self.current_info
+
+    def internal_step(self, action: int) -> None:
+        return self.env.step(self.env.actions.index(action))
 
     def step(self, action: int) -> None:
         """
@@ -187,6 +192,14 @@ class Bot:
             self.overview.get("depth", -1),
         ):
             self.cache_overview()
+
+        # update terrain features every 50 turns
+        if (
+            self.blstats.time
+            - self.terrain_features[self.blstats.dungeon_number, self.blstats.level_number].get("time", 0)
+            > 50
+        ):
+            self.cache_terrain()
 
         extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
@@ -425,11 +438,11 @@ class Bot:
         ):
             # Visited the room
             if np.any(np.logical_and(self.current_level.was_on, room_mask)):
-                explored = "partially explored"
+                explored = "Partially explored"
             else:
-                explored = "unexplored"
+                explored = "Unexplored"
         else:
-            explored = "explored"
+            explored = "Explored"
 
         # Compute the number of exits
         corridor_exits = np.argwhere(np.logical_and(dilated_corridors, room_mask))
@@ -437,8 +450,34 @@ class Bot:
         num_exits = len(corridor_exits) + len(door_exits)
         num_closed_doors = len(door_exits)
 
-        # TODO: Add info about features: stairs, fountains, sinks, altars, shops
+        # Info about features: stairs, fountains, sinks, altars, etc.
+        # TODO: add shops
+        map_features = self.terrain_features[(self.blstats.dungeon_number, self.blstats.level_number)].get(
+            "features", {}
+        )
+        room_features = defaultdict(int)
+        for feature_name, positions in map_features.items():
+            for pos in positions:
+                if room_mask[tuple(pos)]:
+                    room_features[feature_name] += 1
+
+        name_plural = {
+            "stairs down": ("A stairs down", "stairs down"),
+            "stairs up": ("A stairs up", "stairs up"),
+            "altar": ("An altar", "altars"),
+            "fountain": ("A fountain", "fountains"),
+            "throne": ("A throne", "thrones"),
+            "sink": ("A sink", "sinks"),
+            "trap": ("A trap", "traps"),
+            "grave": ("A grave", "graves"),
+        }
+
         features = []
+        for feature, count in room_features.items():
+            if count == 1:
+                features.append(name_plural[feature][0])
+            elif count > 1:
+                features.append(f"{count} {name_plural[feature][1]}")
 
         # Compute distance from the player to the room
         room_distances = np.sum(np.abs(np.array(self.entity.position) - room_coords), axis=1)
@@ -501,7 +540,13 @@ class Bot:
             features = ", ".join(room_info["features"])
 
             if direction == "here":
-                direction = "<- You are here"
+                here = "<- You are here."
+                direction = ""
+                punctuation = ":" if features else ""
+            else:
+                here = ""
+                direction = direction
+                punctuation = ":" if features else "."
 
             detail_text = f"{explored} room"
             if num_exits:
@@ -509,29 +554,75 @@ class Bot:
                 if num_closed_doors > 0:
                     exits_text += f" ({num_closed_doors} closed doors)"
                 detail_text += " " + exits_text
-            if features:
-                detail_text += " containing " + ", ".join(features)
 
-            desc.append(f"{detail_text} {distance} {direction}.")
+            text = " ".join([e for e in [detail_text, distance, direction, punctuation, here] if e])
+            text = text.replace(" :", ":")
+            text = text.replace(" .", " ")
+
+            desc.append(text)
+
+            if features:
+                desc.append(f"  {features}.")
 
         return "\n".join(desc)
 
     def cache_overview(self):
-        self.step(A.Command.OVERVIEW)
-        self.overview = {
-            "message": self.message,
-            "dungeon_number": self.blstats.dungeon_number,
-            "depth": self.blstats.depth,
-        }
+        obs, *_ = self.internal_step(A.Command.OVERVIEW)
+        blstats = self.get_blstats(obs)
+        message = self.get_message(obs)
 
-        # clear message, because it is redundant
-        self.message = self.get_message(self.last_obs)
+        self.overview = {
+            "message": message,
+            "dungeon_number": blstats.dungeon_number,
+            "depth": blstats.depth,
+        }
 
     def get_cached_overview(self):
         """
         Returns the cached overview of the bot's current state.
         """
         return self.overview["message"] if self.overview else ""
+
+    def cache_terrain(self):
+        self.internal_step(ord("#"))
+        self.internal_step(ord("t"))
+        self.internal_step(ord("e"))
+        self.internal_step(A.MiscAction.MORE)
+
+        obs, *_ = self.internal_step(ord("b"))
+        blstats = self.get_blstats(obs)
+        glyphs = self.get_glyphs(obs)
+
+        self.terrain_features[(blstats.dungeon_number, blstats.level_number)] = {
+            "features": self.get_terrain_features(glyphs),
+            "time": blstats.time,
+        }
+
+        self.internal_step(A.Command.ESC)
+
+    def get_terrain_features(self, glyphs) -> Dict[str, Any]:
+        """
+        Returns the terrain features of the current level.
+        """
+        name_glyph = {
+            "stairs down": G.STAIR_DOWN,
+            "stairs up": G.STAIR_UP,
+            "altar": G.ALTAR,
+            "fountain": G.FOUNTAIN,
+            "throne": G.THRONE,
+            "sink": G.SINK,
+            "trap": G.TRAPS,
+            "grave": G.GRAVE,
+        }
+
+        terrain_features = {}
+        for name, glyph in name_glyph.items():
+            mask = utils.isin(glyphs, glyph)
+            positions = np.argwhere(mask)
+            if len(positions) > 0:
+                terrain_features[name] = positions
+
+        return terrain_features
 
     @property
     def inventory(self):
