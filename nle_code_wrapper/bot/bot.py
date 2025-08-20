@@ -604,7 +604,7 @@ class Bot:
         current_features = self.get_terrain_features(glyphs)
 
         if not force:
-            past_features = self.terrain_features[(blstats.dungeon_number, blstats.level_number)]["features"]
+            past_features = self.terrain_features[(blstats.dungeon_number, blstats.level_number)].get("features", {})
 
             # Handle stairs persistence
             for key in ("stairs up", "stairs down"):

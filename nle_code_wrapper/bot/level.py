@@ -97,11 +97,3 @@ class Level:
 
     def object_coords(self, obj: frozenset) -> List[Union[Any, Tuple[int64, int64]]]:
         return utils.coords(self.objects, obj)
-
-    @property
-    def stairs(self) -> List[Tuple[int64, int64]]:
-        """
-        Returns the coordinates of the down stairs on the current level.
-        """
-
-        return self.object_coords(G.STAIR_DOWN)

@@ -189,13 +189,29 @@ def descend_stairs(bot: "Bot") -> bool:
     """
     Navigates to and descends the nearest downward staircase.
     """
-    if goto_object(bot, G.STAIR_DOWN):
-        bot.step(A.MiscDirection.DOWN)
-        return True
+    features = bot.terrain_features[bot.blstats.dungeon_number, bot.blstats.level_number].get("features", {})
+    feature = features.get("stairs down", None)
+
+    if feature is not None:
+        distances = bot.pathfinder.distances(bot.entity.position)
+        closest_feature = min(
+            (tuple(f) for f in feature if distances.get(tuple(f))),
+            key=lambda f: distances.get(f, np.inf),
+            default=None,
+        )
+
+        if closest_feature:
+            bot.pathfinder.goto(closest_feature)
+            bot.step(A.MiscDirection.DOWN)
+            return True
+
+        return False
+
     else:
         prev_level = bot.blstats.depth
         bot.step(A.MiscDirection.DOWN)
         curr_level = bot.blstats.depth
+
         return curr_level > prev_level
 
 
@@ -204,13 +220,29 @@ def ascend_stairs(bot: "Bot") -> bool:
     """
     Navigates to and ascends the nearest upward staircase.
     """
-    if goto_object(bot, G.STAIR_UP):
-        bot.step(A.MiscDirection.UP)
-        return True
+    features = bot.terrain_features[bot.blstats.dungeon_number, bot.blstats.level_number].get("features", {})
+    feature = features.get("stairs up", None)
+
+    if feature is not None:
+        distances = bot.pathfinder.distances(bot.entity.position)
+        closest_feature = min(
+            (tuple(f) for f in feature if distances.get(tuple(f))),
+            key=lambda f: distances.get(f, np.inf),
+            default=None,
+        )
+
+        if closest_feature:
+            bot.pathfinder.goto(closest_feature)
+            bot.step(A.MiscDirection.UP)
+            return True
+
+        return False
+
     else:
         prev_level = bot.blstats.depth
         bot.step(A.MiscDirection.UP)
         curr_level = bot.blstats.depth
+
         return curr_level < prev_level
 
 
