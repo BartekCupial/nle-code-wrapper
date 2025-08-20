@@ -44,6 +44,13 @@ def direction_strategy(
     return True
 
 
+def noop(bot):
+    """
+    Wastes move
+    """
+    return
+
+
 class NLECodeWrapper(gym.Wrapper):
     def __init__(
         self,
@@ -100,12 +107,6 @@ class NLECodeWrapper(gym.Wrapper):
         if add_more_strategy:
             # add more strategy
             self.bot.strategy(more)
-
-        def noop(bot):
-            """
-            Wastes move
-            """
-            return
 
         self.bot.strategy(noop)
 

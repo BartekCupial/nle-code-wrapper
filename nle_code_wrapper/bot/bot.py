@@ -294,7 +294,7 @@ class Bot:
                 self.type_text(spell.letter)
 
                 if "In what direction?" in self.message:
-                    self.pathfinder.direction(direction)
+                    self.step(direction)
                     return True
 
                 # potential failure here

@@ -358,12 +358,19 @@ class Pvp:
         def wand_action():
             # 1) check if we have a wand
             if self._find_best_offensive_wand() is None:
+                self.bot.add_message("No offensive wands available.")
                 return False
 
             best_ray, target_hit, self_hit = self._get_best_ray()
 
             # 3) zap the wand if criteria are met
-            if target_hit > 0.8 and self_hit < 0.2:
+            if target_hit < 0.8:
+                self.bot.add_message("Target is too far away to zap.")
+
+            if self_hit > 0.2:
+                self.bot.add_message("Too dangerous to zap.")
+
+            if target_hit >= 0.8 and self_hit <= 0.2:
                 return self._execute_wand_zap(best_ray)
             else:
                 return False
@@ -374,6 +381,7 @@ class Pvp:
         def wand_action():
             # 1) check if we have a wand
             if self._find_best_offensive_wand() is None:
+                self.bot.add_message("No offensive wands available.")
                 return False
 
             # 2) come in range of the target
@@ -383,7 +391,7 @@ class Pvp:
             best_ray, target_hit, self_hit = self._get_best_ray()
 
             # 3) zap the wand if criteria are met
-            if target_hit > 0.8 and self_hit < 0.2:
+            if target_hit >= 0.8 and self_hit <= 0.2:
                 return self._execute_wand_zap(best_ray)
             # 4) if we can't zap, try to move closer
             else:

@@ -42,7 +42,15 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
     levitate_over_lava_river,
 )
 from nle_code_wrapper.bot.strategies.eat import eat_corpse_floor, eat_corpse_inventory, eat_food_inventory
-from nle_code_wrapper.bot.strategies.emergency import cure_disease, emergency_eat, emergency_heal, emergency_pray
+from nle_code_wrapper.bot.strategies.emergency import (
+    emergency_escape,
+    escape_downstairs,
+    escape_room,
+    escape_upstairs,
+    fix_trouble,
+    heal,
+    pray,
+)
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.explore import (
     explore,
@@ -214,6 +222,13 @@ __all__ = [
     explore_north,
     explore_south,
     explore_west,
+    escape_upstairs,
+    escape_downstairs,
+    escape_room,
+    emergency_escape,
+    fix_trouble,
+    heal,
+    pray,
     fight_engulfed,
     fight_melee,
     fight_ranged,
@@ -300,8 +315,4 @@ __all__ = [
     no,
     cancel,
     more,
-    emergency_pray,
-    emergency_heal,
-    emergency_eat,
-    cure_disease,
 ]

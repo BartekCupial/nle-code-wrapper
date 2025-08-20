@@ -208,7 +208,7 @@ def fight_multiple_monsters(bot: "Bot") -> bool:
 @strategy
 def goto_choke_point(bot: "Bot") -> bool:
     """
-    Directs the bot to move to the nearest choke point.
+    Directs the bot to move to the nearest choke point. Use only when there are multiple monsters around.
     """
     bot.movements = Movements(bot, monster_collision=False)
 

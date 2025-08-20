@@ -103,6 +103,13 @@ def read_scroll_of_fire(bot: "Bot"):
     return use_item(bot, ["fire"], "scrolls", A.Command.READ)
 
 
+def read_scroll_of_teleportation(bot: "Bot"):
+    """
+    Read a scroll of teleportation to escape danger.
+    """
+    return use_item(bot, ["teleportation"], "scrolls", A.Command.READ)
+
+
 def quaff_healing_potion(bot: "Bot"):
     """
     Quaff a healing potion to restore health.
@@ -132,7 +139,7 @@ def quaff_noncursed_extra_healing_potion(bot: "Bot"):
 
 def quaff_fruit_juice(bot: "Bot"):
     """
-    Quaff fruit juice to restore health and cure hunger.
+    Quaff fruit juice to satisfy hunger.
     """
     return use_item(bot, ["fruit juice"], "potions", A.Command.QUAFF)
 
@@ -152,29 +159,58 @@ def quaff_holy_water(bot: "Bot"):
 
 
 def cast_healing(bot: "Bot"):
-    return bot.cast("healing", direction=(0, 0), fail=30.0)
-
-
-def cast_cure_blindness(bot: "Bot"):
-    return bot.cast("cure blindness", direction=(0, 0), fail=30.0)
+    return bot.cast("healing", direction=A.MiscDirection.WAIT, fail=30.0)
 
 
 def cast_extra_healing(bot: "Bot"):
-    return bot.cast("extra healing", direction=(0, 0), fail=30.0)
+    return bot.cast("extra healing", direction=A.MiscDirection.WAIT, fail=30.0)
+
+
+def cast_full_healing(bot: "Bot"):
+    return bot.cast("full healing", direction=A.MiscDirection.WAIT, fail=30.0)
+
+
+def cast_cure_blindness(bot: "Bot"):
+    return bot.cast("cure blindness", direction=A.MiscDirection.WAIT, fail=30.0)
 
 
 def cast_stone_to_flesh(bot: "Bot"):
-    return bot.cast("stone to flesh", direction=(0, 0), fail=30.0)
+    return bot.cast("stone to flesh", direction=A.MiscDirection.WAIT, fail=30.0)
 
 
 def cast_cure_sickness(bot: "Bot"):
     # check if 100% chance
-    bot.cast("cure sickness", direction=(0, 0), fail=0.0)
+    return bot.cast("cure sickness", direction=A.MiscDirection.WAIT, fail=0.0)
 
 
 def zap_yourself_wand_of_fire(bot: "Bot"):
-    # TODO:
-    pass
+    """
+    Zap a wand of fire to stop sliming.
+    """
+    if use_item(bot, ["fire"], "wands", A.Command.ZAP):
+        bot.step(A.MiscDirection.WAIT)
+        return True
+    return False
+
+
+def zap_down_wand_of_digging(bot: "Bot"):
+    """
+    Zap a wand of digging to escape from a dangerous situation.
+    """
+    if use_item(bot, ["digging"], "wands", A.Command.ZAP):
+        bot.step(A.MiscDirection.DOWN)
+        return True
+    return False
+
+
+def zap_yourself_wand_of_teleportation(bot: "Bot"):
+    """
+    Zap a wand of teleportation to escape from a dangerous situation.
+    """
+    if use_item(bot, ["teleportation"], "wands", A.Command.ZAP):
+        bot.step(A.MiscDirection.WAIT)
+        return True
+    return False
 
 
 def wait_it_out(bot: "Bot", status_name: str):
@@ -187,52 +223,78 @@ def wait_it_out(bot: "Bot", status_name: str):
 
 
 @strategy
-def emergency_pray(bot: "Bot") -> bool:
+def pray(bot: "Bot") -> bool:
     """
-    Attempt to pray if the bot is in an emergency situation. Will not pray if pray timeout is active.
+    Attempt to pray. Will not pray if pray timeout is active.
     """
     return bot.safely_pray()
 
 
 @strategy
-def emergency_eat(bot: "Bot"):
+def heal(bot: "Bot"):
     """
-    Eat fruit juice if available to satisfy hunger. Use in emergencies when weak from hunger.
+    Attempts to heal the bot: casting healing spells, quaffing healing potions, or praying.
     """
-
-    items = [item for item in bot.inventory["potions"] if any(pot in item.name for pot in ["fruit juice"])]
-
-    if items:
-        potion = items[0]
-        bot.step(A.Command.QUAFF)
-        bot.step(potion.letter)
-
+    if cast_healing(bot):
         return True
-    else:
-        return False
+    elif cast_extra_healing(bot):
+        return True
+    elif cast_full_healing(bot):
+        return True
+    elif quaff_healing_potion(bot):
+        return True
+    elif bot.safely_pray():
+        return True
+
+    return False
 
 
 @strategy
-def emergency_heal(bot: "Bot"):
-    return quaff_healing_potion(bot)
+def escape_upstairs(bot: "Bot") -> bool:
+    """
+    Attempts to escape upstairs from a dangerous situation by moving to a safer location. Similar to `ascend_stairs`, but will move avoiding monsters.
+    """
+    pass
 
 
 @strategy
-def cure_disease(bot: "Bot"):
+def escape_downstairs(bot: "Bot") -> bool:
     """
-    Attempt to cure: lycanthropy, stoning, sliming, food poisoning, sickness, hallucination, blindness, stunning, confusion, strangulation, deaf
+    Attempts to escape downstairs from a dangerous situation by moving to a safer location. Similar to `descend_stairs`, but will move avoiding monsters.
     """
-    # lycanthropy
-    if bot.character.is_lycanthrope:
-        if eat_spring_of_wolfsbane(bot):
-            return True
-        elif quaff_holy_water(bot):
-            return True
-        elif bot.safely_pray():
-            return True
+    pass
 
+
+@strategy
+def escape_room(bot: "Bot") -> bool:
+    """
+    Attempts to escape to a safer room from a dangerous situation by moving to a safer location. Similar to `goto_room`, but will move avoiding monsters.
+    """
+    pass
+
+
+@strategy
+def emergency_escape(bot: "Bot") -> bool:
+    """
+    Attempts to escape from a dangerous situation by teleporting or digging.
+    """
+    if read_scroll_of_teleportation(bot):
+        return True
+    elif zap_down_wand_of_digging(bot):
+        return True
+    elif zap_yourself_wand_of_teleportation(bot):
+        return True
+
+    return False
+
+
+@strategy
+def fix_trouble(bot: "Bot"):
+    """
+    Attempts to fix major and minor troubles: lycanthropy, stoning, sliming, food poisoning, sickness, hallucination, blindness, stunning, confusion, strangulation, deaf
+    """
     # stoning
-    elif bot.stone:
+    if bot.stone:
         if eat_lizard_corpse(bot):
             return True
         elif quaff_acid_potion(bot):
@@ -274,6 +336,20 @@ def cure_disease(bot: "Bot"):
         elif eat_eucalyptus(bot):
             return True
 
+    # strangulation
+    elif bot.strngl:
+        if bot.safely_pray():
+            return True
+
+    # lycanthropy
+    elif bot.character.is_lycanthrope:
+        if eat_spring_of_wolfsbane(bot):
+            return True
+        elif quaff_holy_water(bot):
+            return True
+        elif bot.safely_pray():
+            return True
+
     # hallucination
     elif bot.hallu:
         if apply_unicorn_horn(bot):
@@ -305,12 +381,6 @@ def cure_disease(bot: "Bot"):
             return wait_it_out(bot, "stun")
         elif bot.conf:
             return wait_it_out(bot, "confused")
-
-    # strangulation
-    elif bot.strngl:
-        # TODO: if amulet of strangulation we should try to pray and then remove it
-        # are there any other forms of strangling?
-        pass
 
     # deaf
     elif bot.deaf:
