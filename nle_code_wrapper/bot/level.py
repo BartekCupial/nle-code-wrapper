@@ -40,6 +40,8 @@ class Level:
         self.was_on = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.known_traps = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
         self.known_traps[:] = -1
+        self.features = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
+        self.features[:] = -1
 
         self.shop = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
         self.shop_interior = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
@@ -84,6 +86,14 @@ class Level:
         mask = utils.isin(glyphs, G.TRAPS)
         self.known_traps[mask] = glyphs[mask]
         self.was_on[blstats.y, blstats.x] = True
+
+        mask = utils.isin(glyphs, G.STAIR_DOWN, G.STAIR_UP, G.ALTAR, G.FOUNTAIN, G.THRONE, G.SINK, G.GRAVE, G.TRAPS)
+        if not np.all(self.features[mask] == glyphs[mask]):
+            self.features[mask] = glyphs[mask]
+            # means that we need to update terrain features
+            return True
+        else:
+            return False
 
     def object_coords(self, obj: frozenset) -> List[Union[Any, Tuple[int64, int64]]]:
         return utils.coords(self.objects, obj)

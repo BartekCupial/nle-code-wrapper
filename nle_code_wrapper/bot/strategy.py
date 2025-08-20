@@ -126,9 +126,7 @@ def repeat_until_discovery(func):
                 map(
                     tuple,
                     np.argwhere(
-                        utils.isin(
-                            bot.glyphs, G.BARS, G.THRONE, G.GRAVE, G.STAIR_DOWN, G.STAIR_UP, G.ALTAR, G.FOUNTAIN, G.SINK
-                        )
+                        utils.isin(bot.glyphs, G.THRONE, G.GRAVE, G.STAIR_DOWN, G.STAIR_UP, G.ALTAR, G.FOUNTAIN, G.SINK)
                     ),
                 )
             )

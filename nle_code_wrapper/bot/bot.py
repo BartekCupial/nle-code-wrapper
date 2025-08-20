@@ -326,7 +326,10 @@ class Bot:
         self.entities = self.get_entities(self.current_obs)
         self.current_level = self.get_current_level(self.current_obs)
 
-        self.current_level.update(self.glyphs, self.blstats)
+        terrain_needs_update = self.current_level.update(self.glyphs, self.blstats)
+        if terrain_needs_update:
+            self.update_terrain_features(self.glyphs, self.blstats)
+
         self.inventory_manager.update()
         self.character.update()
         self.movements.update()
@@ -593,12 +596,35 @@ class Bot:
         blstats = self.get_blstats(obs)
         glyphs = self.get_glyphs(obs)
 
-        self.terrain_features[(blstats.dungeon_number, blstats.level_number)] = {
-            "features": self.get_terrain_features(glyphs),
-            "time": blstats.time,
-        }
+        self.update_terrain_features(glyphs, blstats, force=True)
 
         self.internal_step(A.Command.ESC)
+
+    def update_terrain_features(self, glyphs, blstats, force: bool = False):
+        current_features = self.get_terrain_features(glyphs)
+
+        if not force:
+            past_features = self.terrain_features[(blstats.dungeon_number, blstats.level_number)]["features"]
+
+            # Handle stairs persistence
+            for key in ("stairs up", "stairs down"):
+                past_positions = past_features.get(key)
+                curr_positions = current_features.get(key)
+
+                if past_positions is not None and curr_positions is not None:
+                    # Merge (union) rows from both arrays
+                    merged = np.vstack((past_positions, curr_positions))
+                    merged_unique = np.unique(merged, axis=0)
+                    current_features[key] = merged_unique
+
+                elif past_positions is not None and curr_positions is None:
+                    # Current scan missed it -> carry past memory
+                    current_features[key] = past_positions
+
+        self.terrain_features[(blstats.dungeon_number, blstats.level_number)] = {
+            "features": current_features,
+            "time": blstats.time,
+        }
 
     def get_terrain_features(self, glyphs) -> Dict[str, Any]:
         """
