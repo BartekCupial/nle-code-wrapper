@@ -195,7 +195,7 @@ def descend_stairs(bot: "Bot") -> bool:
     if feature is not None:
         distances = bot.pathfinder.distances(bot.entity.position)
         closest_feature = min(
-            (tuple(f) for f in feature if distances.get(tuple(f))),
+            (tuple(f) for f in feature if distances.get(tuple(f)) is not None),
             key=lambda f: distances.get(f, np.inf),
             default=None,
         )
@@ -226,7 +226,7 @@ def ascend_stairs(bot: "Bot") -> bool:
     if feature is not None:
         distances = bot.pathfinder.distances(bot.entity.position)
         closest_feature = min(
-            (tuple(f) for f in feature if distances.get(tuple(f))),
+            (tuple(f) for f in feature if distances.get(tuple(f)) is not None),
             key=lambda f: distances.get(f, np.inf),
             default=None,
         )
