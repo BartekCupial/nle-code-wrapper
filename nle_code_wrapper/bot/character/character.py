@@ -1,3 +1,5 @@
+import re
+from collections import namedtuple
 from typing import TYPE_CHECKING, Optional
 
 import nle.nethack as nh
@@ -10,6 +12,9 @@ from nle_code_wrapper.bot.inventory import Item
 
 if TYPE_CHECKING:
     from nle_code_wrapper.bot import Bot
+
+
+Spell = namedtuple("Spell", ["letter", "name", "level", "category", "fail", "retention"])
 
 
 ALL_SPELL_NAMES = [
@@ -74,6 +79,7 @@ class Character:
         self.race = None
         self.gender = None
         self.upgradable_skills = dict()
+        self.known_spells = {}
 
         self.is_lycanthrope = False
         self.init = False
@@ -96,6 +102,10 @@ class Character:
             message = "\n".join([bytes(line).decode("latin-1") for line in obs["tty_chars"]])
             self.parse_welcome(message)
             obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.ESC))
+
+        if len(self.known_spells) == 0 and self.role in [Role.WIZARD, Role.PRIEST, Role.MONK, Role.HEALER]:
+            # If we are a spellcaster, we should have spells
+            self.update_spells()
 
         if "You feel feverish." in self.bot.message:
             self.is_lycanthrope = True
@@ -341,6 +351,40 @@ class Character:
 
         wep_type = Skill(np.abs(weapon.object.oc_skill))
         return self.skill.weapon_bonus[self.skill.skill_levels[wep_type.value]]
+
+    def update_spells(self):
+        self.known_spells = {}
+        obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.Command.CAST))
+        text = obs["text_message"]
+        self.parse_spellcast_view(text)
+
+    def parse_spellcast_view(self, text):
+        # Pattern for spells
+        spell_pattern = r"^([a-z])\s*-\s*([a-z ]+?)\s+(\d+)\s+([a-z]+)\s+(\d+)%\s+(\d+)%$"
+
+        # Pattern for end markers
+        end_pattern = r"\(end\)"
+        page_pattern = r"\((\d+) of \1\)"  # Same number (e.g., "2 of 2")
+        diff_page_pattern = r"\((\d+) of (\d+)\)"  # Different numbers (e.g., "1 of 2")
+
+        spells = re.finditer(spell_pattern, text, re.MULTILINE)
+        for match in spells:
+            spell = Spell(*match.groups())
+            self.known_spells[spell.name] = spell
+
+        # Check for (end)
+        if re.search(end_pattern, text):
+            self.bot.env.step(self.bot.env.actions.index(A.MiscAction.MORE))
+
+        # Check for (n of n) - same number
+        elif re.search(page_pattern, text):
+            self.bot.env.step(self.bot.env.actions.index(A.MiscAction.MORE))
+
+        # Check for (n of m) - different numbers
+        elif re.search(diff_page_pattern, text):
+            obs, *_ = self.bot.env.step(self.bot.env.actions.index(A.TextCharacters.SPACE))
+            text = obs["text_message"]
+            self.parse_spellcast_view(text)
 
     def __str__(self):
         skill_str = "| ".join(self.skill.get_skill_str_list())

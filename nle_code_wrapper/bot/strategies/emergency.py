@@ -151,25 +151,25 @@ def quaff_holy_water(bot: "Bot"):
     return use_item(bot, ["water"], "potions", A.Command.QUAFF, [ItemBeatitude.BLESSED])
 
 
+def cast_healing(bot: "Bot"):
+    return bot.cast("healing", direction=(0, 0), fail=30.0)
+
+
 def cast_cure_blindness(bot: "Bot"):
-    # TODO:
-    pass
+    return bot.cast("cure blindness", direction=(0, 0), fail=30.0)
 
 
 def cast_extra_healing(bot: "Bot"):
-    # TODO:
-    pass
+    return bot.cast("extra healing", direction=(0, 0), fail=30.0)
 
 
 def cast_stone_to_flesh(bot: "Bot"):
-    # TODO:
-    pass
+    return bot.cast("stone to flesh", direction=(0, 0), fail=30.0)
 
 
 def cast_cure_sickness(bot: "Bot"):
-    # TODO:
     # check if 100% chance
-    pass
+    bot.cast("cure sickness", direction=(0, 0), fail=0.0)
 
 
 def zap_yourself_wand_of_fire(bot: "Bot"):

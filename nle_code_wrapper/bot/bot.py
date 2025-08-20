@@ -268,6 +268,27 @@ class Bot:
         else:
             return False
 
+    def cast(self, spell_name, direction, fail: float = None):
+        if spell_name in self.character.known_spells:
+            spell = self.character.known_spells[spell_name]
+
+            if fail is None or spell.fail <= fail:
+                self.step(A.Command.CAST)
+
+                if "You are too impaired" in self.message:
+                    return False
+
+                self.type_text(spell.letter)
+
+                if "In what direction?" in self.message:
+                    self.pathfinder.direction(direction)
+                    return True
+
+                # potential failure here
+                # You don't have enough energy to cast that spell.
+
+        return False
+
     def type_text(self, text: str) -> None:
         for char in text:
             self.step(ord(char))
