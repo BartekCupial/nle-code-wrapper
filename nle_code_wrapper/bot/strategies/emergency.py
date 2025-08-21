@@ -250,30 +250,6 @@ def heal(bot: "Bot"):
 
 
 @strategy
-def escape_upstairs(bot: "Bot") -> bool:
-    """
-    Attempts to escape upstairs from a dangerous situation by moving to a safer location. Similar to `ascend_stairs`, but will move avoiding monsters.
-    """
-    pass
-
-
-@strategy
-def escape_downstairs(bot: "Bot") -> bool:
-    """
-    Attempts to escape downstairs from a dangerous situation by moving to a safer location. Similar to `descend_stairs`, but will move avoiding monsters.
-    """
-    pass
-
-
-@strategy
-def escape_room(bot: "Bot") -> bool:
-    """
-    Attempts to escape to a safer room from a dangerous situation by moving to a safer location. Similar to `goto_room`, but will move avoiding monsters.
-    """
-    pass
-
-
-@strategy
 def emergency_escape(bot: "Bot") -> bool:
     """
     Attempts to escape from a dangerous situation by teleporting or digging.

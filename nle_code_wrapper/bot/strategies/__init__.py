@@ -44,14 +44,12 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
 from nle_code_wrapper.bot.strategies.eat import eat_corpse_floor, eat_corpse_inventory, eat_food_inventory
 from nle_code_wrapper.bot.strategies.emergency import (
     emergency_escape,
-    escape_downstairs,
-    escape_room,
-    escape_upstairs,
     fix_trouble,
     heal,
     pray,
 )
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
+from nle_code_wrapper.bot.strategies.escape import escape_downstairs, escape_room, escape_upstairs
 from nle_code_wrapper.bot.strategies.explore import (
     explore,
     explore_corridor,

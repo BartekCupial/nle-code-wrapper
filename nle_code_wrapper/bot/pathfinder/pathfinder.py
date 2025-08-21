@@ -61,8 +61,8 @@ class Pathfinder:
 
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
-        self.trap_cost = 10
-        self.monster_cost = 5
+        self.trap_cost = 1000
+        self.monster_cost = 50
         self._graph_cache = {}
 
     @property
