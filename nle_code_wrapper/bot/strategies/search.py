@@ -119,8 +119,7 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     distances = spatial.distance.cdist(unsearched_walls_indices, empty_positions, metric="cityblock")
 
     # Adjust distances by area: larger spaces are better
-    # (using sqrt(area) to avoid making area too dominant)
-    weighted_distances = distances / np.sqrt(empty_areas)[None, :]
+    weighted_distances = distances / empty_areas[None, :]
 
     min_dist_per_wall = weighted_distances.min(axis=1)
     best_wall_idx = min_dist_per_wall.argmin()
