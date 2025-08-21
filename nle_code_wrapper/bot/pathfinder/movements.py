@@ -155,12 +155,7 @@ class Movements:
 
     def neighbors(self, node: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
         """
-        This method calculates the possible moves for the player.
-
-        Args:
-            node (Tuple[int64, int64]): The current position of the player.
-        Returns:
-            List[Union[Any, Tuple[int64, int64]]]: A list of possible moves for the player.
+        List of valid move destinations for the player from the current position.
         """
         neighbors = []
 
@@ -175,6 +170,9 @@ class Movements:
         return neighbors
 
     def adjacents(self, node: Tuple[int64, int64]) -> List[Union[Any, Tuple[int64, int64]]]:
+        """
+        List of adjacent positions to the current position, including non-walkable (doors, boulders, etc.) tiles.
+        """
         adjacents = []
 
         for dir in cardinal_directions:
