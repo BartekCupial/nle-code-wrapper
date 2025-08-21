@@ -205,14 +205,7 @@ def descend_stairs(bot: "Bot") -> bool:
             bot.step(A.MiscDirection.DOWN)
             return True
 
-        return False
-
-    else:
-        prev_level = bot.blstats.depth
-        bot.step(A.MiscDirection.DOWN)
-        curr_level = bot.blstats.depth
-
-        return curr_level > prev_level
+    return False
 
 
 @strategy
@@ -236,14 +229,7 @@ def ascend_stairs(bot: "Bot") -> bool:
             bot.step(A.MiscDirection.UP)
             return True
 
-        return False
-
-    else:
-        prev_level = bot.blstats.depth
-        bot.step(A.MiscDirection.UP)
-        curr_level = bot.blstats.depth
-
-        return curr_level < prev_level
+    return False
 
 
 @strategy
