@@ -1,12 +1,15 @@
+import io
 from collections import deque
 from itertools import pairwise
 from typing import TYPE_CHECKING, Any, Dict, List, Tuple, Union
 
+import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 from nle.nethack import actions as A
 from nle_utils.glyph import G
 from numpy import int64
+from PIL import Image
 
 from nle_code_wrapper.bot.exceptions import BotPanic, UnexpectedPotion
 
@@ -59,6 +62,7 @@ class Pathfinder:
     def __init__(self, bot: "Bot") -> None:
         self.bot: Bot = bot
         self.trap_cost = 10
+        self.monster_cost = 5
         self._graph_cache = {}
 
     @property
@@ -103,7 +107,7 @@ class Pathfinder:
         Returns:
             nx.Graph: Graph with nodes representing positions and edges connecting neighboring positions
         """
-        graph = nx.Graph()
+        graph = nx.DiGraph()
         pos_to_node = {}
         node_counter = start_count
 
@@ -127,11 +131,8 @@ class Pathfinder:
                 if nbr_node is not None:
                     # If neighbor already exists, just add edge if not present
                     if not graph.has_edge(current_node, nbr_node):
-                        # Calculate edge weight based on trap presence
-                        weight = 1  # Default weight
-                        if self.bot.current_level.objects[nbr] in G.TRAPS:
-                            weight += self.trap_cost
-                        graph.add_edge(current_node, nbr_node, weight=weight)
+                        graph.add_edge(current_node, nbr_node, weight=1)
+                        graph.add_edge(nbr_node, current_node, weight=1)
                     continue
 
                 if nbr in seen:
@@ -140,12 +141,8 @@ class Pathfinder:
                 # Add new position to graph
                 pos_to_node[nbr] = node_counter
                 graph.add_node(node_counter)
-
-                # Add weighted edge
-                weight = 1
-                if self.bot.current_level.objects[nbr] in G.TRAPS:
-                    weight += self.trap_cost
-                graph.add_edge(pos_to_node[current_pos], node_counter, weight=weight)
+                graph.add_edge(current_node, node_counter, weight=1)
+                graph.add_edge(node_counter, current_node, weight=1)
 
                 # Add to BFS queue
                 queue.append(nbr)
@@ -154,6 +151,24 @@ class Pathfinder:
 
         # Store the (row, col) positions as node attributes
         nx.set_node_attributes(graph, {node_id: pos for pos, node_id in pos_to_node.items()}, name="positions")
+
+        danger_zone = set()
+        for pos in [entity.position for entity in self.bot.entities]:
+            # add monster position and its adjacents to danger zone
+            danger_zone.add(tuple(pos))
+            for adjacent in self.adjacents(pos):
+                danger_zone.add(tuple(adjacent))
+
+        for u, v in graph.edges:
+            v_pos = tuple(graph._node[v]["positions"])
+
+            # Add penalty for edges leading to dangerous positions
+            # If after moving we remain in danger zone, set higher weight
+            if v_pos in danger_zone:
+                graph[u][v]["weight"] = self.monster_cost
+
+            if self.bot.current_level.objects[v_pos] in G.TRAPS:
+                graph[u][v]["weight"] = self.trap_cost
 
         return graph
 
@@ -205,7 +220,7 @@ class Pathfinder:
 
         try:
             # Find shortest path using NetworkX
-            path_nodes = nx.shortest_path(graph, start_node, end_node)
+            path_nodes = nx.shortest_path(graph, start_node, end_node, weight="weight")
 
             # Convert path nodes back to positions
             path_positions = [node_positions[node] for node in path_nodes]
@@ -361,32 +376,90 @@ class Pathfinder:
     ) -> Union[Tuple[int64, int64], bool]:
         """
         Check if the goal is reachable from the start position.
-
-        Args:
-            start (Tuple[int64, int64]): Start position.
-            goal (Tuple[int64, int64]): Goal position.
-        Returns:
-            Union[Tuple[int64, int64], bool]: Return the position of the reachable adjacent node or False if not reachable.
         """
 
         distances = self.distances(start)
         positions = self.adjacents(goal) if adjacent else self.neighbors(goal)
 
-        n_dist = []
-        for n in positions:
-            if n in distances:
-                n_dist.append(distances[n])
-            else:
-                n_dist.append(np.inf)
+        position = min(
+            (tuple(n) for n in positions if distances.get(tuple(n)) is not None),
+            key=lambda n: distances.get(n, np.inf),
+            default=None,
+        )
 
-        if len(n_dist) == 0:
-            return None
-
-        if min(n_dist) == np.inf:
-            return None
-
-        idx = np.argmin(n_dist)
-        return positions[idx]
+        return position
 
     def update(self):
         self._graph_cache.clear()
+
+    def render_movements_graph(
+        self,
+        figsize: tuple = (80, 24),
+        show_node_labels: bool = True,
+        show_edge_labels: bool = True,
+        node_size: int = 700,
+        edge_color: str = "black",
+        cmap: str = "YlGnBu",
+    ):
+        """
+        Render a grid graph with nodes on a grid, labeled with node IDs, and edges labeled with their weights.
+        Returns the rendered image as a numpy array (h, w, 3).
+        """
+        graph = self.create_movements_graph()
+
+        # Extract positions
+        positions = nx.get_node_attributes(graph, "positions")
+        # Flip (row,col) to (col,-row) for (x, y) placement; -row for correct image direction
+        pos = {n: (c, -r) for n, (r, c) in positions.items()}
+
+        plt.figure(figsize=figsize)
+        ax = plt.gca()
+
+        # Draw edges/plain, then nodes on top
+        nx.draw_networkx_edges(graph, pos, ax=ax, edge_color=edge_color, width=2, arrows=False)
+
+        # (Optional) Show edge weights as labels
+        if show_edge_labels:
+            weights = nx.get_edge_attributes(graph, "weight")
+            label_dict = {}
+            seen = set()
+            for (u, v), w in weights.items():
+                if (v, u) in weights and (frozenset((u, v)) not in seen):
+                    # Bidirectional, show tuple
+                    label = (weights.get((u, v), ""), weights.get((v, u), ""))
+                    # Place label on one edge only (arbitrarily u, v)
+                    label_dict[(u, v)] = f"{label}"
+                    seen.add(frozenset((u, v)))
+                elif (v, u) not in weights:
+                    # Unidirectional, show single
+                    label_dict[(u, v)] = str(w)
+
+            nx.draw_networkx_edge_labels(
+                graph, pos, edge_labels=label_dict, font_color="red", font_size=20, rotate=False, label_pos=0.5
+            )
+
+        # Draw nodes
+        nx.draw_networkx_nodes(
+            graph, pos, ax=ax, node_color="lightgray", node_size=node_size, edgecolors="black", linewidths=2
+        )
+
+        # Show node IDs
+        if show_node_labels:
+            node_labels = {n: str(n) for n in graph.nodes}
+            nx.draw_networkx_labels(graph, pos, labels=node_labels, font_color="black", font_weight="bold")
+
+        plt.axis("off")
+        plt.tight_layout()
+
+        # Save to buffer
+        buf = io.BytesIO()
+        plt.savefig(buf, format="png", bbox_inches="tight")
+        plt.close()
+        buf.seek(0)
+        img = Image.open(buf)
+        img_array = np.array(img)
+        # Remove alpha if present
+        if img_array.shape[2] == 4:
+            img_array = img_array[:, :, :3]
+
+        return img_array
