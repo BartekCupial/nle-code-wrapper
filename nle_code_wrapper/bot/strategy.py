@@ -132,9 +132,10 @@ def repeat_until_discovery(func):
             )
 
         features, num_rooms, num_corridors = label_dungeon_features(bot)
+        corridors = features > num_rooms
         labels = get_labels(features)
         doors = get_doors()
-        dead_ends = get_dead_ends(features)
+        dead_ends = get_dead_ends(corridors)
         items = get_items()
         specials = get_specials()
         seen = bot.current_level.seen.copy()
@@ -145,6 +146,7 @@ def repeat_until_discovery(func):
 
             # 1) if we have new room of new corridor break
             new_features, new_num_rooms, new_num_corridors = label_dungeon_features(bot)
+            new_corridors = new_features > new_num_rooms
             new_labels = get_labels(new_features)
             if len(labels) < len(new_labels):
                 pass
@@ -157,7 +159,7 @@ def repeat_until_discovery(func):
                     return True
 
             # 3) if we have dead new end break
-            new_dead_ends = get_dead_ends(new_features)
+            new_dead_ends = get_dead_ends(new_corridors)
             if new_dead_ends.difference(dead_ends):
                 from nle_code_wrapper.bot.strategies.search import search_corridor_for_hidden_doors
 
