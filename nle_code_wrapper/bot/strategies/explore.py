@@ -89,15 +89,20 @@ def explore_once(
     if filter_func:
         unexplored_positions = np.array([position for position in unexplored_positions if filter_func(position)])
 
-        # if we are in the room, prioritize positions in the room
-        if labeled_rooms[bot.entity.position] > 0:
-            room_mask = labeled_rooms == labeled_rooms[bot.entity.position]
-            unexplored_positions_room = np.array(
-                [position for position in unexplored_positions if room_mask[tuple(position)]]
-            )
+        # prioritize positions in the room
+        room_mask = labeled_rooms > 0
 
-            if len(unexplored_positions_room) > 0:
-                unexplored_positions = unexplored_positions_room
+        distances = bot.pathfinder.distances(bot.entity.position)
+        unexplored_positions_room = np.array(
+            [
+                position
+                for position in unexplored_positions
+                if room_mask[tuple(position)] and distances.get(tuple(position)) is not None
+            ]
+        )
+
+        if len(unexplored_positions_room) > 0:
+            unexplored_positions = unexplored_positions_room
 
         return goto_closest(bot, unexplored_positions)
     else:
