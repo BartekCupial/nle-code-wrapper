@@ -4,7 +4,7 @@ from typing import Any, List, Tuple, Union
 import numpy as np
 from nle import nethack
 from nle_utils.blstats import BLStats
-from nle_utils.glyph import SHOP, SS, C, G
+from nle_utils.glyph import SS, C, G
 from numpy import int64, ndarray
 
 from nle_code_wrapper.utils import utils
@@ -42,10 +42,6 @@ class Level:
         self.known_traps[:] = -1
         self.features = np.zeros((C.SIZE_Y, C.SIZE_X), np.int16)
         self.features[:] = -1
-
-        self.shop = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
-        self.shop_interior = np.zeros((C.SIZE_Y, C.SIZE_X), bool)
-        self.shop_type = np.zeros((C.SIZE_Y, C.SIZE_X), np.int32) + SHOP.UNKNOWN
 
         self.search_count = np.zeros((C.SIZE_Y, C.SIZE_X), np.int32)
         self.door_open_count = np.zeros((C.SIZE_Y, C.SIZE_X), np.int32)

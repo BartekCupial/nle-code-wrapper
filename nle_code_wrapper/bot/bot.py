@@ -12,7 +12,7 @@ from nle import nethack
 from nle.env.base import NLE
 from nle.nethack import actions as A
 from nle_utils.blstats import BLStats
-from nle_utils.glyph import G
+from nle_utils.glyph import SHOP, G
 from numpy import int64, ndarray
 from scipy import ndimage
 
@@ -26,6 +26,7 @@ from nle_code_wrapper.bot.pvp import Pvp
 from nle_code_wrapper.bot.trap_tracker import TrapTracker
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.inspect import check_strategy_parameters
+from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
 
 
 class Bot:
@@ -85,6 +86,7 @@ class Bot:
         self.current_discount = 1.0
         self.overview = {}
         self.terrain_features = defaultdict(dict)
+        self.shops = defaultdict(list)
         self.last_prayer = None
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
@@ -330,6 +332,7 @@ class Bot:
         if terrain_needs_update:
             self.update_terrain_features(self.glyphs, self.blstats)
 
+        self.update_shops()
         self.inventory_manager.update()
         self.character.update()
         self.movements.update()
@@ -482,6 +485,12 @@ class Bot:
             elif count > 1:
                 features.append(f"{count} {name_plural[feature][1]}")
 
+        shop_name = None
+        for shop_info in self.shops[self.blstats.dungeon_number, self.blstats.level_number]:
+            if room_mask[shop_info["position"]]:
+                shop_name = shop_info["name"]
+                break
+
         # Compute distance from the player to the room
         room_distances = np.sum(np.abs(np.array(self.entity.position) - room_coords), axis=1)
         idx = np.argmin(room_distances)
@@ -503,11 +512,11 @@ class Bot:
             "num_exits": num_exits,
             "num_closed_doors": num_closed_doors,
             "features": features,
+            "shop_name": shop_name,
         }
 
     def get_map_description(self):
         from nle_code_wrapper.bot.strategies.explore import get_revelable_positions
-        from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
 
         labeled_rooms, num_rooms = room_detection(self)
         labeled_corridors, num_corridors = corridor_detection(self)
@@ -540,6 +549,7 @@ class Bot:
             direction = room_info["direction"]
             num_exits = room_info["num_exits"]
             num_closed_doors = room_info["num_closed_doors"]
+            shop_name = room_info["shop_name"]
             features = "  Objects: " + ", ".join(room_info["features"]) + "." if room_info["features"] else ""
 
             if direction == "here":
@@ -551,7 +561,11 @@ class Bot:
                 direction = direction
                 punctuation = ":" if features else "."
 
-            detail_text = f"{explored} room"
+            if shop_name is not None:
+                detail_text = f"{explored} {shop_name}"
+            else:
+                detail_text = f"{explored} room"
+
             if num_exits:
                 exits_text = f"with {num_exits} {'exit' if num_exits == 1 else 'exits'}"
                 if num_closed_doors > 0:
@@ -649,6 +663,39 @@ class Bot:
                 terrain_features[name] = positions
 
         return terrain_features
+
+    def update_shops(self):
+        from nle_code_wrapper.utils.strategies import room_detection
+
+        shop_type = None
+        matches = re.search(f"Welcome( again)? to [a-zA-Z' ]*({'|'.join(SHOP.name2id.keys())})!", self.message)
+
+        if matches is None:
+            return
+
+        shop_name = matches.groups()[1]
+        assert shop_name in SHOP.name2id, shop_name
+        shop_type = SHOP.name2id[shop_name]
+        shop_string = SHOP.id2string[shop_type]
+
+        distances = self.pathfinder.distances(self.entity.position)
+        shop_keepers = [entity.position for entity in self.entities if entity.name == "shopkeeper"]
+
+        closest_shop_keeper = min(
+            [sk for sk in shop_keepers if self.pathfinder.reachable(self.entity.position, sk)],
+            key=lambda sk: distances.get(self.pathfinder.reachable(self.entity.position, sk), np.inf),
+            default=None,
+        )
+
+        assert closest_shop_keeper is not None, "Could not find shopkeeper"
+
+        self.shops[(self.blstats.dungeon_number, self.blstats.level_number)].append(
+            {
+                "name": shop_string,
+                "type": shop_type,
+                "position": closest_shop_keeper,
+            }
+        )
 
     @property
     def inventory(self):

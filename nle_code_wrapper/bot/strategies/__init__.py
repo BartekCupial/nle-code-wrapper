@@ -128,6 +128,7 @@ from nle_code_wrapper.bot.strategies.search import (
     search_for_traps,
     search_room_for_hidden_doors,
 )
+from nle_code_wrapper.bot.strategies.shop import leave_shop
 from nle_code_wrapper.bot.strategies.skills_simple import (
     pray_altar,
     quaff_fountain,
@@ -313,4 +314,5 @@ __all__ = [
     no,
     cancel,
     more,
+    leave_shop,
 ]
