@@ -22,25 +22,20 @@ def escape_to_location(bot, target_location: Tuple[int, int]) -> bool:
 
     # Loop until the bot reaches the target position.
     while bot.entity.position != target_location:
-        try:
-            path = bot.pathfinder.get_path_to(target_location)
+        path = bot.pathfinder.get_path_to(target_location)
 
-            # If no path exists, the way is blocked.
-            if not path or len(path) <= 1:
-                bot.add_message("Path is blocked, cannot escape.")
-                return False
+        # If no path exists, the way is blocked.
+        if not path or len(path) <= 1:
+            bot.add_message("Path is blocked, cannot escape.")
+            return False
 
-            # Take a single step along the newly calculated path.
-            bot.pathfinder.move(path[1])
+        # Take a single step along the newly calculated path.
+        bot.pathfinder.move(path[1])
 
-            # Check for game interruptions (e.g., a prompt)
-            if bot.in_yn_function or bot.in_getlin:
-                bot.add_message("Escape interrupted by game prompt.")
-                return False
-
-        except (LostHP, EnemyAppeared):
-            # If the bot loses HP or an enemy appears, re-evaluate the path.
-            continue
+        # Check for game interruptions (e.g., a prompt)
+        if bot.in_yn_function or bot.in_getlin:
+            bot.add_message("Escape interrupted by game prompt.")
+            return False
 
     return False
 

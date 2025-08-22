@@ -16,9 +16,17 @@ def leave_shop(bot: "Bot") -> bool:
     """
     Leaves the shop by moving to the shop door and exiting through it. Drops all unpaid items.
     """
+    shopkeeper_positions = [entity.position for entity in bot.entities if entity.name == "shopkeeper"]
+    if not shopkeeper_positions:
+        return False
+
     # Drop all unpaid items
     bot.step(A.Command.DROPTYPE)
-    bot.type_text("u")
+
+    # check if "u" exists
+    if "Unpaid items" in bot.message:
+        bot.type_text("u")
+
     bot.step(A.MiscAction.MORE)
     bot.step(A.Command.PICKUP)
     bot.step(A.TextCharacters.SPACE)
@@ -26,6 +34,8 @@ def leave_shop(bot: "Bot") -> bool:
     # Features and shop id outside while so we keep them consistent
     labeled_features, num_rooms, num_corridors = label_dungeon_features(bot)
     shop_id = labeled_features[bot.entity.position]
+
+    i = 0
 
     # while we are in the shop
     while labeled_features[bot.entity.position] == shop_id:
@@ -64,5 +74,11 @@ def leave_shop(bot: "Bot") -> bool:
         else:
             path = bot.pathfinder.get_path_to(target_position)
             bot.pathfinder.move(path[1])
+
+        i += 1
+
+        if i > 50:
+            bot.add_message("Couldn't leave the shop, something is blocking the exit.")
+            break
 
     return True

@@ -235,7 +235,7 @@ def ascend_stairs(bot: "Bot") -> bool:
 @strategy
 def goto_room(bot: "Bot") -> bool:
     """
-    Moves the agent to the closest room (where distance is calculated as number of agent steps).
+    Moves the agent to the closest room.
     Tips:
     - if we are standing in the room it isn't taken into consideration
     - doors are not treated as part of the room
@@ -247,7 +247,7 @@ def goto_room(bot: "Bot") -> bool:
 @strategy
 def goto_room_west(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms westward.
+    Moves the agent to the closest room westward.
     """
     return goto_feature_direction(bot, "west", room_detection)
 
@@ -255,7 +255,7 @@ def goto_room_west(bot: "Bot") -> bool:
 @strategy
 def goto_room_east(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms eastward.
+    Moves the agent to the closest room eastward.
     """
     return goto_feature_direction(bot, "east", room_detection)
 
@@ -263,7 +263,7 @@ def goto_room_east(bot: "Bot") -> bool:
 @strategy
 def goto_room_north(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms northward.
+    Moves the agent to the closest room northward.
     """
     return goto_feature_direction(bot, "north", room_detection)
 
@@ -271,7 +271,7 @@ def goto_room_north(bot: "Bot") -> bool:
 @strategy
 def goto_room_south(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but filters possible rooms southward.
+    Moves the agent to the closest room southward.
     """
     return goto_feature_direction(bot, "south", room_detection)
 
@@ -279,7 +279,7 @@ def goto_room_south(bot: "Bot") -> bool:
 @strategy
 def goto_unexplored_room(bot: "Bot") -> bool:
     """
-    Similar to `goto_room`, but considers only unexplored rooms (not visited).
+    Moves the agent to the closest unexplored room (not visited).
     """
     return goto_unexplored_feature(bot, room_detection)
 
@@ -287,7 +287,7 @@ def goto_unexplored_room(bot: "Bot") -> bool:
 @strategy
 def goto_corridor(bot: "Bot") -> bool:
     """
-    Moves the agent to the closest corridor (where distance is calculated as number of agent steps).
+    Moves the agent to the closest corridor.
     Tips:
     - if we are standing in the corridor it isn't taken into consideration
     - doors are treated as part of the corridor
@@ -300,7 +300,7 @@ def goto_corridor(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_west(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles westward.
+    Moves the agent to the closest corridor westward.
     """
     return goto_feature_direction(bot, "west", corridor_detection)
 
@@ -308,7 +308,7 @@ def goto_corridor_west(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_east(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles eastward.
+    Moves the agent to the closest corridor eastward.
     """
     return goto_feature_direction(bot, "east", corridor_detection)
 
@@ -316,7 +316,7 @@ def goto_corridor_east(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_north(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles northward.
+    Moves the agent to the closest corridor northward.
     """
     return goto_feature_direction(bot, "north", corridor_detection)
 
@@ -324,7 +324,7 @@ def goto_corridor_north(bot: "Bot") -> bool:
 @strategy
 def goto_corridor_south(bot: "Bot") -> bool:
     """
-    Similar to `explore_corridor`, but filters undiscovered tiles southward.
+    Moves the agent to the closest corridor southward.
     """
     return goto_feature_direction(bot, "south", corridor_detection)
 
@@ -332,6 +332,6 @@ def goto_corridor_south(bot: "Bot") -> bool:
 @strategy
 def goto_unexplored_corridor(bot: "Bot") -> bool:
     """
-    Similar to `goto_corridor`, but considers only unexplored corridors (not visited).
+    Moves the agent to the closest unexplored corridor (not visited).
     """
     return goto_unexplored_feature(bot, corridor_detection)

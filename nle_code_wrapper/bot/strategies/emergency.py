@@ -227,7 +227,11 @@ def pray(bot: "Bot") -> bool:
     """
     Attempt to pray. Will not pray if pray timeout is active.
     """
-    return bot.safely_pray()
+    if bot.safely_pray():
+        return True
+    else:
+        bot.add_message("You have prayed recently, wait before praying again.")
+        return False
 
 
 @strategy
@@ -255,7 +259,7 @@ def rest_until_full_health(bot: "Bot"):
     Attempts to regenerate health by waiting.
     """
     while bot.blstats.hitpoints < bot.blstats.max_hitpoints:
-        bot.wait()
+        bot.search(40)
 
     return True
 

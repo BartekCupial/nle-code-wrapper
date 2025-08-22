@@ -159,9 +159,10 @@ class Pathfinder:
             for adjacent in self.adjacents(pos):
                 danger_zone.add(tuple(adjacent))
 
+        # TODO: compute a distance field from the monsters and penalize a radius around the monster
+
         for u, v in graph.edges:
             v_pos = tuple(graph._node[v]["positions"])
-
             # Add penalty for edges leading to dangerous positions
             # If after moving we remain in danger zone, set higher weight
             if v_pos in danger_zone:
