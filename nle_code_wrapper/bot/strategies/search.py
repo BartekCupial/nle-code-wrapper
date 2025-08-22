@@ -94,15 +94,15 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
     Searches the rooms for possible hidden doors, will automatically go to the best room and search multiple spots for doors.
     """
     # Dynamic search threshold
-    search_count_threshold = 10
+    search_count_threshold = 22
 
     while True:
         unsearched_walls = find_unsearched_walls(bot, search_count_threshold=search_count_threshold)
 
-        if np.any(unsearched_walls) or search_count_threshold > 40:
+        if np.any(unsearched_walls) or search_count_threshold > 44:
             break
 
-        search_count_threshold += 10
+        search_count_threshold += 22
 
     empty_spaces = find_empty_spaces(bot)
 
@@ -140,12 +140,13 @@ def search_room_for_hidden_doors(bot: "Bot") -> bool:
         bot.pathfinder.goto(tuple(wall_idx))
 
         before_search_time = bot.blstats.time
-        bot.search(10)
+        n_search = 22
+        bot.search(n_search)
 
         if "find a hidden door" in bot.message:
             return True
 
-        if bot.blstats.time - before_search_time < 10:
+        if bot.blstats.time - before_search_time < n_search:
             return False
 
         places_to_search = np.array(
@@ -252,7 +253,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
 
     positions = nx.get_node_attributes(graph, "positions")
     searchable_positions = [positions[node] for node, degree in nx.degree(graph) if degree <= 1]
-    searchable_positions = [pos for pos in searchable_positions if level.search_count[pos] < 40]
+    searchable_positions = [pos for pos in searchable_positions if level.search_count[pos] < 44]
     searchable_positions = [pos for pos in searchable_positions if current_corridor[pos]]
     searchable_positions = [pos for pos in searchable_positions if level.was_on[pos]]
 
@@ -260,7 +261,7 @@ def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
         return False
 
     goto_closest(bot, searchable_positions)
-    bot.search(40)
+    bot.search(22)
     if "find a hidden door" in bot.message or "find a hidden passage" in bot.message:
         return True
 
