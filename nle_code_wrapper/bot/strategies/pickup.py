@@ -42,7 +42,7 @@ def examine_items(bot: "Bot"):
 
 def pickup_multipage(bot: "Bot", item_category: ItemCategory, text: str):
     # Pattern for items
-    item_pattern = r"([a-zA-Z]) - (.+)"
+    item_pattern = r"([$a-zA-Z]) - (.+)"
 
     # Pattern for end markers
     end_pattern = r"\(end\)"
