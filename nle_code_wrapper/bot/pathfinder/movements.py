@@ -37,13 +37,11 @@ class Movements:
     def __init__(
         self,
         bot: "Bot",
-        allow_walking_through_traps: bool = True,
         levitating: bool = False,
         monster_collision: bool = True,
         cardinal_only: bool = False,
     ) -> None:
         self.bot: "Bot" = bot
-        self.allow_walking_through_traps = allow_walking_through_traps  # TODO: handle traps
         self.levitating = levitating
         self.monster_collision = monster_collision
         self.cardinal_only = cardinal_only

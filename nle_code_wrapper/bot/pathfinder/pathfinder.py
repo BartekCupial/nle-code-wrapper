@@ -83,7 +83,6 @@ class Pathfinder:
             return self._create_movements_graph()
 
         key = (
-            self.bot.movements.allow_walking_through_traps,
             self.bot.movements.levitating,
             self.bot.movements.cardinal_only,
             self.bot.movements.monster_collision,
