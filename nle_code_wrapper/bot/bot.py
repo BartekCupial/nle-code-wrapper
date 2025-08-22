@@ -274,7 +274,7 @@ class Bot:
             return True
 
         # safe to pray if the bot has not prayed for a while
-        elif self.last_prayer is not None and self.blstats.time - self.last_prayer > 500:
+        elif self.last_prayer is not None and self.blstats.time - self.last_prayer > 1000:
             self.pray()
 
             return True

@@ -47,6 +47,7 @@ from nle_code_wrapper.bot.strategies.emergency import (
     fix_trouble,
     heal,
     pray,
+    rest_until_full_health,
 )
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.escape import escape_downstairs, escape_room, escape_upstairs
@@ -315,4 +316,5 @@ __all__ = [
     cancel,
     more,
     leave_shop,
+    rest_until_full_health,
 ]

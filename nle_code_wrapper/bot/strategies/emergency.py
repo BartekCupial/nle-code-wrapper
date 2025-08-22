@@ -213,7 +213,7 @@ def zap_yourself_wand_of_teleportation(bot: "Bot"):
     return False
 
 
-def wait_it_out(bot: "Bot", status_name: str):
+def wait_until_status_clear(bot: "Bot", status_name: str):
     status = getattr(bot, status_name)
     while status:
         bot.wait()
@@ -233,7 +233,7 @@ def pray(bot: "Bot") -> bool:
 @strategy
 def heal(bot: "Bot"):
     """
-    Attempts to heal the bot: casting healing spells, quaffing healing potions, or praying.
+    Attempts to heal by casting healing spells, quaffing healing potions, or praying.
     """
     if cast_healing(bot):
         return True
@@ -247,6 +247,17 @@ def heal(bot: "Bot"):
         return True
 
     return False
+
+
+@strategy
+def rest_until_full_health(bot: "Bot"):
+    """
+    Attempts to regenerate health by waiting.
+    """
+    while bot.blstats.hitpoints < bot.blstats.max_hitpoints:
+        bot.wait()
+
+    return True
 
 
 @strategy
@@ -331,7 +342,7 @@ def fix_trouble(bot: "Bot"):
         if apply_unicorn_horn(bot):
             return True
         else:
-            return wait_it_out(bot, "hallu")
+            return wait_until_status_clear(bot, "hallu")
 
     # blindness
     elif bot.blind:
@@ -346,7 +357,7 @@ def fix_trouble(bot: "Bot"):
         elif quaff_healing_potion(bot):
             return True
         else:
-            return wait_it_out(bot, "blind")
+            return wait_until_status_clear(bot, "blind")
 
     # stun or confusion
     elif bot.stun or bot.conf:
@@ -354,9 +365,9 @@ def fix_trouble(bot: "Bot"):
             return True
 
         if bot.stun:
-            return wait_it_out(bot, "stun")
+            return wait_until_status_clear(bot, "stun")
         elif bot.conf:
-            return wait_it_out(bot, "confused")
+            return wait_until_status_clear(bot, "confused")
 
     # deaf
     elif bot.deaf:
