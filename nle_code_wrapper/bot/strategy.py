@@ -182,10 +182,12 @@ def repeat_until_discovery(func):
 
                 # but you shouldn't search if there is a boulder
                 if np.any(utils.isin(kernel, G.BOULDER)):
+                    bot.add_message("You find a boulder.")
                     return True
 
                 # but you shouldn't search if there are doors
                 elif np.any(utils.isin(kernel, G.DOOR_CLOSED)):
+                    bot.add_message("You find closed doors.")
                     return True
 
                 else:
