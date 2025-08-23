@@ -250,7 +250,7 @@ def find_tactical_positions(bot: "Bot", nearby_monsters: List[Entity]) -> List[T
 
     tactical_spots = []
     # Find articulation points (potential corridor/chokepoint positions)
-    for choke in nx.articulation_points(graph):
+    for choke in nx.articulation_points(graph.to_undirected()):
         choke_pos = tuple(graph._node[choke]["positions"])
         # Check neighbors of articulation points
         for neighbor in bot.pathfinder.adjacents(choke_pos):
