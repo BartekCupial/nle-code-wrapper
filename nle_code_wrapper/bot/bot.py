@@ -229,7 +229,7 @@ class Bot:
         Args:
             message: message to add
         """
-        self.last_obs["text_message"] += "\n" + message
+        self.current_obs["text_message"] += "\n" + message
 
     def search(self, num_times=1) -> None:
         old_time = self.blstats.time
