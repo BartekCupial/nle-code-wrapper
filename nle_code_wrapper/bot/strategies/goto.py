@@ -234,104 +234,71 @@ def ascend_stairs(bot: "Bot") -> bool:
 
 @strategy
 def goto_room(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest room.
-    Tips:
-    - if we are standing in the room it isn't taken into consideration
-    - doors are not treated as part of the room
-    - looking at each room consider only closest tile from each room
-    """
+    """Moves the agent to the closest other room (ignores current room)."""
     return goto_feature_direction(bot, "all", room_detection)
 
 
 @strategy
 def goto_room_west(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest room westward.
-    """
+    """Moves the agent to the nearest different room westward (none if already westernmost)."""
     return goto_feature_direction(bot, "west", room_detection)
 
 
 @strategy
 def goto_room_east(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest room eastward.
-    """
+    """Moves the agent to the nearest different room eastward (none if already easternmost)."""
     return goto_feature_direction(bot, "east", room_detection)
 
 
 @strategy
 def goto_room_north(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest room northward.
-    """
+    """Moves the agent to the nearest different room northward (none if already northernmost)."""
     return goto_feature_direction(bot, "north", room_detection)
 
 
 @strategy
 def goto_room_south(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest room southward.
-    """
+    """Moves the agent to the nearest different room southward (none if already southernmost)."""
     return goto_feature_direction(bot, "south", room_detection)
 
 
 @strategy
 def goto_unexplored_room(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest unexplored room (not visited).
-    """
+    """Moves the agent to the nearest unexplored room (ignores visited)."""
     return goto_unexplored_feature(bot, room_detection)
 
 
 @strategy
 def goto_corridor(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest corridor.
-    Tips:
-    - if we are standing in the corridor it isn't taken into consideration
-    - doors are treated as part of the corridor
-    - looking at each corridor consider only closest tile from each corridor
-    - corridors and rooms are labeled using connected components without diagonal connectivity
-    """
+    """Moves the agent to the closest other corridor (ignores current corridor)."""
     return goto_feature_direction(bot, "all", corridor_detection)
 
 
 @strategy
 def goto_corridor_west(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest corridor westward.
-    """
+    """Moves the agent to the nearest different corridor westward (none if already westernmost)."""
     return goto_feature_direction(bot, "west", corridor_detection)
 
 
 @strategy
 def goto_corridor_east(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest corridor eastward.
-    """
+    """Moves the agent to the nearest different corridor eastward (none if already easternmost)."""
     return goto_feature_direction(bot, "east", corridor_detection)
 
 
 @strategy
 def goto_corridor_north(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest corridor northward.
-    """
+    """Moves the agent to the nearest different corridor northward (none if already northernmost)."""
     return goto_feature_direction(bot, "north", corridor_detection)
 
 
 @strategy
 def goto_corridor_south(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest corridor southward.
-    """
+    """Moves the agent to the nearest different corridor southward (none if already southernmost)."""
     return goto_feature_direction(bot, "south", corridor_detection)
 
 
 @strategy
 def goto_unexplored_corridor(bot: "Bot") -> bool:
-    """
-    Moves the agent to the closest unexplored corridor (not visited).
-    """
+    """Moves the agent to the nearest unexplored corridor (ignores visited)."""
     return goto_unexplored_feature(bot, corridor_detection)
