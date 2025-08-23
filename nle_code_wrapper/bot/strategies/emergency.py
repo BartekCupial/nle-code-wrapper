@@ -230,7 +230,7 @@ def pray(bot: "Bot") -> bool:
     if bot.safely_pray():
         return True
     else:
-        bot.add_message("You have prayed recently, wait before praying again.")
+        bot.add_message("Still too early to pray.")
         return False
 
 

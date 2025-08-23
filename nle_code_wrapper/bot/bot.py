@@ -268,7 +268,7 @@ class Bot:
 
     def safely_pray(self):
         # The initial prayer timeout is set to 300 turns https://nethackwiki.com/wiki/Prayer_timeout
-        if self.last_prayer is None or self.blstats.time > 300:
+        if self.last_prayer is None and self.blstats.time > 300:
             self.pray()
 
             return True
