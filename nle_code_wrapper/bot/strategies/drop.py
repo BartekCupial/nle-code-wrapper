@@ -98,7 +98,7 @@ def drop_cursed_items(bot: "Bot") -> bool:
 
 @strategy
 def identify_items_altar(bot: "Bot") -> bool:
-    """Identifies all items of unknown beatitude on an altar."""
+    """Identifies the beatitude on items at an altar."""
     if not goto_glyph(bot, G.ALTAR):
         return False
 
