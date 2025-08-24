@@ -85,6 +85,38 @@ def drop_unidentified_wands(bot: "Bot") -> bool:
 
 
 @strategy
+def drop_unidentified_rings(bot: "Bot") -> bool:
+    """Drops all unidentified rings from inventory."""
+    return drop_items(bot, "rings", lambda item: item.beatitude == ItemBeatitude.UNKNOWN)
+
+
+@strategy
+def drop_unidentified_amulets(bot: "Bot") -> bool:
+    """Drops all unidentified amulets from inventory."""
+    return drop_items(bot, "amulets", lambda item: item.beatitude == ItemBeatitude.UNKNOWN)
+
+
+@strategy
+def drop_unidentified_food(bot: "Bot") -> bool:
+    """Drops all unidentified food from inventory."""
+    return drop_items(
+        bot, "food", lambda item: item.beatitude == ItemBeatitude.UNKNOWN and item.category == ItemCategory.COMESTIBLES
+    )
+
+
+@strategy
+def drop_corpses(bot: "Bot") -> bool:
+    """Drops all corpses from inventory."""
+    return drop_items(bot, "food", lambda item: item.category == ItemCategory.CORPSE)
+
+
+@strategy
+def drop_coins(bot: "Bot") -> bool:
+    """Drops all gold from inventory."""
+    return drop_items(bot, "coins", lambda item: True)
+
+
+@strategy
 def drop_cursed_items(bot: "Bot") -> bool:
     """Drops all cursed items from inventory."""
     if not select_drop_category(bot, "cursed"):

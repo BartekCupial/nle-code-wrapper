@@ -42,10 +42,15 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
     levitate_over_lava_river,
 )
 from nle_code_wrapper.bot.strategies.drop import (
+    drop_coins,
+    drop_corpses,
     drop_cursed_items,
     drop_unequipped_armor,
     drop_unequipped_weapons,
+    drop_unidentified_amulets,
+    drop_unidentified_food,
     drop_unidentified_potions,
+    drop_unidentified_rings,
     drop_unidentified_scrolls,
     drop_unidentified_spellbooks,
     drop_unidentified_wands,
