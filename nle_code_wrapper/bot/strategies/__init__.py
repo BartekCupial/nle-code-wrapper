@@ -41,6 +41,14 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
     freeze_lava_wand,
     levitate_over_lava_river,
 )
+from nle_code_wrapper.bot.strategies.drop import (
+    drop_unequipped_armor,
+    drop_unequipped_weapons,
+    drop_unidentified_potions,
+    drop_unidentified_scrolls,
+    drop_unidentified_spellbooks,
+    drop_unidentified_wands,
+)
 from nle_code_wrapper.bot.strategies.eat import eat_corpse_floor, eat_corpse_inventory, eat_food_inventory
 from nle_code_wrapper.bot.strategies.emergency import (
     emergency_escape,
@@ -225,6 +233,12 @@ __all__ = [
     escape_upstairs,
     escape_downstairs,
     escape_room,
+    drop_unequipped_armor,
+    drop_unequipped_weapons,
+    drop_unidentified_potions,
+    drop_unidentified_scrolls,
+    drop_unidentified_spellbooks,
+    drop_unidentified_wands,
     emergency_escape,
     fix_trouble,
     heal,
