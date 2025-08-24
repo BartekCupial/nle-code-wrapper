@@ -585,7 +585,7 @@ class Bot:
 
             text = " ".join([e for e in [detail_text, distance, direction, punctuation, here] if e])
             text = text.replace(" :", ":")
-            text = text.replace(" .", " ")
+            text = text.replace(" .", ".")
 
             desc.append(text)
 
