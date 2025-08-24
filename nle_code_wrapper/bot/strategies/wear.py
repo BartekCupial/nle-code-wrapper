@@ -66,6 +66,10 @@ def _wear_with_dependencies(bot: "Bot", dependencies: List[ArmorClass], armor_cl
                     bot.step(letter)
                 return False
 
+    if worn_item := bot.inventory.worn_armor_by_type[armor_class] is not None:
+        bot.step(A.Command.TAKEOFF)
+        bot.step(worn_item.letter)
+
     # Wear target item
     bot.step(A.Command.WEAR)
     bot.step(best_item.letter)
