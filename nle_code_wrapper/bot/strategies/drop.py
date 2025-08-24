@@ -2,15 +2,16 @@ import re
 from typing import Callable, List, Optional
 
 from nle.nethack import actions as A
+from nle_utils.glyph import G
 
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.inventory import ArmorClass, Item, ItemBeatitude, ItemCategory
+from nle_code_wrapper.bot.strategies.goto import goto_glyph
 from nle_code_wrapper.bot.strategy import strategy
 
 
 def select_drop_category(bot: "Bot", what: str):
     """Selects item category to drop from inventory"""
-
     bot.step(A.Command.DROPTYPE)
 
     pattern = r"([$a-zA-Z]) - (.+)"
@@ -81,3 +82,37 @@ def drop_unidentified_spellbooks(bot: "Bot") -> bool:
 def drop_unidentified_wands(bot: "Bot") -> bool:
     """Drops all unidentified wands from inventory."""
     return drop_items(bot, "wands", lambda item: item.beatitude == ItemBeatitude.UNKNOWN)
+
+
+@strategy
+def drop_cursed_items(bot: "Bot") -> bool:
+    """Drops all cursed items from inventory."""
+    if not select_drop_category(bot, "cursed"):
+        return False
+
+    bot.step(A.Command.PICKUP)
+    bot.step(A.TextCharacters.SPACE)
+
+    return True
+
+
+@strategy
+def identify_items_altar(bot: "Bot") -> bool:
+    """Identifies all items of unknown beatitude on an altar."""
+    if not goto_glyph(bot, G.ALTAR):
+        return False
+
+    # Items of unknown Bless/Curse status
+    if not select_drop_category(bot, "items of unknown"):
+        return False
+
+    # select and drop all items
+    bot.step(A.Command.PICKUP)
+    bot.step(A.TextCharacters.SPACE)
+
+    # select and pickup all items
+    bot.step(A.Command.PICKUP)
+    bot.step(A.Command.PICKUP)
+    bot.step(A.TextCharacters.SPACE)
+
+    return True

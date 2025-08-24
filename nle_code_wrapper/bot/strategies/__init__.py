@@ -42,12 +42,14 @@ from nle_code_wrapper.bot.strategies.cross_lava_river import (
     levitate_over_lava_river,
 )
 from nle_code_wrapper.bot.strategies.drop import (
+    drop_cursed_items,
     drop_unequipped_armor,
     drop_unequipped_weapons,
     drop_unidentified_potions,
     drop_unidentified_scrolls,
     drop_unidentified_spellbooks,
     drop_unidentified_wands,
+    identify_items_altar,
 )
 from nle_code_wrapper.bot.strategies.eat import eat_corpse_floor, eat_corpse_inventory, eat_food_inventory
 from nle_code_wrapper.bot.strategies.emergency import (
@@ -239,6 +241,8 @@ __all__ = [
     drop_unidentified_scrolls,
     drop_unidentified_spellbooks,
     drop_unidentified_wands,
+    drop_cursed_items,
+    identify_items_altar,
     emergency_escape,
     fix_trouble,
     heal,
