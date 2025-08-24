@@ -228,39 +228,38 @@ def search_room_for_hidden_doors_old(bot: "Bot") -> bool:
 @strategy
 def search_corridor_for_hidden_doors(bot: "Bot") -> bool:
     """
-    Searches the current corridor for hidden doors by directing the bot to search dead ends of the corridor.
+    Searches the current corridor for hidden doors.
     Tips:
-    - searches spot 10 times (hidden passages might require multiple searches)
     - diagonal connectivity between corridor will be classified as dead end
-    - we need to be in the corridor to search it (`goto_corridor`)
-    - there is a limit for searching each spot
     """
 
-    bot.movements = Movements(bot, cardinal_only=True)
-
-    my_position = bot.entity.position
-    level = bot.current_level
+    def get_dead_ends(features):
+        """
+        return positions of the dead ends in the dungeon
+        dead end is a position which has on or less cardinal neighbors
+        to confirm dead end we check if bot was on this position
+        """
+        prev_movements = bot.movements
+        bot.movements = Movements(bot, cardinal_only=True)
+        dead_ends = np.array(
+            [
+                n
+                for n in np.argwhere(features)
+                if bot.current_level.was_on[tuple(n)] and len(bot.pathfinder.neighbors(tuple(n))) <= 1
+            ]
+        )
+        bot.movements = prev_movements
+        return set(map(tuple, dead_ends))
 
     labeled_corridors, num_labels = corridor_detection(bot)
-    current_corridor = labeled_corridors == labeled_corridors[my_position]
 
-    # Check if we are in the corridor
-    # if labeled_corridors[my_position] == 0:
-    #     return False
+    dead_ends = get_dead_ends(labeled_corridors)
+    dead_ends = [pos for pos in dead_ends if bot.current_level.search_count[pos] < 44]
 
-    # look at dead ends, i.e. positions with only one neighbor
-    graph = bot.pathfinder.create_movements_graph(my_position)
-
-    positions = nx.get_node_attributes(graph, "positions")
-    searchable_positions = [positions[node] for node, degree in nx.degree(graph) if degree <= 1]
-    searchable_positions = [pos for pos in searchable_positions if level.search_count[pos] < 44]
-    searchable_positions = [pos for pos in searchable_positions if current_corridor[pos]]
-    searchable_positions = [pos for pos in searchable_positions if level.was_on[pos]]
-
-    if len(searchable_positions) == 0:
+    if len(dead_ends) == 0:
         return False
 
-    goto_closest(bot, searchable_positions)
+    goto_closest(bot, dead_ends)
     bot.search(22)
     if "find a hidden door" in bot.message or "find a hidden passage" in bot.message:
         return True
