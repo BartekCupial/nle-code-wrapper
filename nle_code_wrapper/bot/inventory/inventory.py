@@ -54,6 +54,8 @@ class Inventory:
             properties = self.item_parser(text)
 
             if letter in self.items:
+                # sometimes item text changes
+                self.items[letter].text = text
                 self.items[letter].update_properties(**properties)
             else:
                 self.items[letter] = Item(
