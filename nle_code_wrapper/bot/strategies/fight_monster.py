@@ -10,7 +10,7 @@ from nle_code_wrapper.bot.entity import Entity
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 from nle_code_wrapper.bot.pvp.monster import MonsterClassTypes
 from nle_code_wrapper.bot.strategies.goto import goto_closest
-from nle_code_wrapper.bot.strategy import repeat, strategy
+from nle_code_wrapper.bot.strategy import repeat, repeat_n_times, strategy
 
 
 @strategy
@@ -138,7 +138,6 @@ def fight_engulfed(bot: "Bot") -> bool:
 
 
 @strategy
-@repeat
 def wait_for_monster(bot: "Bot") -> bool:
     """
     Makes the bot wait for monsters to come within an attack range.
@@ -157,7 +156,7 @@ def wait_for_monster(bot: "Bot") -> bool:
             return False
 
     # Wait for monsters to come to us
-    bot.wait()
+    bot.search(20)
 
     return True
 

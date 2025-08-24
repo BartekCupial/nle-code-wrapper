@@ -112,7 +112,7 @@ def drop_corpses(bot: "Bot") -> bool:
 
 @strategy
 def drop_coins(bot: "Bot") -> bool:
-    """Drops all gold from inventory."""
+    """Drops all coins from inventory."""
     return drop_items(bot, "coins", lambda item: True)
 
 
