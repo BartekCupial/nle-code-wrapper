@@ -550,7 +550,7 @@ class Bot:
             num_exits = room_info["num_exits"]
             num_closed_doors = room_info["num_closed_doors"]
             shop_name = room_info["shop_name"]
-            features = "  Objects: " + ", ".join(room_info["features"]) + "." if room_info["features"] else ""
+            features = "    Objects: " + ", ".join(room_info["features"]) + "." if room_info["features"] else ""
 
             if direction == "here":
                 here = "<- You are here."
@@ -582,6 +582,13 @@ class Bot:
                 desc.append(features)
 
         return "\n".join(desc)
+
+    def get_inventory_description(self):
+        return "\n".join(
+            f"{key}:\n    " + "\n    ".join(f"{chr(item.letter)}) {item.text}" for item in category)
+            for key, category in self.inventory.inventory.items()
+            if category
+        )
 
     def cache_overview(self):
         obs, *_ = self.internal_step(A.Command.OVERVIEW)
