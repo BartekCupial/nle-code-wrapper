@@ -398,7 +398,7 @@ class Bot:
             self.levels[key] = Level(*key)
         return self.levels[key]
 
-    def describe_room(self, room_mask, dilated_corridors, dilated_doors, revelable_positions):
+    def describe_room(self, room_mask, dilated_corridors, dilated_doors, dilated_bars, revelable_positions):
         def direction_to(from_xy, to_xy):
             """
             Returns a string describing the direction.
@@ -453,8 +453,10 @@ class Bot:
         # Compute the number of exits
         corridor_exits = np.argwhere(np.logical_and(dilated_corridors, room_mask))
         door_exits = np.argwhere(np.logical_and(dilated_doors, room_mask))
-        num_exits = len(corridor_exits) + len(door_exits)
+        bar_exits = np.argwhere(np.logical_and(dilated_bars, room_mask))
+        num_exits = len(corridor_exits) + len(door_exits) + len(bar_exits)
         num_closed_doors = len(door_exits)
+        num_bars = len(bar_exits)
 
         # Info about features: stairs, fountains, sinks, altars, etc.
         # TODO: add shops
@@ -511,6 +513,7 @@ class Bot:
             "direction": direction,
             "num_exits": num_exits,
             "num_closed_doors": num_closed_doors,
+            "num_bars": num_bars,
             "features": features,
             "shop_name": shop_name,
         }
@@ -524,12 +527,13 @@ class Bot:
 
         dilated_corridors = ndimage.binary_dilation(labeled_corridors)
         dilated_doors = ndimage.binary_dilation(utils.isin(self.glyphs, G.DOOR_CLOSED))
+        dilated_bars = ndimage.binary_dilation(utils.isin(self.glyphs, G.BARS))
 
         rooms_info = []
         for room_id in range(1, num_rooms + 1):
             room = labeled_rooms == room_id
 
-            room_info = self.describe_room(room, dilated_corridors, dilated_doors, revelable_positions)
+            room_info = self.describe_room(room, dilated_corridors, dilated_doors, dilated_bars, revelable_positions)
             room_info["room_id"] = room_id
 
             rooms_info.append(room_info)
@@ -549,6 +553,7 @@ class Bot:
             direction = room_info["direction"]
             num_exits = room_info["num_exits"]
             num_closed_doors = room_info["num_closed_doors"]
+            num_bars = room_info["num_bars"]
             shop_name = room_info["shop_name"]
             features = "    Objects: " + ", ".join(room_info["features"]) + "." if room_info["features"] else ""
 
@@ -568,8 +573,14 @@ class Bot:
 
             if num_exits:
                 exits_text = f"with {num_exits} {'exit' if num_exits == 1 else 'exits'}"
+
+                blocked_exits = []
                 if num_closed_doors > 0:
-                    exits_text += f" ({num_closed_doors} closed doors)"
+                    blocked_exits.append(f"{num_closed_doors} closed doors")
+                if num_bars > 0:
+                    blocked_exits.append(f"{num_bars} iron bars")
+                exits_text += f" ({'and '.join(blocked_exits)})" if blocked_exits else ""
+
                 detail_text += " " + exits_text
 
             text = " ".join([e for e in [detail_text, distance, direction, punctuation, here] if e])
