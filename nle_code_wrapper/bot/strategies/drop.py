@@ -20,7 +20,7 @@ def select_drop_category(bot: "Bot", what: str):
         letter = match.group(1)
         name = match.group(2)
 
-        if name.lower() == what:
+        if what.lower() in name.lower():
             bot.type_text(letter)
             bot.step(A.MiscAction.MORE)
 
@@ -100,14 +100,16 @@ def drop_unidentified_amulets(bot: "Bot") -> bool:
 def drop_unidentified_food(bot: "Bot") -> bool:
     """Drops all unidentified food from inventory."""
     return drop_items(
-        bot, "food", lambda item: item.beatitude == ItemBeatitude.UNKNOWN and item.category == ItemCategory.COMESTIBLES
+        bot,
+        "comestibles",
+        lambda item: item.beatitude == ItemBeatitude.UNKNOWN and item.category == ItemCategory.COMESTIBLES,
     )
 
 
 @strategy
 def drop_corpses(bot: "Bot") -> bool:
     """Drops all corpses from inventory."""
-    return drop_items(bot, "food", lambda item: item.category == ItemCategory.CORPSE)
+    return drop_items(bot, "comestibles", lambda item: item.category == ItemCategory.CORPSE)
 
 
 @strategy
@@ -119,7 +121,7 @@ def drop_coins(bot: "Bot") -> bool:
 @strategy
 def drop_cursed_items(bot: "Bot") -> bool:
     """Drops all cursed items from inventory."""
-    if not select_drop_category(bot, "cursed"):
+    if not select_drop_category(bot, "Items known to be Cursed"):
         return False
 
     bot.step(A.Command.PICKUP)
@@ -135,7 +137,7 @@ def identify_items_altar(bot: "Bot") -> bool:
         return False
 
     # Items of unknown Bless/Curse status
-    if not select_drop_category(bot, "items of unknown"):
+    if not select_drop_category(bot, "Items of unknown Bless/Curse status"):
         return False
 
     # select and drop all items

@@ -328,17 +328,20 @@ class Bot:
         self.entities = self.get_entities(self.current_obs)
         self.current_level = self.get_current_level(self.current_obs)
 
-        terrain_needs_update = self.current_level.update(self.glyphs, self.blstats)
-        if terrain_needs_update:
-            self.update_terrain_features(self.glyphs, self.blstats)
-
-        self.update_shops()
         self.inventory_manager.update()
         self.character.update()
         self.movements.update()
         self.pathfinder.update()
         self.pvp.update()
         self.trap_tracker.update()
+
+        # those two right now only used for display purposes
+        terrain_needs_update = self.current_level.update(self.glyphs, self.blstats)
+        if terrain_needs_update:
+            self.update_terrain_features(self.glyphs, self.blstats)
+
+        # order matters, update shops after updating pathfinder
+        self.update_shops()
 
     def get_blstats(self, last_obs) -> BLStats:
         return BLStats(*last_obs["blstats"])
