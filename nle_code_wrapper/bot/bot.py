@@ -45,7 +45,7 @@ class Bot:
         self.pvp: Pvp = Pvp(self)
         self.trap_tracker: TrapTracker = TrapTracker(self)
 
-        self.strategies: list[Callable] = []
+        self.strategies: dict[str, Callable] = {}
         self.panics: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
 
@@ -56,7 +56,7 @@ class Bot:
         Args:
             func: function to add as a strategy
         """
-        self.strategies.append(func)
+        self.strategies[func.__name__] = func
 
     def panic(self, func: Callable) -> None:
         """
@@ -143,7 +143,7 @@ class Bot:
         self.update()
         self.check_panics()
 
-    def strategy_step(self, action: Union[int, int64]) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
+    def strategy_step(self, action: str) -> Tuple[Dict[str, ndarray], float, bool, bool, Dict[str, Any]]:
         """
         Take a step in the environment using the strategies defined in the bot. If no strategy is chosen, the action
         will decide the strategy to use. If a strategy is chosen, the action will be passed as an argument to the strategy.
@@ -161,32 +161,34 @@ class Bot:
         self.current_info = {}
 
         try:
-            if self.current_strategy is None:
-                if action < len(self.strategies):
-                    self.current_strategy = self.strategies[action]
-                    self.current_args = ()
-                else:
-                    # if action is wrong do nothing, we still should increment strategy_step
-                    # this is only relevant for multiple arguments strategies
-                    self.strategy_steps += 1
-            else:
-                self.current_args += (action,)
+            self.strategies[action](self)
+            # if self.current_strategy is None:
+            #     if action < len(self.strategies):
+            #         self.current_strategy = self.strategies[action]
+            #         self.current_args = ()
+            #     else:
+            #         # if action is wrong do nothing, we still should increment strategy_step
+            #         # this is only relevant for multiple arguments strategies
+            #         self.strategy_steps += 1
+            # else:
+            #     self.current_args += (action,)
 
-            # we need this if the strategy was not created because out of bounds
-            if self.current_strategy is not None:
-                # TODO: support in the future, keep in mind action space will have to be changed
-                assert (
-                    check_strategy_parameters(self.current_strategy) == 1
-                ), f"For now ban on strategies with arguments, {self.current_strategy.__name__}"
+            # # we need this if the strategy was not created because out of bounds
+            # if self.current_strategy is not None:
+            #     # TODO: support in the future, keep in mind action space will have to be changed
+            #     assert (
+            #         check_strategy_parameters(self.current_strategy) == 1
+            #     ), f"For now ban on strategies with arguments, {self.current_strategy.__name__}"
 
-                # If the strategy has all the arguments it needs, call it
-                if check_strategy_parameters(self.current_strategy) == len(self.current_args) + 1:  # +1 for self
-                    self.current_strategy(self, *self.current_args)
-                    self.current_strategy = None
-                    self.current_args = None
+            #     # If the strategy has all the arguments it needs, call it
+            #     if check_strategy_parameters(self.current_strategy) == len(self.current_args) + 1:  # +1 for self
+            #         self.current_strategy(self, *self.current_args)
+            #         self.current_strategy = None
+            #         self.current_args = None
         except (BotPanic, BotFinished):
-            self.current_strategy = None
-            self.current_args = None
+            # self.current_strategy = None
+            # self.current_args = None
+            pass
 
         # if we changed the dungeon_number we need to update the overview
         if (self.blstats.dungeon_number, self.blstats.depth) != (

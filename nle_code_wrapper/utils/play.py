@@ -52,7 +52,7 @@ def play_using_strategies_autocomplete(env, action_mode="human"):
     if action_mode == "random":
         action = env.action_space.sample()
     elif action_mode == "human":
-        names = [strategy.__name__ for strategy in env.bot.strategies]
+        names = [strategy for strategy in env.bot.strategies]
         setup_autocomplete(partial(completer, commands=names))
 
         while True:
@@ -65,6 +65,7 @@ def play_using_strategies_autocomplete(env, action_mode="human"):
             else:
                 try:
                     action = names.index(command)
+                    action = command
                     break
                 except ValueError:
                     print(f"Selected action '{command}' is not in action list. Please try again.")
