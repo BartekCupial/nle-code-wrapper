@@ -27,8 +27,9 @@ class SaveOnException(gym.Wrapper):
         try:
             return self.env.reset(seed=self.recorded_seed, **kwargs)
         except Exception as e:
-            log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
-            self.save_to_file()
+            message = f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}"
+            log.error(message)
+            self.save_to_file(message=message)
 
             bot = self.env.get_wrapper_attr("bot")
             obs = bot.last_obs
@@ -42,8 +43,9 @@ class SaveOnException(gym.Wrapper):
             self.recorded_actions.append(action)
             return self.env.step(action)
         except Exception as e:
-            log.error(f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}")
-            self.save_to_file()
+            message = f"Bot failed due to unhandled exception: {str(e)}\n{traceback.format_exc()}"
+            log.error(message)
+            self.save_to_file(message=message)
 
             bot = self.env.get_wrapper_attr("bot")
             obs = bot.last_obs
@@ -52,11 +54,12 @@ class SaveOnException(gym.Wrapper):
 
             return obs, bot.reward, True, False, info
 
-    def save_to_file(self):
+    def save_to_file(self, message=""):
         dat = {
             "seed": self.recorded_seed,
             "actions": self.recorded_actions,
             "last_observation": self.env.unwrapped.last_observation,
+            "message": message,
         }
         og_ttyrec = self.env.unwrapped.nethack._ttyrec
         if og_ttyrec is not None:
