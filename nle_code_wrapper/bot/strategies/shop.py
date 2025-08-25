@@ -47,7 +47,7 @@ def leave_shop(bot: "Bot") -> bool:
         else:
             shop_keepers = [entity.position for entity in bot.entities if entity.name == "shopkeeper"]
 
-            distances = bot.pathfinder.compute_distances(bot.entity.position)
+            distances = bot.pathfinder.distances(bot.entity.position)
             closest_shop_keeper = min(
                 [sk for sk in shop_keepers if bot.pathfinder.reachable(bot.entity.position, sk)],
                 key=lambda sk: distances.get(bot.pathfinder.reachable(bot.entity.position, sk), np.inf),

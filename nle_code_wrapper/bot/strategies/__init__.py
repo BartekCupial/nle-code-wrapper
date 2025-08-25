@@ -66,6 +66,7 @@ from nle_code_wrapper.bot.strategies.emergency import (
 )
 from nle_code_wrapper.bot.strategies.engrave import engrave_elbereth
 from nle_code_wrapper.bot.strategies.escape import escape_downstairs, escape_room, escape_upstairs
+from nle_code_wrapper.bot.strategies.excalibur import dip_for_excalibur
 from nle_code_wrapper.bot.strategies.explore import (
     explore,
     explore_corridor,
