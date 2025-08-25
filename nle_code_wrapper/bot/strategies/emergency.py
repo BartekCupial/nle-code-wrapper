@@ -371,7 +371,7 @@ def fix_trouble(bot: "Bot"):
         if bot.stun:
             return wait_until_status_clear(bot, "stun")
         elif bot.conf:
-            return wait_until_status_clear(bot, "confused")
+            return wait_until_status_clear(bot, "conf")
 
     # deaf
     elif bot.deaf:
