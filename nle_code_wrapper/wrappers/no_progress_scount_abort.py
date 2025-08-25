@@ -4,7 +4,7 @@ from nle import nethack
 
 
 class NoProgressScoutAbort(gym.Wrapper):
-    def __init__(self, env, no_progress_timeout=150):
+    def __init__(self, env, no_progress_timeout=300):
         super().__init__(env)
         self.no_progress_timeout = no_progress_timeout
 
