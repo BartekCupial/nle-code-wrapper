@@ -3,6 +3,7 @@ from collections import defaultdict
 from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import EnemyAppeared
 from nle_code_wrapper.bot.pathfinder.movements import Movements
+from nle_code_wrapper.bot.pvp.monster import MonsterClassTypes
 
 
 def enemy_appeared(bot: "Bot"):
@@ -15,12 +16,14 @@ def enemy_appeared(bot: "Bot"):
     # Count entities from current observation
     for entity in bot.entities:
         if bot.pathfinder.reachable(bot.entity.position, entity.position, adjacent=True):
-            current_entities[entity.glyph] += 1
+            if not MonsterClassTypes.always_peaceful(entity.name):
+                current_entities[entity.glyph] += 1
 
     # Count entities from previous observation
     for entity in bot.get_entities(bot.last_obs):
         if bot.pathfinder.reachable(bot.entity.position, entity.position, adjacent=True):
-            last_entities[entity.glyph] += 1
+            if not MonsterClassTypes.always_peaceful(entity.name):
+                last_entities[entity.glyph] += 1
 
     bot.movements.monster_collision = monster_collistion
 
