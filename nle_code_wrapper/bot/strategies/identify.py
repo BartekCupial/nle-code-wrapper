@@ -208,3 +208,8 @@ def engrave_identify(bot: "Bot"):
 
         bot.inventory_manager.item_database.update_item_candidates(appearance, wand_types)
         bot.inventory_manager.item_database[appearance.name].engraved = True
+
+
+@strategy
+def identify_items_shop(bot: "Bot") -> bool:
+    pass
