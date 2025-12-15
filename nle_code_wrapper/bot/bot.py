@@ -29,6 +29,20 @@ from nle_code_wrapper.utils.inspect import check_strategy_parameters
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
 
 
+def make_primitive_strategy(action_int: int, name: str, doc: str) -> Callable:
+    """Creates a strategy function that performs a single low-level NLE action."""
+
+    def primitive_func(bot: "Bot") -> bool:
+        # Primitives are simple: just take the step
+        # The Bot.step() method handles the state update (inventory, glyphs, etc.)
+        bot.step(action_int)
+        return True
+
+    primitive_func.__name__ = name
+    primitive_func.__doc__ = doc
+    return primitive_func
+
+
 class Bot:
     def __init__(self, env: gym.Env, max_strategy_steps: int = 1000, gamma: float = 0.99) -> None:
         """
@@ -66,6 +80,22 @@ class Bot:
             func: function to add as a panic
         """
         self.panics.append(func)
+
+    def register_primitives(self, primitives_list: list[str]) -> None:
+        """
+        Registers low-level primitives (e.g., 'north', 'kick') as strategies.
+        Args:
+            primitives_list: List of action names to register (e.g. ['north', 'kick'])
+        """
+        from nle_code_wrapper.utils.primitives import PRIMITIVE_ACTION_MAP, PRIMITIVE_DESCRIPTIONS
+
+        for name in primitives_list:
+            action_int = PRIMITIVE_ACTION_MAP[name]
+            description = PRIMITIVE_DESCRIPTIONS[name]
+
+            # Create the wrapper function
+            strat_func = make_primitive_strategy(action_int, name, description)
+            self.strategy(strat_func)
 
     def reset(self, **kwargs) -> Tuple[Dict[str, ndarray], Dict[str, Dict[str, Any]]]:
         """
