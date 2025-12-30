@@ -21,6 +21,7 @@ from sample_factory.utils.utils import experiment_dir
 
 import nle_code_wrapper.bot.panics as panic_module
 import nle_code_wrapper.bot.strategies as strategy_module
+from nle_code_wrapper.utils.primitives import PRIMITIVE_ACTION_MAP
 from nle_code_wrapper.utils.utils import get_function_by_name
 from nle_code_wrapper.wrappers import NLECodeWrapper, NoProgressFeedback, SaveOnException
 
@@ -114,12 +115,13 @@ def make_nethack_env(env_name, cfg, env_config, render_mode: Optional[str] = Non
             cfg.strategies,
             cfg.panics,
             max_strategy_steps=cfg.max_strategy_steps,
-            add_letter_strategies=cfg.add_letter_strategies,
-            add_direction_strategies=cfg.add_direction_strategies,
-            add_more_strategy=cfg.add_more_strategy,
             gamma=gamma,
         )
         env = NoProgressFeedback(env)
+
+        if cfg.primitives:
+            primitives = list(PRIMITIVE_ACTION_MAP.keys())
+            env.bot.register_primitives(primitives)
 
     # if cfg.save_on_exception:
     #     failed_game_path = join(experiment_dir(cfg=cfg), "failed_games")
