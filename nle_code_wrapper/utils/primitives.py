@@ -262,5 +262,5 @@ PRIMITIVE_DESCRIPTIONS = {
     "wizard map": "wizard map",
     "wizard where": "wizard where",
     "wizard wish": "wizard wish",
-    **{char: f"type character '{char}' when prompted for a character response" for char in ascii_lowercase + ascii_uppercase}
+    **{char: f"type character '{char}'" for char in ascii_lowercase + ascii_uppercase}
 }
