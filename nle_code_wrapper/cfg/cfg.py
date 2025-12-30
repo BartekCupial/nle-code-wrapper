@@ -17,11 +17,7 @@ def add_code_wrapper_cli_args(p: ArgumentParser) -> None:
         help="where to search for strategies implementation",
     )
     p.add_argument("--max_strategy_steps", type=int, default=None, help="Strategy episode horizon.")
-    p.add_argument("--add_letter_strategies", type=str2bool, default=True, help="Allow typing letters a-zA-Z.")
-    p.add_argument(
-        "--add_direction_strategies", type=str2bool, default=True, help="Allow basic low level skills eat, quaff etc."
-    )
-    p.add_argument("--add_more_strategy", type=str2bool, default=True, help="Allow typing `more` to skip stuff.")
+    p.add_argument("--primitives", type=str2bool, default=True, help="Do we want to add primitive actions to the code wrapper?")
     p.add_argument("--panics", type=ast.literal_eval, default=[], help="List of panic names")
     p.add_argument(
         "--panics_loc",
