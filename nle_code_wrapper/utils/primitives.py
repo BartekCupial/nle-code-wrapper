@@ -1,3 +1,5 @@
+from string import ascii_lowercase, ascii_uppercase
+
 import nle.nethack.actions as A
 
 # Mapping from string name to NLE Action Enum
@@ -129,6 +131,7 @@ PRIMITIVE_ACTION_MAP = {
     "wizard map": A.WizardCommand.WIZMAP,
     "wizard where": A.WizardCommand.WIZWHERE,
     "wizard wish": A.WizardCommand.WIZWISH,
+    **{char: ord(char) for char in ascii_lowercase + ascii_uppercase}
 }
 
 PRIMITIVE_DESCRIPTIONS = {
@@ -259,4 +262,5 @@ PRIMITIVE_DESCRIPTIONS = {
     "wizard map": "wizard map",
     "wizard where": "wizard where",
     "wizard wish": "wizard wish",
+    **{char: f"type character '{char}' when prompted for a character response" for char in ascii_lowercase + ascii_uppercase}
 }
