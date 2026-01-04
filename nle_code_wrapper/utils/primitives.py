@@ -2,6 +2,9 @@ from string import ascii_lowercase, ascii_uppercase
 
 import nle.nethack.actions as A
 
+LETTERS = [chr(i) for i in range(ord("a"), ord("z") + 1)]
+LETTERS_UPPER = [chr(i) for i in range(ord("A"), ord("Z") + 1)]
+
 # Mapping from string name to NLE Action Enum
 PRIMITIVE_ACTION_MAP = {
     "help": A.UnsafeActions.HELP,
@@ -111,9 +114,11 @@ PRIMITIVE_ACTION_MAP = {
     "wield": A.Command.WIELD,
     "wipe": A.Command.WIPE,
     "zap": A.Command.ZAP,
+    "plus": A.TextCharacters.PLUS,
     "minus": A.TextCharacters.MINUS,
     "space": A.TextCharacters.SPACE,
     "apos": A.TextCharacters.APOS,
+    "quote": A.TextCharacters.QUOTE,
     "0": A.TextCharacters.NUM_0,
     "1": A.TextCharacters.NUM_1,
     "2": A.TextCharacters.NUM_2,
@@ -124,6 +129,7 @@ PRIMITIVE_ACTION_MAP = {
     "7": A.TextCharacters.NUM_7,
     "8": A.TextCharacters.NUM_8,
     "9": A.TextCharacters.NUM_9,
+    "$": A.TextCharacters.DOLLAR,
     "wizard detect": A.WizardCommand.WIZDETECT,
     "wizard genesis": A.WizardCommand.WIZGENESIS,
     "wizard identify": A.WizardCommand.WIZIDENTIFY,
@@ -131,8 +137,13 @@ PRIMITIVE_ACTION_MAP = {
     "wizard map": A.WizardCommand.WIZMAP,
     "wizard where": A.WizardCommand.WIZWHERE,
     "wizard wish": A.WizardCommand.WIZWISH,
-    **{char: ord(char) for char in ascii_lowercase + ascii_uppercase}
 }
+
+# Dynamically map a-z and A-Z
+for char in LETTERS + LETTERS_UPPER + ["y", "n"]:
+    if char not in PRIMITIVE_ACTION_MAP:
+        PRIMITIVE_ACTION_MAP[char] = ord(char)
+
 
 PRIMITIVE_DESCRIPTIONS = {
     "north": "go one step north",
@@ -202,9 +213,11 @@ PRIMITIVE_DESCRIPTIONS = {
     "wield": "wield weapon (w- means wield nothing)",
     "wipe": "wipe off your face",
     "zap": "zap a wand",
+    "plus": "+",
     "minus": "-",
     "space": " ",
     "apos": "'",
+    "quote": '"',
     "0": "0",
     "1": "1",
     "2": "2",
@@ -215,6 +228,7 @@ PRIMITIVE_DESCRIPTIONS = {
     "7": "7",
     "8": "8",
     "9": "9",
+    "$": "$",
     "help": "show the help menu",
     "previous message": "repeat last message",
     "extcmd": "extended command (#)",
@@ -262,5 +276,9 @@ PRIMITIVE_DESCRIPTIONS = {
     "wizard map": "wizard map",
     "wizard where": "wizard where",
     "wizard wish": "wizard wish",
-    **{char: f"type character '{char}'" for char in ascii_lowercase + ascii_uppercase}
+    "y": "press 'y' (yes)",
+    "n": "press 'n' (no)",
 }
+
+for char in LETTERS + LETTERS_UPPER:
+    PRIMITIVE_DESCRIPTIONS[char] = f"press key '{char}'"
