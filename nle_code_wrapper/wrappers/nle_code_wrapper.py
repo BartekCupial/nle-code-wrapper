@@ -16,11 +16,15 @@ class NLECodeWrapper(gym.Wrapper):
         panics: List[Callable],
         max_strategy_steps: int = 1000,
         gamma: float = 0.99,
+        primitives: List[str] = []
     ) -> None:
         super().__init__(env)
         if max_strategy_steps is None:
             max_strategy_steps = env.unwrapped._max_episode_steps
         self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma)
+
+        if len(primitives) > 0:
+            self.bot.register_primitives(primitives)
 
         for panic_func in panics:
             self.bot.panic(panic_func)
@@ -28,7 +32,7 @@ class NLECodeWrapper(gym.Wrapper):
         for strategy_func in strategies:
             self.bot.strategy(strategy_func)
 
-        self.action_space = gym.spaces.Discrete(len(self.bot.strategies))
+        self.action_space = gym.spaces.Discrete(len(self.bot.strategies) + len(primitives))
         self.observation_space = gym.spaces.Dict(
             {"env_steps": gym.spaces.Box(low=0, high=255, shape=(1,)), **self.env.observation_space}
         )
