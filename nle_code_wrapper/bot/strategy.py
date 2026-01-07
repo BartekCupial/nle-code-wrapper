@@ -6,7 +6,6 @@ from nle import nethack
 from nle_utils.glyph import G
 from scipy import ndimage
 
-from nle_code_wrapper.bot import Bot
 from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 from nle_code_wrapper.utils import utils
@@ -28,19 +27,25 @@ def strategy(func):
     def wrapper(bot: "Bot", *args, **kwargs):
         bot.strategy_steps += 1
 
-        if bot.strategy_steps >= bot.max_strategy_steps:
-            bot.truncated = True
-            raise BotFinished
-
         try:
             temp_movements = bot.movements
             # default movements
             levitating = True if bot.blstats.prop_mask & nethack.BL_MASK_LEV else False
             bot.movements = Movements(bot, levitating=levitating)
             ret = func(bot, *args, **kwargs)
-        except (BotPanic, BotFinished) as e:
+        except BotFinished as e:
             bot.movements = temp_movements
             raise e
+        except BotPanic as e:
+            bot.movements = temp_movements
+            if bot.strategy_steps >= bot.max_strategy_steps:
+                bot.truncated = True
+                raise BotFinished
+            raise e
+        
+        if bot.strategy_steps >= bot.max_strategy_steps:
+            bot.truncated = True
+            raise BotFinished
 
         return ret
 
