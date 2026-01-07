@@ -27,11 +27,12 @@ from nle_code_wrapper.bot.trap_tracker import TrapTracker
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.inspect import check_strategy_parameters
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
-
+from nle_code_wrapper.bot.strategy import strategy
 
 def make_primitive_strategy(action_int: int, name: str, doc: str) -> Callable:
     """Creates a strategy function that performs a single low-level NLE action."""
 
+    @strategy
     def primitive_func(bot: "Bot") -> bool:
         # Primitives are simple: just take the step
         # The Bot.step() method handles the state update (inventory, glyphs, etc.)
@@ -133,7 +134,7 @@ class Bot:
         new_extra_stats = {
             "env_steps": self.steps,
             "strategy_reward": self.reward,
-            "strategy_usefull": self.steps > 0,
+            "strategy_useful": self.steps > 0,
         }
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
@@ -220,6 +221,9 @@ class Bot:
             # self.current_args = None
             pass
 
+        if self.current_info == {}:
+            self.current_info = copy.deepcopy(self.last_info)
+
         # if we changed the dungeon_number we need to update the overview
         if (self.blstats.dungeon_number, self.blstats.depth) != (
             self.overview.get("dungeon_number", -1),
@@ -239,11 +243,10 @@ class Bot:
         new_extra_stats = {
             "env_steps": self.steps,
             "strategy_reward": self.reward,
-            "strategy_usefull": self.steps > 0,
+            "strategy_useful": self.steps > 0,
         }
 
-        if "end_status" not in self.current_info:
-            # this will happen when we exceed max_strategy_steps
+        if self.strategy_steps >= self.max_strategy_steps and self.current_info["end_status"] == NLE.StepStatus.RUNNING:
             self.current_info["end_status"] = NLE.StepStatus.ABORTED
 
         if self.terminated or self.truncated:
