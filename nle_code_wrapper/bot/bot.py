@@ -121,8 +121,8 @@ class Bot:
         self.last_prayer = None
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
-        self.last_obs = self.current_obs
-        self.last_info = self.current_info
+        self.last_obs = copy.deepcopy(self.current_obs)
+        self.last_info = copy.deepcopy(self.current_info)
 
         self.update()
         self.start_glyph = self.entity.glyph
@@ -189,7 +189,6 @@ class Bot:
         self.current_discount = 1.0
         self.terminated = False
         self.truncated = False
-        self.current_info = {}
 
         try:
             self.strategies[action](self)
@@ -220,9 +219,6 @@ class Bot:
             # self.current_strategy = None
             # self.current_args = None
             pass
-
-        if self.current_info == {}:
-            self.current_info = copy.deepcopy(self.last_info)
 
         # if we changed the dungeon_number we need to update the overview
         if (self.blstats.dungeon_number, self.blstats.depth) != (
