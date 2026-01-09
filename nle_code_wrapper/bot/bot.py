@@ -228,7 +228,7 @@ class Bot:
         if (self.blstats.dungeon_number, self.blstats.depth) != (
             self.overview.get("dungeon_number", -1),
             self.overview.get("depth", -1),
-        ):
+        ) and not self.terminated and not self.truncated:
             self.cache_overview()
 
         # update terrain features every 50 turns
@@ -236,7 +236,7 @@ class Bot:
             self.blstats.time
             - self.terrain_features[self.blstats.dungeon_number, self.blstats.level_number].get("time", 0)
             > 50
-        ):
+        ) and not self.terminated and not self.truncated:
             self.cache_terrain()
 
         extra_stats = self.current_info.get("episode_extra_stats", {})
