@@ -734,8 +734,8 @@ class Bot:
         shop_keepers = [entity.position for entity in self.entities if entity.name == "shopkeeper"]
 
         closest_shop_keeper = min(
-            [sk for sk in shop_keepers if self.pathfinder.reachable(self.entity.position, sk)],
-            key=lambda sk: distances.get(self.pathfinder.reachable(self.entity.position, sk), np.inf),
+            [sk for sk in shop_keepers],
+            key=lambda sk: distances.get(sk, np.inf),
             default=None,
         )
 
