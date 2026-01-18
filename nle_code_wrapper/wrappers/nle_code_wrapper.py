@@ -16,12 +16,13 @@ class NLECodeWrapper(gym.Wrapper):
         panics: List[Callable],
         max_strategy_steps: int = 1000,
         gamma: float = 0.99,
-        primitives: List[str] = []
+        primitives: List[str] = [],
+        no_strategy_progress_timeout: int = 150,
     ) -> None:
         super().__init__(env)
         if max_strategy_steps is None:
             max_strategy_steps = env.unwrapped._max_episode_steps
-        self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma)
+        self.bot = Bot(env, max_strategy_steps=max_strategy_steps, gamma=gamma, no_strategy_progress_timeout=no_strategy_progress_timeout)
 
         if len(primitives) > 0:
             self.bot.register_primitives(primitives)
