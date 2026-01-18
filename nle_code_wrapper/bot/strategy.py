@@ -38,14 +38,10 @@ def strategy(func):
             raise e
         except BotPanic as e:
             bot.movements = temp_movements
-            if bot.strategy_steps >= bot.max_strategy_steps:
-                bot.truncated = True
-                raise BotFinished
+            bot.check_abort()
             raise e
         
-        if bot.strategy_steps >= bot.max_strategy_steps:
-            bot.truncated = True
-            raise BotFinished
+        bot.check_abort()
 
         return ret
 

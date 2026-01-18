@@ -45,7 +45,7 @@ def make_primitive_strategy(action_int: int, name: str, doc: str) -> Callable:
 
 
 class Bot:
-    def __init__(self, env: gym.Env, max_strategy_steps: int = 1000, gamma: float = 0.99) -> None:
+    def __init__(self, env: gym.Env, max_strategy_steps: int = 1000, gamma: float = 0.99, no_strategy_progress_timeout: int = 150) -> None:
         """
         Gym environment or Namespace with the same attributes as the gym environment
         """
@@ -63,6 +63,7 @@ class Bot:
         self.strategies: dict[str, Callable] = {}
         self.panics: list[Callable] = []
         self.max_strategy_steps = max_strategy_steps
+        self.no_strategy_progress_timeout = no_strategy_progress_timeout
 
     def strategy(self, func: Callable) -> None:
         """
@@ -119,6 +120,8 @@ class Bot:
         self.terrain_features = defaultdict(dict)
         self.shops = defaultdict(list)
         self.last_prayer = None
+
+        self._no_progress_count = 0
 
         self.current_obs, self.current_info = self.env.reset(**kwargs)
         self.last_obs = copy.deepcopy(self.current_obs)
@@ -242,7 +245,7 @@ class Bot:
             "strategy_useful": self.steps > 0,
         }
 
-        if self.strategy_steps >= self.max_strategy_steps and self.current_info["end_status"] == NLE.StepStatus.RUNNING:
+        if self.truncated and self.current_info["end_status"] == NLE.StepStatus.RUNNING:
             self.current_info["end_status"] = NLE.StepStatus.ABORTED
 
         if self.terminated or self.truncated:
@@ -252,6 +255,16 @@ class Bot:
         self.current_info["episode_extra_stats"] = {**extra_stats, **new_extra_stats}
 
         return self.current_obs, self.reward, self.terminated, self.truncated, self.current_info
+
+    def check_abort(self) -> None:
+        if self.steps > 0:
+            self._no_progress_count = 0
+        else:
+            self._no_progress_count += 1
+
+        if self._no_progress_count >= self.no_strategy_progress_timeout or self.strategy_steps >= self.max_strategy_steps:
+            self.truncated = True
+            raise BotFinished
 
     def add_message(self, message: str) -> None:
         """
