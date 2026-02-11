@@ -144,7 +144,12 @@ class Bot:
         return self.current_obs, self.current_info
 
     def internal_step(self, action: int) -> None:
-        return self.env.step(self.env.actions.index(action))
+        obs, reward, self.terminated, self.truncated, info = self.env.step(self.env.actions.index(action))
+
+        if self.terminated or self.truncated:
+            raise BotFinished
+
+        return obs, reward, self.terminated, self.truncated, info
 
     def step(self, action: int) -> None:
         """
@@ -228,7 +233,10 @@ class Bot:
             self.overview.get("dungeon_number", -1),
             self.overview.get("depth", -1),
         ) and not self.terminated and not self.truncated:
-            self.cache_overview()
+            try:
+                self.cache_overview()
+            except BotFinished:
+                pass
 
         # update terrain features every 50 turns
         if (
@@ -236,7 +244,10 @@ class Bot:
             - self.terrain_features[self.blstats.dungeon_number, self.blstats.level_number].get("time", 0)
             > 50
         ) and not self.terminated and not self.truncated:
-            self.cache_terrain()
+            try:
+                self.cache_terrain()
+            except BotFinished:
+                pass
 
         extra_stats = self.current_info.get("episode_extra_stats", {})
         new_extra_stats = {
