@@ -26,6 +26,7 @@ def select_drop_category(bot: "Bot", what: str):
 
             return True
 
+    bot.step(A.Command.ESC)  # Close the menu if nothing to drop
     return False
 
 
