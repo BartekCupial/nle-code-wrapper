@@ -256,9 +256,10 @@ class ItemParser:
         name = self._make_singular(name)
         name = name.removeprefix("an ")
         name = name.removeprefix("a ")
-        if "egg" in name:
+        if " egg" in name:
             name = name.removesuffix(" egg")
-        parsed_item.update({"permonst": name_to_monsters[name], "name": "egg"})
+            parsed_item["permonst"] = name_to_monsters[name]
+        parsed_item["name"] = "egg"
 
     def _matches_any_suffix(self, name, suffixes):
         """Helper method to check if name starts/ends with any of the given suffixes"""
