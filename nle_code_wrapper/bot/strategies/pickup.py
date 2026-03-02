@@ -109,7 +109,10 @@ def look(bot: "Bot", item_category: ItemCategory) -> bool:
         # check if there is an item we would like to pick up
         if any([item.item_category == item_category for item in items]):
             bot.step(A.Command.PICKUP)
-            pickup_multipage(bot, item_category, bot.message)
+            # NetHack can auto-pick when only one floor item is actually pickuppable.
+            # In that case no selection interaction is opened, so skip menu parsing.
+            if bot.xwaitingforspace:
+                pickup_multipage(bot, item_category, bot.message)
             return True
 
     return False
