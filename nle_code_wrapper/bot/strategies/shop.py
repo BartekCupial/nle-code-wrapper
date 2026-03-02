@@ -62,7 +62,7 @@ def leave_shop(bot: "Bot") -> bool:
                 bot.wait()
 
             # goto the shopkeeper
-            # NOTE: if it's actually a monster that blocks the exit,
+            # NOTE: if it's actually a monster that blocks the exit instead of the shopkeeper,
             # then moving towards the shopkeeper is still a reasonable move,
             # as it gives the monster a chance to move out of the way.
             else:
