@@ -212,14 +212,23 @@ class ItemParser:
         name = name.removeprefix("a ")
         parsed_item.update({"permonst": name_to_monsters[name], "item_category": ItemCategory.CORPSE, "name": "corpse"})
 
-    def _handle_ooze(self, parsed_item):
-        """Handle ooze"""
+    def _handle_glob(self, parsed_item):
+        """Handle glob"""
         name = parsed_item["name"]
         name = self._make_singular(name)
-        parts = name.split("glob of ")
+        if "glob of " in name:
+            parts = name.split("glob of ")
+        elif "globs of " in name:
+            parts = name.split("globs of ")
+        else:
+            raise ValueError(f"Unexpected glob format: {name}")
         assert len(parts) == 2
-        name = "glob of " + parts[1]
-        parsed_item.update({"permonst": name_to_monsters[parts[1]], "item_category": ItemCategory.CORPSE, "name": name})
+        monster_name = parts[1]
+
+        normalized_name = "glob of " + monster_name
+        parsed_item.update(
+            {"permonst": name_to_monsters[monster_name], "item_category": ItemCategory.CORPSE, "name": normalized_name}
+        )
 
     def _handle_statue(self, parsed_item):
         """Handle statue items"""
@@ -270,7 +279,7 @@ class ItemParser:
 
         creature_item_handlers = {
             (" corpse", " corpses"): self._handle_corpse,
-            (" ooze",): self._handle_ooze,
+            ("glob of ", "globs of "): self._handle_glob,
             ("statue of ", "statues of "): self._handle_statue,
             ("figurine of ", "figurines of "): self._handle_figurine,
             ("tin of ", "tins of "): self._handle_tin,
