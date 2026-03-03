@@ -56,15 +56,15 @@ def leave_shop(bot: "Bot") -> bool:
 
             reach = bot.pathfinder.reachable(bot.entity.position, closest_shop_keeper)
 
-            # if (1) we can't reach the shopkeeper or (2) we are next to the shopkeeper:
-            # wait until shopkeeper/monster moves
-            if reach is None or distances[reach] == 0:
+            if reach is None:
+                bot.add_message("Couldn't leave the shop, something is blocking the exit.")
+                return False
+
+            # wait until shopkeeper moves
+            if distances[reach] == 0:
                 bot.wait()
 
             # goto the shopkeeper
-            # NOTE: if it's actually a monster that blocks the exit instead of the shopkeeper,
-            # then moving towards the shopkeeper is still a reasonable move,
-            # as it gives the monster a chance to move out of the way.
             else:
                 path = bot.pathfinder.get_path_to(reach)
                 bot.pathfinder.move(path[1])
@@ -73,7 +73,7 @@ def leave_shop(bot: "Bot") -> bool:
 
         if i > 50:
             bot.add_message("Couldn't leave the shop, something is blocking the exit.")
-            break
+            return False
 
     return True
 
