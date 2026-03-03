@@ -72,7 +72,7 @@ class ItemParser:
             r")*)"
             # Item details
             r"(?:\s+(?P<enchantment>[+-]\d+))?"  # Space before enchantment
-            r"\s+(?P<name>[a-zA-z0-9-!'# ]+)"  # Required space before name
+            r"\s+(?P<name>[a-zA-Z0-9-!'# ]+)"  # Required space before name
             # Optional information
             r"(?:\s+\((?P<uses>[0-9]+:[0-9]+|no charge)\))?"
             r"(?:\s+\((?P<info>[a-zA-Z0-9; ]+(?:,\s+(?:flickering|gleaming|glimmering))?[a-zA-Z0-9; ]*)\))?"
