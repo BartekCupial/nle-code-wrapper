@@ -562,7 +562,7 @@ class Bot:
 
         shop_name = None
         for shop_info in self.shops[self.blstats.dungeon_number, self.blstats.level_number]:
-            if room_mask[shop_info["position"]]:
+            if shop_info["position"] is not None and room_mask[shop_info["position"]]:
                 shop_name = shop_info["name"]
                 break
 
