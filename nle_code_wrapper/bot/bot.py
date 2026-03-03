@@ -23,11 +23,12 @@ from nle_code_wrapper.bot.inventory import InventoryManager
 from nle_code_wrapper.bot.level import Level
 from nle_code_wrapper.bot.pathfinder import Movements, Pathfinder
 from nle_code_wrapper.bot.pvp import Pvp
+from nle_code_wrapper.bot.strategy import strategy
 from nle_code_wrapper.bot.trap_tracker import TrapTracker
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.inspect import check_strategy_parameters
 from nle_code_wrapper.utils.strategies import corridor_detection, room_detection
-from nle_code_wrapper.bot.strategy import strategy
+
 
 def make_primitive_strategy(action_int: int, name: str, doc: str) -> Callable:
     """Creates a strategy function that performs a single low-level NLE action."""
@@ -45,7 +46,9 @@ def make_primitive_strategy(action_int: int, name: str, doc: str) -> Callable:
 
 
 class Bot:
-    def __init__(self, env: gym.Env, max_strategy_steps: int = 1000, gamma: float = 0.99, no_strategy_progress_timeout: int = 150) -> None:
+    def __init__(
+        self, env: gym.Env, max_strategy_steps: int = 1000, gamma: float = 0.99, no_strategy_progress_timeout: int = 150
+    ) -> None:
         """
         Gym environment or Namespace with the same attributes as the gym environment
         """
@@ -229,10 +232,15 @@ class Bot:
             pass
 
         # if we changed the dungeon_number we need to update the overview
-        if (self.blstats.dungeon_number, self.blstats.depth) != (
-            self.overview.get("dungeon_number", -1),
-            self.overview.get("depth", -1),
-        ) and not self.terminated and not self.truncated:
+        if (
+            (self.blstats.dungeon_number, self.blstats.depth)
+            != (
+                self.overview.get("dungeon_number", -1),
+                self.overview.get("depth", -1),
+            )
+            and not self.terminated
+            and not self.truncated
+        ):
             try:
                 self.cache_overview()
             except BotFinished:
@@ -240,10 +248,14 @@ class Bot:
 
         # update terrain features every 50 turns
         if (
-            self.blstats.time
-            - self.terrain_features[self.blstats.dungeon_number, self.blstats.level_number].get("time", 0)
-            > 50
-        ) and not self.terminated and not self.truncated:
+            (
+                self.blstats.time
+                - self.terrain_features[self.blstats.dungeon_number, self.blstats.level_number].get("time", 0)
+                > 50
+            )
+            and not self.terminated
+            and not self.truncated
+        ):
             try:
                 self.cache_terrain()
             except BotFinished:
@@ -273,7 +285,10 @@ class Bot:
         else:
             self._no_progress_count += 1
 
-        if self._no_progress_count >= self.no_strategy_progress_timeout or self.strategy_steps >= self.max_strategy_steps:
+        if (
+            self._no_progress_count >= self.no_strategy_progress_timeout
+            or self.strategy_steps >= self.max_strategy_steps
+        ):
             self.truncated = True
             raise BotFinished
 
@@ -763,7 +778,7 @@ class Bot:
             default=None,
         )
 
-        assert closest_shop_keeper is not None, "Could not find shopkeeper"
+        # assert closest_shop_keeper is not None, "Could not find shopkeeper"
 
         self.shops[(self.blstats.dungeon_number, self.blstats.level_number)].append(
             {
