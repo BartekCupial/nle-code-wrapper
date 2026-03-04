@@ -270,24 +270,26 @@ class ItemParser:
             parsed_item["permonst"] = name_to_monsters[name]
         parsed_item["name"] = "egg"
 
-    def _matches_any_suffix(self, name, suffixes):
-        """Helper method to check if name starts/ends with any of the given suffixes"""
+    def _matches_any_suffix(self, name, suffixes, match_mode="start_or_end"):
+        """Helper method to match item text with configurable strictness."""
+        if match_mode == "contains":
+            return any(suffix in name for suffix in suffixes)
         return any(name.endswith(suffix) for suffix in suffixes) or any(name.startswith(suffix) for suffix in suffixes)
 
     def _parse_creature_items(self, parsed_item):
         name = parsed_item["name"]
 
-        creature_item_handlers = {
-            (" corpse", " corpses"): self._handle_corpse,
-            ("glob of ", "globs of "): self._handle_glob,
-            ("statue of ", "statues of "): self._handle_statue,
-            ("figurine of ", "figurines of "): self._handle_figurine,
-            ("tin of ", "tins of "): self._handle_tin,
-            (" egg", " eggs"): self._handle_egg,
-        }
+        creature_item_handlers = [
+            ((" corpse", " corpses"), self._handle_corpse, "start_or_end"),
+            (("glob of ", "globs of "), self._handle_glob, "contains"),
+            (("statue of ", "statues of "), self._handle_statue, "contains"),
+            (("figurine of ", "figurines of "), self._handle_figurine, "contains"),
+            (("tin of ", "tins of "), self._handle_tin, "contains"),
+            ((" egg", " eggs"), self._handle_egg, "start_or_end"),
+        ]
 
-        for suffixes, handler in creature_item_handlers.items():
-            if self._matches_any_suffix(name, suffixes):
+        for suffixes, handler, match_mode in creature_item_handlers:
+            if self._matches_any_suffix(name, suffixes, match_mode):
                 handler(parsed_item)
                 break
 
