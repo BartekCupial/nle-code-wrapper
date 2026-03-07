@@ -218,4 +218,6 @@ def repeat_until_discovery(func):
 
             seen = bot.current_level.seen.copy()
 
+        return False
+
     return wrapper

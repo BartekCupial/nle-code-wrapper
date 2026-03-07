@@ -68,6 +68,9 @@ def explore_once(
         - Finds positions to explore
         - Directs the bot to the closest unexplored position using pathfinding
     """
+    if bot.engulfed:
+        return False
+
     feature_labels, num_labels = feature_detection(bot)
     labeled_rooms, num_rooms = room_detection(bot)
 
