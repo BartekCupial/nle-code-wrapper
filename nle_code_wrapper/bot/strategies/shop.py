@@ -27,9 +27,12 @@ def leave_shop(bot: "Bot") -> bool:
     if "Unpaid items" in bot.message:
         bot.type_text("u")
 
+    # Advance from type selection to item selection menu, then select all items
+    # across all pages (NetHack shows multi-page drop menus for large inventories)
     bot.step(A.MiscAction.MORE)
-    bot.step(A.Command.PICKUP)
-    bot.step(A.TextCharacters.SPACE)
+    while bot.xwaitingforspace:
+        bot.step(A.Command.PICKUP)  # select all items on current page (- -> +)
+        bot.step(A.TextCharacters.SPACE)  # advance page, or confirm on last page
 
     # Features and shop id outside while so we keep them consistent
     labeled_features, num_rooms, num_corridors = label_dungeon_features(bot)
