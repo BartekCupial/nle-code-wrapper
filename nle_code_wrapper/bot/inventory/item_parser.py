@@ -78,7 +78,7 @@ class ItemParser:
             r"(?:\s+\((?P<info>[a-zA-Z0-9; ]+(?:,\s+(?:flickering|gleaming|glimmering))?[a-zA-Z0-9; ]*)\))?"
             # Shop information
             r"(?:\s+\((?P<shop_status>for sale|unpaid),\s+"  # Matches shop status
-            r"(?:\d+\s+aum,\s+)?(?P<shop_price>\d+)\s+zorkmids?\))?"  # Matches shop price and currency
+            r"(?:\d+\s+aum,\s+)?(?P<shop_price>\d+)\s+[^)]*\)?)?"  # Matches shop price; [^)]*\)? handles truncated inv strings (NLE caps inv_strs at 80 chars)
             r"$"
         )
 
