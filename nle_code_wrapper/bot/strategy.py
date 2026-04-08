@@ -1,5 +1,6 @@
 import itertools
 from functools import wraps
+from typing import TYPE_CHECKING
 
 import numpy as np
 from nle import nethack
@@ -10,6 +11,9 @@ from nle_code_wrapper.bot.exceptions import BotFinished, BotPanic
 from nle_code_wrapper.bot.pathfinder.movements import Movements
 from nle_code_wrapper.utils import utils
 from nle_code_wrapper.utils.strategies import label_dungeon_features, save_boolean_array_pillow
+
+if TYPE_CHECKING:
+    from nle_code_wrapper.bot import Bot
 
 
 def strategy(func):
@@ -27,6 +31,13 @@ def strategy(func):
     def wrapper(bot: "Bot", *args, **kwargs):
         bot.strategy_steps += 1
 
+        if (
+            func.__module__.startswith("nle_code_wrapper.bot.strategies")
+            and func.__name__ not in {"cancel", "more", "yes", "no"}
+            and (bot.in_yn_function or bot.in_getlin or bot.xwaitingforspace)
+        ):
+            return False
+
         try:
             temp_movements = bot.movements
             # default movements
@@ -40,7 +51,7 @@ def strategy(func):
             bot.movements = temp_movements
             bot.check_abort()
             raise e
-        
+
         bot.check_abort()
 
         return ret
