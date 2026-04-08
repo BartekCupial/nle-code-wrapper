@@ -92,12 +92,18 @@ class Inventory:
 
     @property
     def main_hand(self):
-        wielded_weapon = [weapon for weapon in self["weapons"] if weapon.equipped]
+        weapons = self["weapons"]
+        primary_weapon = [weapon for weapon in weapons if weapon.equipped and not weapon.at_ready]
+        if primary_weapon:
+            return primary_weapon[0]
+
+        # Fallback for edge cases where only generic equipped status is available.
+        wielded_weapon = [weapon for weapon in weapons if weapon.equipped]
         return wielded_weapon[0] if wielded_weapon else None
 
     @property
     def off_hand(self):
-        wielded_weapon = [weapon for weapon in self["weapons"] if weapon.at_ready]
+        wielded_weapon = [weapon for weapon in self["weapons"] if weapon.equipped and weapon.at_ready]
         return wielded_weapon[0] if wielded_weapon else None
 
     @property

@@ -31,6 +31,7 @@ class ItemParser:
         "being worn": (True, False),
         "being worn; slippery": (True, False),
         "wielded": (True, False),
+        "wielded in other hand": (True, True),
         "chained to you": (True, False),
         "on right hand": (True, False),
         "on left hand": (True, False),
